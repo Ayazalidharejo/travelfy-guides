@@ -1,0 +1,186 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User, Settings, LogOut, MapPin, Menu, X } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useState } from 'react';
+
+const Header = () => {
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const NavLinks = () => (
+    <>
+      <Link 
+        to="/tours" 
+        className="text-foreground hover:text-primary transition-smooth font-medium"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Tours
+      </Link>
+      <Link 
+        to="/about" 
+        className="text-foreground hover:text-primary transition-smooth font-medium"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        About
+      </Link>
+      <Link 
+        to="/contact" 
+        className="text-foreground hover:text-primary transition-smooth font-medium"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Contact
+      </Link>
+      {isAdmin && (
+        <Link 
+          to="/admin" 
+          className="text-foreground hover:text-primary transition-smooth font-medium"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Admin
+        </Link>
+      )}
+    </>
+  );
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between px-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <MapPin className="h-8 w-8 text-primary" />
+          <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+            Travel Tours
+          </span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-8">
+          <NavLinks />
+        </nav>
+
+        {/* Auth Section */}
+        <div className="flex items-center space-x-4">
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback className="bg-gradient-primary text-white">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback className="bg-gradient-primary text-white">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user?.name}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/bookings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  My Bookings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden md:flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/login')}
+                className="font-medium"
+              >
+                Login
+              </Button>
+              <Button 
+                variant="hero" 
+                onClick={() => navigate('/register')}
+                className="font-medium"
+              >
+                Get Started
+              </Button>
+            </div>
+          )}
+
+          {/* Mobile Menu */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <div className="flex flex-col space-y-4 mt-6">
+                <NavLinks />
+                
+                {!isAuthenticated && (
+                  <div className="pt-4 border-t space-y-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        navigate('/login');
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      variant="hero" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        navigate('/register');
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      Get Started
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
