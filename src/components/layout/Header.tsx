@@ -56,6 +56,15 @@ const Header = () => {
           Admin
         </Link>
       )}
+      {!user && (
+        <Link 
+          to="/admin-login" 
+          className="text-muted-foreground hover:text-primary transition-smooth font-medium text-sm"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Admin Access
+        </Link>
+      )}
     </>
   );
 

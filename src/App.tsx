@@ -8,6 +8,12 @@ import Layout from "@/components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import ToursPage from "./pages/ToursPage";
 import TourDetailPage from "./pages/TourDetailPage";
 import BookingPage from "./pages/BookingPage";
@@ -29,14 +35,19 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Public routes without layout */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
             
             {/* Public routes with layout */}
             <Route path="/" element={<Layout><HomePage /></Layout>} />
             <Route path="/tours" element={<Layout><ToursPage /></Layout>} />
             <Route path="/tours/:id" element={<Layout><TourDetailPage /></Layout>} />
+            <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+            <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
+            <Route path="/privacy" element={<Layout><PrivacyPage /></Layout>} />
+            <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
             
             {/* Protected routes with layout */}
             <Route path="/booking/:tourId" element={<Layout><BookingPage /></Layout>} />
