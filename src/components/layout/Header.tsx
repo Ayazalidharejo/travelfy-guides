@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import logo from "@/../public/images/unnamed1-removebg-preview.png"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,10 +74,11 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
-          <MapPin className="h-8 w-8 text-primary" />
+          {/* <MapPin className="h-8 w-8 text-primary" />
           <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
             Travel Tours
-          </span>
+          </span> */}
+          <img style={{width:"130px",height:"75px"}} src={logo} alt="" />
         </Link>
 
         {/* Desktop Navigation */}
