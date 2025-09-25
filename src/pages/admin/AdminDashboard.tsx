@@ -18,6 +18,7 @@ import {
   BarChart3,
   Activity
 } from 'lucide-react';
+import AdminPostDashboard from './AdminPostDashboard';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState<any>(null);
@@ -292,6 +293,7 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
+        <AdminPostDashboard/>
       </div>
     </div>
   );
