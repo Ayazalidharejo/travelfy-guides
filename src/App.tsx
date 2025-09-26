@@ -24,6 +24,7 @@ import AdminTours from "./pages/admin/AdminTours";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/admin-login" element={<AdminLoginPage />} />
             
             {/* Public routes with layout */}
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/" element={<Layout><HomePage /></Layout>} />
             <Route path="/tours" element={<Layout><ToursPage /></Layout>} />
             <Route path="/tours/:id" element={<Layout><TourDetailPage /></Layout>} />

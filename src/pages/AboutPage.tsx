@@ -12,6 +12,11 @@ import {
   Compass,
   Star
 } from 'lucide-react';
+import AboutHero from '@/components/About/AboutHero';
+import MissionVision from '@/components/About/MissionVision';
+import CoreValues from '@/components/About/CoreValues';
+import Achievements from '@/components/About/Achievements';
+import AboutCTA from '@/components/About/AboutCTA';
 
 const AboutPage = () => {
   const stats = [
@@ -47,6 +52,9 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-gradient-card">
       {/* Hero Section */}
+      <AboutHero/>
+      <MissionVision/>
+
       <section className="bg-gradient-hero py-20">
         <div className="container px-4">
           <div className="text-center max-w-4xl mx-auto">
@@ -63,7 +71,9 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
-
+<CoreValues/>
+<Achievements/>
+<AboutCTA/>
       {/* Stats Section */}
       <section className="py-16 bg-white">
         <div className="container px-4">

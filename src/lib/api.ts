@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api';
+// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api';
 
 // Create axios instance
 const api = axios.create({
@@ -33,9 +34,15 @@ api.interceptors.response.use(
 );
 
 // Auth API calls
+
 export const authAPI = {
   login: async (credentials: { email: string; password: string }) => {
     const response = await api.post('/auth/login', credentials);
+    return response.data;
+  },
+
+   forgotPassword: async (email: string) => {
+    const response = await api.post('/forgot-password', { email });
     return response.data;
   },
   
@@ -58,6 +65,18 @@ export const authAPI = {
     const response = await api.put('/auth/updatepassword', passwords);
     return response.data;
   },
+  // Existing authAPI object me ye add karein
+uploadAvatar: async (formData: FormData) => {
+  const response = await api.post('/avatar/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+},
+
+deleteAvatar: async () => {
+  const response = await api.delete('/avatar/delete');
+  return response.data;
+},
 };
 
 // Posts API calls
@@ -147,6 +166,7 @@ export const adminAPI = {
     const response = await api.post('/admin/login', { adminKey });
     return response.data;
   },
+  
 };
 
 // Upload API calls

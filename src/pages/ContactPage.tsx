@@ -16,6 +16,8 @@ import {
   HeadphonesIcon,
   Globe
 } from 'lucide-react';
+import ContactHero from '@/components/Contact/ContactHero';
+import Testimonials from '@/components/Contact/Testimonials';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -107,6 +109,8 @@ const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gradient-card">
       {/* Hero Section */}
+      <ContactHero/>
+      <Testimonials/>
       <section className="bg-gradient-hero py-20">
         <div className="container px-4">
           <div className="text-center max-w-3xl mx-auto">
