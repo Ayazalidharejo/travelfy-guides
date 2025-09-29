@@ -13,6 +13,8 @@ import TourHero from '@/components/Tourpage.tsx/TourHero';
 
 const ToursPage = () => {
   const [tours, setTours] = useState([]);
+  
+  
   const [filteredTours, setFilteredTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,7 +113,7 @@ const ToursPage = () => {
   const Filters = () => (
     <div className="space-y-4">
       {/* Search */}
-      <div>
+      {/* <div>
         <label className="text-sm font-medium mb-2 block">Search Tours</label>
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
@@ -124,7 +126,7 @@ const ToursPage = () => {
             <Search className="h-4 w-4" />
           </Button>
         </form>
-      </div>
+      </div> */}
 
       {/* Category Filter */}
       <div>
