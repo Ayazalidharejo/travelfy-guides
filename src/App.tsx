@@ -25,6 +25,7 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import FeaturedTours from "./components/FeaturedTours";
 
 const queryClient = new QueryClient();
 
@@ -37,9 +38,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="//test" element={<FeaturedTours />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/admin-login" element={<AdminLoginPage />} />
+            
             
             {/* Public routes with layout */}
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />

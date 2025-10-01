@@ -1,6 +1,8 @@
 "use client"
 import React from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Hero: React.FC = () => {
   const { scrollY } = useScroll();
@@ -61,12 +63,16 @@ const Hero: React.FC = () => {
           journey starts here.
         </p>
         <div className="mt-6 flex gap-4">
-          <button className="bg-red-600 hover:bg-red-700 hover:scale-105 transition transform text-white px-6 py-3 rounded-lg shadow-lg font-medium">
-            Explore Tours
-          </button>
-          <button className="bg-white/80 hover:bg-white hover:scale-105 transition transform text-black px-6 py-3 rounded-lg shadow-lg font-medium">
-            Contact Us
-          </button>
+        <Link to="/tours">
+  <Button className="bg-red-600 hover:bg-red-700 hover:scale-105 transition transform text-white px-6 py-3 rounded-lg shadow-lg font-medium">
+    Explore Tours
+  </Button>
+</Link>
+<Link to="/contact">
+    <Button variant="outline" className="bg-white/80 hover:bg-white hover:scale-105 transition transform text-black px-6 py-3 rounded-lg shadow-lg font-medium">
+      Contact Us
+    </Button>
+  </Link>
         </div>
       </div>
     </section>

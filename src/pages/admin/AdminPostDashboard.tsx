@@ -1644,6 +1644,7 @@ const BlogManagement = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
+        
         <h1 className="text-3xl font-bold">Blog Management</h1>
         <button onClick={() => { setEditingPost(null); resetForm(); setShowModal(true); }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
@@ -1913,7 +1914,7 @@ const BlogManagement = () => {
                       </div>
                     </div> */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* <label className="flex items-center">
+                      <label className="flex items-center">
                         <input
                           type="checkbox"
                           checked={formData.depositRequired}
@@ -1921,7 +1922,7 @@ const BlogManagement = () => {
                           className="h-4 w-4 text-blue-600 rounded"
                         />
                         <span className="ml-2 text-sm">Deposit Required</span>
-                      </label> */}
+                      </label>
                       {formData.depositRequired && (
                         <div>
                           <label className="block text-sm font-medium mb-1">Deposit Amount</label>

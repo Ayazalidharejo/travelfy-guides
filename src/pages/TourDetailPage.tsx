@@ -34,8 +34,6 @@
 //   const { isAuthenticated } = useAuth();
 //   const { toast } = useToast();
 //   const [tour, setTour] = useState<any>(null);
-//   console.log(tour);
-  
 //   const [loading, setLoading] = useState(true);
 //   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -447,6 +445,8 @@
 
 
 
+
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -479,7 +479,17 @@ import {
   ArrowLeft,
   Send,
   Edit,
-  Trash2
+  Trash2,
+  Utensils,
+  Home,
+  Activity,
+  ShoppingBag,
+  Leaf,
+  Car,
+  Phone,
+  Mail,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const TourDetailPage = () => {
@@ -490,6 +500,7 @@ const TourDetailPage = () => {
   const [tour, setTour] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showAllImages, setShowAllImages] = useState(false);
   
   // Review form states
   const [reviewRating, setReviewRating] = useState(0);
@@ -588,12 +599,9 @@ const TourDetailPage = () => {
           description: editingReview ? "Review updated successfully!" : "Review submitted successfully!",
         });
         
-        // Reset form
         setReviewRating(0);
         setReviewComment('');
         setEditingReview(null);
-        
-        // Refresh tour data
         fetchTour();
       } else {
         toast({
@@ -618,10 +626,7 @@ const TourDetailPage = () => {
     setEditingReview(review);
     setReviewRating(review.rating);
     setReviewComment(review.comment);
-    
-    // Scroll to review form
-    const reviewSection = document.getElementById('review-form');
-    reviewSection?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleDeleteReview = async (reviewId: string) => {
@@ -637,8 +642,6 @@ const TourDetailPage = () => {
           title: "Success",
           description: "Review deleted successfully!",
         });
-        
-        // Refresh tour data
         fetchTour();
       } else {
         toast({
@@ -685,8 +688,19 @@ const TourDetailPage = () => {
 
   if (!tour) return null;
 
-  const images = tour.images?.length > 0 ? tour.images : [tour.imageUrl || '/placeholder.svg'];
-  const price = tour.priceNumber ? `$${tour.priceNumber}` : tour.price;
+  // Image handling
+  const allImages = [
+    ...(tour.images || []),
+    ...(tour.gallery?.map((item: any) => item.url) || []),
+    tour.coverImage,
+    tour.imageUrl
+  ].filter(Boolean);
+  
+  const images = allImages.length > 0 ? allImages : ['/placeholder.svg'];
+  const mainImages = images.slice(0, 4);
+  const remainingImages = images.slice(4);
+  const price = tour.priceNumber ? `$${tour.priceNumber}` : tour.price || 'Price not available';
+
   const userReview = tour.reviews?.find((r: any) => r.userId === user?._id);
 
   return (
@@ -699,47 +713,137 @@ const TourDetailPage = () => {
         </Button>
       </div>
 
-      {/* Image Gallery */}
+    
       <div className="container px-4 mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-          <div className="lg:col-span-3">
-            <div className="relative aspect-video rounded-lg overflow-hidden">
-              <img
-                src={images[activeImageIndex]}
-                alt={tour.title}
-                className="w-full h-full object-cover"
-              />
-              {tour.featured && (
-                <Badge className="absolute top-4 left-4 bg-gradient-sunset text-white">
-                  Featured
-                </Badge>
-              )}
-              <Badge className="absolute top-4 right-4 bg-gradient-primary text-white">
-                {tour.category}
-              </Badge>
-            </div>
+      <div className="max-w-6xl mx-auto">
+  {/* First Row - 3 Images in 3 Columns */}
+  <div className="grid grid-cols-3 gap-4 mb-4">
+    {mainImages.slice(0, 3).map((image: string, index: number) => (
+      <div
+        key={index}
+        className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group"
+        onClick={() => setActiveImageIndex(index)}
+      >
+        <img
+          src={image}
+          alt={`${tour.title} ${index + 1}`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
+        />
+        {index === 0 && tour.featured && (
+          <Badge className="absolute top-4 left-4 bg-gradient-sunset text-white">
+            Featured
+          </Badge>
+        )}
+        {index === 0 && (
+          <Badge className="absolute top-4 right-4 bg-gradient-primary text-white">
+            {tour.category}
+          </Badge>
+        )}
+      </div>
+    ))}
+  </div>
+
+  {/* Second Row - 1 Image (Full Width) */}
+  {mainImages[3] && (
+    <div className="grid grid-cols-1 gap-4 mb-8">
+      <div
+        className="relative aspect-video rounded-lg overflow-hidden cursor-pointer group"
+        onClick={() => setActiveImageIndex(3)}
+      >
+        <img
+          src={mainImages[3]}
+          alt={`${tour.title} 4`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
+        />
+      </div>
+    </div>
+  )}
+
+  {/* Gallery Section for Remaining Images */}
+  {remainingImages.length > 0 && (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold">Gallery ({images.length} photos)</h3>
+        {!showAllImages && remainingImages.length > 0 && (
+          <Button
+            variant="outline"
+            onClick={() => setShowAllImages(true)}
+            className="gap-2"
+          >
+            <Camera className="h-4 w-4" />
+            View All Photos
+          </Button>
+        )}
+      </div>
+
+      {/* Thumbnail Grid */}
+      <div className={`grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 ${showAllImages ? '' : 'max-h-32 overflow-hidden'}`}>
+        {images.map((image: string, index: number) => (
+          <div
+            key={index}
+            className={`aspect-square rounded-lg overflow-hidden cursor-pointer border-2 ${
+              activeImageIndex === index ? 'border-primary' : 'border-transparent'
+            } group`}
+            onClick={() => setActiveImageIndex(index)}
+          >
+            <img
+              src={image}
+              alt={`${tour.title} ${index + 1}`}
+              className="w-full h-full object-cover group-hover:scale-110 transition-smooth"
+            />
           </div>
-          
-          {images.length > 1 && (
-            <div className="space-y-2">
-              {images.slice(0, 4).map((image: string, index: number) => (
-                <div
-                  key={index}
-                  className={`aspect-square rounded-lg overflow-hidden cursor-pointer border-2 ${
-                    activeImageIndex === index ? 'border-primary' : 'border-transparent'
-                  }`}
-                  onClick={() => setActiveImageIndex(index)}
-                >
-                  <img
-                    src={image}
-                    alt={`${tour.title} ${index + 1}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-smooth"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+        ))}
+      </div>
+
+      {showAllImages && (
+        <div className="mt-4 text-center">
+          <Button
+            variant="outline"
+            onClick={() => setShowAllImages(false)}
+          >
+            Show Less
+          </Button>
         </div>
+      )}
+    </div>
+  )}
+
+  {/* Main Featured Image Display */}
+  <div className="relative aspect-video rounded-lg overflow-hidden mb-8">
+    <img
+      src={images[activeImageIndex]}
+      alt={tour.title}
+      className="w-full h-full object-cover"
+    />
+    
+    {/* Image Navigation */}
+    {images.length > 1 && (
+      <>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white hover:bg-black/70"
+          onClick={() => setActiveImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white hover:bg-black/70"
+          onClick={() => setActiveImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        
+        {/* Image Counter */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+          {activeImageIndex + 1} / {images.length}
+        </div>
+      </>
+    )}
+  </div>
+</div>
       </div>
 
       <div className="container px-4 pb-8">
@@ -751,8 +855,8 @@ const TourDetailPage = () => {
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">{tour.rating?.average?.toFixed(1) || '0.0'}</span>
-                  <span className="text-muted-foreground">({tour.rating?.count || 0} reviews)</span>
+                  <span className="font-semibold">{tour.rating?.average?.toFixed(1) || tour.averageRating?.toFixed(1) || '0.0'}</span>
+                  <span className="text-muted-foreground">({tour.rating?.count || tour.reviewCount || tour.totalReviews || 0} reviews)</span>
                 </div>
                 {tour.prefecture && (
                   <div className="flex items-center gap-1">
@@ -760,42 +864,43 @@ const TourDetailPage = () => {
                     <span className="text-muted-foreground">{tour.prefecture}</span>
                   </div>
                 )}
-                {tour.location && typeof tour.location === 'string' && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">{tour.location}</span>
-                  </div>
-                )}
                 {tour.location && typeof tour.location === 'object' && (
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">
-                      {[tour.location.city, tour.location.country].filter(Boolean).join(', ')}
+                      {[tour.location.city, tour.location.country, tour.location.area].filter(Boolean).join(', ')}
                     </span>
                   </div>
                 )}
               </div>
               
               <h1 className="text-3xl md:text-4xl font-bold">{tour.title}</h1>
+              <h2 className="text-xl text-muted-foreground">{tour.nameJp}</h2>
               
               <div className="flex items-center gap-6 text-sm text-muted-foreground flex-wrap">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{tour.duration}</span>
                 </div>
+                {tour.durationHours && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{tour.durationHours} hours</span>
+                  </div>
+                )}
                 {tour.groupSize && (
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
                     <span>{tour.groupSize.min}-{tour.groupSize.max} people</span>
                   </div>
                 )}
-                {tour.maxGroupSize && (
+                {tour.capacity && (
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    <span>Max {tour.maxGroupSize} people</span>
+                    <span>Capacity: {tour.capacity}</span>
                   </div>
                 )}
-                {tour.freeCancellation !== false && (
+                {tour.freeCancellation && tour.freeCancellation.available && (
                   <div className="flex items-center gap-1">
                     <Shield className="h-4 w-4 text-success" />
                     <span>Free cancellation</span>
@@ -820,13 +925,35 @@ const TourDetailPage = () => {
               )}
             </div>
 
+            {/* Discount Banner */}
+            {tour.discount && tour.discount.percentage > 0 && (
+              <Card className="bg-gradient-sunset text-white">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg">Special Discount!</h3>
+                      <p>{tour.discount.percentage}% OFF - {tour.discount.description}</p>
+                      {tour.discount.validUntil && (
+                        <p className="text-sm opacity-90">
+                          Valid until: {new Date(tour.discount.validUntil).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant="secondary" className="text-lg px-3 py-1">
+                      Save {tour.discount.percentage}%
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Tabs */}
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
                 <TabsTrigger value="includes">What's Included</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews ({tour.rating?.count || 0})</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews ({tour.rating?.count || tour.reviewCount || 0})</TabsTrigger>
               </TabsList>
               
               <TabsContent value="overview" className="space-y-6">
@@ -843,12 +970,12 @@ const TourDetailPage = () => {
                 <div>
                   <h3 className="text-xl font-semibold mb-3">About This Tour</h3>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {tour.fullDescription || tour.description || tour.content || tour.about}
+                    {tour.about || tour.fullDescription || tour.description || tour.content}
                   </p>
                 </div>
 
                 {/* Details */}
-                {tour.details && tour.details !== tour.description && (
+                {tour.details && (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Details</h3>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -901,7 +1028,7 @@ const TourDetailPage = () => {
                     </ul>
                   </div>
                 )}
-                
+
                 {/* Important Information */}
                 {tour.importantInformation && tour.importantInformation.length > 0 && (
                   <div>
@@ -945,7 +1072,7 @@ const TourDetailPage = () => {
                 )}
 
                 {/* Meeting Point */}
-                {tour.meetingPoint && typeof tour.meetingPoint === 'string' && (
+                {tour.meetingPoint && (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Meeting Point</h3>
                     <div className="flex items-start gap-2">
@@ -955,19 +1082,16 @@ const TourDetailPage = () => {
                   </div>
                 )}
 
-                {tour.location && typeof tour.location === 'object' && tour.location.meetingPoint && (
+                {tour.location && typeof tour.location === 'object' && (
                   <div>
-                    <h3 className="text-xl font-semibold mb-3">Meeting Point</h3>
+                    <h3 className="text-xl font-semibold mb-3">Location Details</h3>
                     <div className="flex items-start gap-2">
                       <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                       <div>
-                        <p>{tour.location.meetingPoint}</p>
-                        {tour.location.address && (
-                          <p className="text-sm text-muted-foreground mt-1">{tour.location.address}</p>
-                        )}
-                        {tour.location.area && (
-                          <p className="text-sm text-muted-foreground">{tour.location.area}</p>
-                        )}
+                        {tour.location.address && <p>{tour.location.address}</p>}
+                        {tour.location.area && <p className="text-sm text-muted-foreground">{tour.location.area}</p>}
+                        {tour.location.city && <p className="text-sm text-muted-foreground">{tour.location.city}</p>}
+                        {tour.location.country && <p className="text-sm text-muted-foreground">{tour.location.country}</p>}
                       </div>
                     </div>
                   </div>
@@ -1014,10 +1138,10 @@ const TourDetailPage = () => {
                           <span>Wheelchair accessible</span>
                         </div>
                       )}
-                      {tour.accessibility.visuallyImpaired && (
+                      {tour.accessibility.visuallyImpaired !== undefined && (
                         <div className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="h-4 w-4 text-success" />
-                          <span>Accessible for visually impaired</span>
+                          <CheckCircle className={`h-4 w-4 ${tour.accessibility.visuallyImpaired ? 'text-success' : 'text-muted-foreground'}`} />
+                          <span>Accessible for visually impaired: {tour.accessibility.visuallyImpaired ? 'Yes' : 'No'}</span>
                         </div>
                       )}
                       {tour.accessibility.hearingImpaired && (
@@ -1048,6 +1172,68 @@ const TourDetailPage = () => {
                     <p className="text-muted-foreground">{tour.weatherConsiderations}</p>
                   </div>
                 )}
+
+                {/* Sustainability */}
+                {tour.sustainability && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Sustainability</h3>
+                    <div className="space-y-2">
+                      {tour.sustainability.carbonNeutral && (
+                        <div className="flex items-center gap-2">
+                          <Leaf className="h-5 w-5 text-green-500" />
+                          <span>Carbon Neutral</span>
+                        </div>
+                      )}
+                      {tour.sustainability.ecoFriendly && (
+                        <div className="flex items-center gap-2">
+                          <Leaf className="h-5 w-5 text-green-500" />
+                          <span>Eco Friendly</span>
+                        </div>
+                      )}
+                      {tour.sustainability.localCommunitySupport !== undefined && (
+                        <div className="flex items-center gap-2">
+                          <Users className="h-5 w-5 text-blue-500" />
+                          <span>Local Community Support: {tour.sustainability.localCommunitySupport ? 'Yes' : 'No'}</span>
+                        </div>
+                      )}
+                      {tour.sustainability.practices && tour.sustainability.practices.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mt-3 mb-2">Sustainable Practices</h4>
+                          <ul className="space-y-1">
+                            {tour.sustainability.practices.map((practice: string, index: number) => (
+                              <li key={index} className="flex items-center gap-2 text-sm">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                <span>{practice}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Emergency Contact */}
+                {tour.emergencyContact && (tour.emergencyContact.phone || tour.emergencyContact.email) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Emergency Contact</h3>
+                    <div className="space-y-2">
+                      {tour.emergencyContact.name && <p><strong>Name:</strong> {tour.emergencyContact.name}</p>}
+                      {tour.emergencyContact.phone && (
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4" />
+                          <span>{tour.emergencyContact.phone}</span>
+                        </div>
+                      )}
+                      {tour.emergencyContact.email && (
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4" />
+                          <span>{tour.emergencyContact.email}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="itinerary" className="space-y-4">
@@ -1064,6 +1250,7 @@ const TourDetailPage = () => {
                               <div className="flex items-center gap-2 mb-2">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                                 <span className="font-semibold">{item.time}</span>
+                                {item.duration && <span className="text-sm text-muted-foreground">({item.duration})</span>}
                               </div>
                               <h4 className="font-semibold mb-1">{item.activity}</h4>
                               <p className="text-muted-foreground text-sm">{item.description}</p>
@@ -1086,6 +1273,72 @@ const TourDetailPage = () => {
                       <p className="text-muted-foreground">Detailed itinerary coming soon...</p>
                     </CardContent>
                   </Card>
+                )}
+
+                {/* Activities */}
+                {tour.activities && tour.activities.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Activities</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {tour.activities.map((activity: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <h4 className="font-semibold mb-2">{activity.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">{activity.description}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              {activity.duration && (
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{activity.duration}</span>
+                                </div>
+                              )}
+                              {activity.category && (
+                                <Badge variant="outline">{activity.category}</Badge>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Events */}
+                {tour.events && tour.events.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Special Events</h3>
+                    <div className="space-y-4">
+                      {tour.events.map((event: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-semibold">{event.title}</h4>
+                              {event.date && (
+                                <Badge variant="secondary">
+                                  {new Date(event.date).toLocaleDateString()}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{event.description}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              {event.location && (
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{event.location}</span>
+                                </div>
+                              )}
+                              {event.duration && (
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{event.duration}</span>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </TabsContent>
               
@@ -1288,6 +1541,155 @@ const TourDetailPage = () => {
                     </p>
                   </div>
                 )}
+
+                {/* Accommodation */}
+                {tour.accommodation && tour.accommodation.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Accommodation</h3>
+                    <ul className="space-y-2">
+                      {tour.accommodation.map((item: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Home className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Dining */}
+                {tour.dining && tour.dining.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Dining Options</h3>
+                    <ul className="space-y-2">
+                      {tour.dining.map((item: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Utensils className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Foods */}
+                {tour.foods && tour.foods.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Food Experiences</h3>
+                    <div className="space-y-4">
+                      {tour.foods.map((food: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-semibold">{food.name}</h4>
+                              <div className="flex gap-2">
+                                {food.isVeg && <Badge variant="outline" className="bg-green-50">Vegetarian</Badge>}
+                                {food.recommended && <Badge variant="outline" className="bg-yellow-50">Recommended</Badge>}
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{food.description}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Emergency Services */}
+                {tour.emergencyServices && tour.emergencyServices.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Emergency Services</h3>
+                    <ul className="space-y-2">
+                      {tour.emergencyServices.map((service: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+                          <span>{service}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Shopping Areas */}
+                {tour.shoppingAreas && tour.shoppingAreas.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Shopping Areas</h3>
+                    <ul className="space-y-2">
+                      {tour.shoppingAreas.map((area: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <ShoppingBag className="h-5 w-5 text-purple-500 mt-0.5 shrink-0" />
+                          <span>{area}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Nearby Attractions */}
+                {tour.nearbyAttractions && tour.nearbyAttractions.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Nearby Attractions</h3>
+                    <ul className="space-y-2">
+                      {tour.nearbyAttractions.map((attraction: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                          <span>{attraction}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Exploration Ways */}
+                {tour.explorationWays && tour.explorationWays.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Ways to Explore</h3>
+                    <ul className="space-y-2">
+                      {tour.explorationWays.map((way: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Activity className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
+                          <span>{way}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Guides */}
+                {tour.guides && tour.guides.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Guides</h3>
+                    <ul className="space-y-2">
+                      {tour.guides.map((guide: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Users className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" />
+                          <span>{guide}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Languages Detailed */}
+                {tour.languagesDetailed && tour.languagesDetailed.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Available Languages</h3>
+                    <div className="space-y-3">
+                      {tour.languagesDetailed.map((lang: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">{lang.name}</p>
+                            <p className="text-sm text-muted-foreground">Level: {lang.level}</p>
+                            {lang.guides && <p className="text-sm text-muted-foreground">Guides: {lang.guides}</p>}
+                          </div>
+                          {lang.certification && (
+                            <Badge variant="outline">Certified</Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="reviews" className="space-y-6">
@@ -1367,7 +1769,7 @@ const TourDetailPage = () => {
                       <div className="flex items-center gap-2">
                         <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                         <span className="font-semibold text-lg">
-                          {tour.rating?.average?.toFixed(1) || '0.0'}
+                          {tour.rating?.average?.toFixed(1) || tour.averageRating?.toFixed(1) || '0.0'}
                         </span>
                       </div>
                     </div>
@@ -1445,6 +1847,28 @@ const TourDetailPage = () => {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* FAQs */}
+                {tour.faqs && tour.faqs.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
+                    <div className="space-y-4">
+                      {tour.faqs.map((faq: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <h4 className="font-semibold mb-2">{faq.question}</h4>
+                            <p className="text-muted-foreground">{faq.answer}</p>
+                            {faq.category && (
+                              <Badge variant="outline" className="mt-2">
+                                {faq.category}
+                              </Badge>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
@@ -1458,6 +1882,11 @@ const TourDetailPage = () => {
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-6 w-6 text-primary" />
                       <span className="text-3xl font-bold text-primary">{price}</span>
+                      {tour.discount && tour.discount.percentage > 0 && (
+                        <span className="text-lg line-through text-muted-foreground ml-2">
+                          ${(tour.priceNumber / (1 - tour.discount.percentage / 100)).toFixed(0)}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">per person</p>
                   </div>
@@ -1473,6 +1902,12 @@ const TourDetailPage = () => {
                     <span className="text-muted-foreground">Duration:</span>
                     <span className="font-medium">{tour.duration}</span>
                   </div>
+                  {tour.durationHours && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Hours:</span>
+                      <span className="font-medium">{tour.durationHours} hours</span>
+                    </div>
+                  )}
                   {tour.groupSize && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Group Size:</span>
@@ -1481,10 +1916,16 @@ const TourDetailPage = () => {
                       </span>
                     </div>
                   )}
-                  {tour.maxGroupSize && (
+                  {tour.capacity && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Max Group:</span>
-                      <span className="font-medium">{tour.maxGroupSize} people</span>
+                      <span className="text-muted-foreground">Capacity:</span>
+                      <span className="font-medium">{tour.capacity} people</span>
+                    </div>
+                  )}
+                  {tour.remainingSpots && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Remaining Spots:</span>
+                      <span className="font-medium">{tour.remainingSpots}</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between text-sm">
@@ -1499,22 +1940,36 @@ const TourDetailPage = () => {
                       <span className="font-medium">{tour.difficulty}</span>
                     </div>
                   )}
-                  {tour.season && (
+                  {tour.tourType && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Best Season:</span>
-                      <span className="font-medium">{tour.season}</span>
+                      <span className="text-muted-foreground">Tour Type:</span>
+                      <span className="font-medium">{tour.tourType}</span>
                     </div>
                   )}
-                  {tour.availability?.days && (
+                  {(tour.minAge || tour.maxAge) && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Available:</span>
-                      <span className="font-medium">{tour.availability.days.join(', ')}</span>
+                      <span className="text-muted-foreground">Age Range:</span>
+                      <span className="font-medium">
+                        {tour.minAge || 0}-{tour.maxAge || 99}
+                      </span>
                     </div>
                   )}
-                  {tour.ageRestriction && (
+                  {tour.startTime && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Age Restriction:</span>
-                      <span className="font-medium">{tour.ageRestriction}</span>
+                      <span className="text-muted-foreground">Start Time:</span>
+                      <span className="font-medium">{tour.startTime}</span>
+                    </div>
+                  )}
+                  {tour.endTime && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">End Time:</span>
+                      <span className="font-medium">{tour.endTime}</span>
+                    </div>
+                  )}
+                  {tour.operatingHours && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Operating Hours:</span>
+                      <span className="font-medium">{tour.operatingHours}</span>
                     </div>
                   )}
                 </div>
@@ -1533,10 +1988,16 @@ const TourDetailPage = () => {
                 </div>
                 
                 <div className="pt-2 space-y-2 text-xs text-muted-foreground">
-                  {tour.freeCancellation !== false && (
+                  {tour.freeCancellation && tour.freeCancellation.available && (
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-success" />
-                      <span>Free cancellation up to 24 hours</span>
+                      <span>Free cancellation up to {tour.freeCancellation.deadlineHours || 24} hours</span>
+                    </div>
+                  )}
+                  {tour.reserveNowPayLater && tour.reserveNowPayLater.available && (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      <span>Reserve now & pay later</span>
                     </div>
                   )}
                   {tour.instantConfirmation && (
@@ -1545,48 +2006,34 @@ const TourDetailPage = () => {
                       <span>Instant confirmation</span>
                     </div>
                   )}
-                  {tour.photosIncluded && (
+                  {tour.liveTourGuide && tour.liveTourGuide.available && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-primary" />
+                      <span>Live tour guide</span>
+                    </div>
+                  )}
+                  {tour.features?.photoOpportunities && (
                     <div className="flex items-center gap-2">
                       <Camera className="h-4 w-4 text-primary" />
                       <span>Photos included</span>
                     </div>
                   )}
-                  {tour.guide && (
+                  {tour.features?.comfortableTransport && (
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-primary" />
-                      <span>Professional guide</span>
-                    </div>
-                  )}
-                  {tour.transportation && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-success" />
+                      <Car className="h-4 w-4 text-primary" />
                       <span>Transportation included</span>
                     </div>
                   )}
                 </div>
 
-                {tour.guideInfo && (
+                {tour.bookingDeadline && (
                   <>
                     <Separator />
                     <div>
-                      <h4 className="font-semibold mb-2">Your Guide</h4>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={tour.guideInfo.avatar} />
-                          <AvatarFallback className="bg-gradient-primary text-white">
-                            {tour.guideInfo.name?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{tour.guideInfo.name}</p>
-                          <p className="text-xs text-muted-foreground">{tour.guideInfo.experience}</p>
-                        </div>
-                      </div>
-                      {tour.guideInfo.languages && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Speaks: {tour.guideInfo.languages.join(', ')}
-                        </p>
-                      )}
+                      <h4 className="font-semibold mb-2">Booking Information</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Book at least {tour.bookingDeadline} hours in advance
+                      </p>
                     </div>
                   </>
                 )}
@@ -1597,6 +2044,40 @@ const TourDetailPage = () => {
                     <div>
                       <h4 className="font-semibold mb-2">Cancellation Policy</h4>
                       <p className="text-xs text-muted-foreground">{tour.cancellationPolicy}</p>
+                    </div>
+                  </>
+                )}
+
+                {tour.refundPolicy && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold mb-2">Refund Policy</h4>
+                      <p className="text-xs text-muted-foreground">{tour.refundPolicy}</p>
+                    </div>
+                  </>
+                )}
+
+                {tour.paymentMethods && tour.paymentMethods.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold mb-2">Payment Methods</h4>
+                      <p className="text-xs text-muted-foreground">
+                        {tour.paymentMethods.join(', ')}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {tour.depositRequired && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold mb-2">Deposit</h4>
+                      <p className="text-xs text-muted-foreground">
+                        ${tour.depositAmount || 0} deposit required
+                      </p>
                     </div>
                   </>
                 )}

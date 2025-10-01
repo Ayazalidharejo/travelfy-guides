@@ -254,6 +254,13 @@ const Header = React.memo(() => {
         Home
       </Link>
       <Link 
+        to="/test" 
+        className="text-foreground hover:text-primary transition-smooth font-medium"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        testing
+      </Link>
+      <Link 
         to="/tours" 
         className="text-foreground hover:text-primary transition-smooth font-medium"
         onClick={() => setMobileMenuOpen(false)}

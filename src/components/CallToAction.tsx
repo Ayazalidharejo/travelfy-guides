@@ -6,7 +6,7 @@ const CallToAction: React.FC = () => {
     <section className="bg-gradient-to-r from-red-600 to-yellow-500 py-16 px-6 md:px-20 text-center text-white rounded-lg mx-6 md:mx-20 my-12 shadow-lg">
       <h2 className="text-3xl md:text-4xl font-bold mb-4">
         Ready to Start Your Adventure with{" "}
-        <span className="bg-white/30 px-2 rounded">Karvaan Tours</span>?
+        <span className="bg-white/30 px-2 rounded">Karvaan</span>?
       </h2>
       <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
         Book your dream tour today and experience the beauty and culture of Japan like never before!

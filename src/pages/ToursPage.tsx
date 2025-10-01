@@ -9,7 +9,7 @@ import { postsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import TourHero from '@/components/Tourpage.tsx/TourHero';
+
 
 const ToursPage = () => {
   const [tours, setTours] = useState([]);
@@ -202,7 +202,7 @@ const ToursPage = () => {
           </div>
         </div>
       </section>
-<TourHero/>
+
       <div className="container px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Filters Sidebar */}

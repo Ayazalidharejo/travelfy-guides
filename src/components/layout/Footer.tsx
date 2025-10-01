@@ -47,9 +47,7 @@ const Footer = () => {
               <Link to="/contact" className="block text-muted-foreground hover:text-primary transition-smooth">
                 Contact
               </Link>
-              <Link to="/faq" className="block text-muted-foreground hover:text-primary transition-smooth">
-                FAQ
-              </Link>
+             
             </div>
           </div>
 
@@ -63,12 +61,7 @@ const Footer = () => {
               <Link to="/tours?category=cultural" className="block text-muted-foreground hover:text-primary transition-smooth">
                 Cultural
               </Link>
-              <Link to="/tours?category=nature" className="block text-muted-foreground hover:text-primary transition-smooth">
-                Nature
-              </Link>
-              <Link to="/tours?category=food" className="block text-muted-foreground hover:text-primary transition-smooth">
-                Food Tours
-              </Link>
+              
             </div>
           </div>
 
@@ -95,8 +88,8 @@ const Footer = () => {
         <div className="border-t mt-8 pt-8 text-center">
           <p className="text-muted-foreground">
             © 2024 Travel Tours. All rights reserved. | 
-            <Link to="/privacy" className="hover:text-primary transition-smooth ml-1">Privacy Policy</Link> | 
-            <Link to="/terms" className="hover:text-primary transition-smooth ml-1">Terms of Service</Link>
+            {/* <Link to="/privacy" className="hover:text-primary transition-smooth ml-1">Privacy Policy</Link> | 
+            <Link to="/terms" className="hover:text-primary transition-smooth ml-1">Terms of Service</Link> */}
           </p>
         </div>
       </div>
