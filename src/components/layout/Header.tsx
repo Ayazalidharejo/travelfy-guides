@@ -253,13 +253,13 @@ const Header = React.memo(() => {
       >
         Home
       </Link>
-      <Link 
+      {/* <Link 
         to="/test" 
         className="text-foreground hover:text-primary transition-smooth font-medium"
         onClick={() => setMobileMenuOpen(false)}
       >
         testing
-      </Link>
+      </Link> */}
       <Link 
         to="/tours" 
         className="text-foreground hover:text-primary transition-smooth font-medium"
@@ -290,7 +290,7 @@ const Header = React.memo(() => {
           Admin
         </Link>
       )}
-      {!user && (
+      {/* {!user && (
         <Link 
           to="/admin-login" 
           className="text-muted-foreground hover:text-primary transition-smooth font-medium text-sm"
@@ -298,7 +298,7 @@ const Header = React.memo(() => {
         >
           Admin Access
         </Link>
-      )}
+      )} */}
     </>
   ), [isAdmin, user]);
 
