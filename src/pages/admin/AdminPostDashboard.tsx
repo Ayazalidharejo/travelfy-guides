@@ -1804,6 +1804,8 @@
 // };
 
 // export default TourBookingForm;
+
+
 import React, { useState } from 'react';
 import { Plus, Trash2, ChevronDown, ChevronUp, X } from 'lucide-react';
 
@@ -1812,7 +1814,6 @@ const TourBookingForm = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
-    status: '',
     tagline: '',
     tourType: '',
     description: '',
@@ -1829,11 +1830,7 @@ const TourBookingForm = () => {
     hotel: '',
     includes: '',
     excludes: '',
-    rules: '',
-    explorationWays: '',
-    thingsToCare: '',
     languages: '',
-    tips: '',
     nearbyAttractions: '',
     freeCancellation: false,
     deadlineHours: '',
@@ -1850,9 +1847,7 @@ const TourBookingForm = () => {
     singlePersonName: '',
     singlePersonAge: '',
     singlePersonNationality: '',
-    singlePersonEmail: '',
     singlePersonPreferences: '',
-    singlePersonDietaryReq: '',
     // Group Fields
     groupName: '',
     groupLeaderName: '',
@@ -1867,6 +1862,12 @@ const TourBookingForm = () => {
     // Arrays for multiple entries
     highlightsList: [],
     taglinesList: [],
+    // Drop-off fields
+    sameDropOff: true,
+    dropArea: '',
+    dropLocation: '',
+    dropPoint: '',
+    dropDetails: '',
     // New fields based on requirements
     themesList: [],
     selectedSellingPoints: [],
@@ -1951,7 +1952,6 @@ const TourBookingForm = () => {
 
   // Options
   const categories = ['Tour', 'Transport', 'Hotel'];
-  const statuses = ['Active', 'Inactive', 'Draft', 'Archived'];
   const tourTypes = ['Private', 'Group', 'Shared', 'Custom'];
   const transportTypes = ['Bus', 'Car', 'Van', 'Boat', 'Train', 'Airplane', 'Other'];
   const transportModals = Array.from({ length: 10 }, (_, i) => (2001 + i).toString());
@@ -1997,7 +1997,7 @@ const TourBookingForm = () => {
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlotsOptions = [
     '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30',
-    '10:00', '10:30', '11:00', '11:30', '12:00', 
+    '10:00', '10:30', '11:00', '11:30', '12:00'
   ];
   const durationOptions = ['2 Hours', '4 Hours', '6 Hours', '1 Day', '2 Days', '3 Days'];
   const currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
@@ -2150,7 +2150,8 @@ const TourBookingForm = () => {
     if (!actualPrice || !discountPercentage) return '';
     const price = parseFloat(actualPrice);
     const discount = parseFloat(discountPercentage);
-    return (price - (price * discount / 100)).toFixed(2);
+    const netPrice = (price - (price * discount / 100)).toFixed(2);
+    return netPrice;
   };
 
   const handleActualPriceChange = (e) => {
@@ -2162,6 +2163,17 @@ const TourBookingForm = () => {
       netPrice: netPrice
     }));
   };
+
+  // Update net price when discount changes
+  React.useEffect(() => {
+    if (currentPricing.actualPrice && formData.discountPercentage) {
+      const netPrice = calculateNetPrice(currentPricing.actualPrice, formData.discountPercentage);
+      setCurrentPricing(prev => ({
+        ...prev,
+        netPrice: netPrice
+      }));
+    }
+  }, [formData.discountPercentage, currentPricing.actualPrice]);
 
   // Add Pricing Schedule
   const addPricingSchedule = () => {
@@ -2316,8 +2328,106 @@ const TourBookingForm = () => {
   // Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    alert('Tour created successfully! Check console for data.');
+    
+    // Complete form data console log
+    console.log('=== COMPLETE FORM DATA ===');
+    console.log('Product Management:', {
+      title: formData.title,
+      category: formData.category,
+      tourType: formData.tourType,
+      taglinesList: formData.taglinesList,
+      themesList: formData.themesList,
+      selectedSellingPoints: formData.selectedSellingPoints
+    });
+    
+    console.log('Description & Highlights:', {
+      description: formData.description,
+      highlightsList: formData.highlightsList
+    });
+    
+    console.log('Transport Details:', {
+      transportType: formData.transportType,
+      transportModal: formData.transportModal,
+      makeVariant: formData.makeVariant
+    });
+    
+    console.log('Location Details:', {
+      city: formData.city,
+      hotel: formData.hotel,
+      pickupLocation: formData.pickupLocation,
+      bestTime: formData.bestTime,
+      locationDetails: formData.locationDetails,
+      sameDropOff: formData.sameDropOff,
+      dropArea: formData.dropArea,
+      dropLocation: formData.dropLocation,
+      dropPoint: formData.dropPoint,
+      dropDetails: formData.dropDetails
+    });
+    
+    console.log('Booking Type:', formData.bookingType);
+    
+    if (formData.bookingType === 'single') {
+      console.log('Single Person Booking:', {
+        name: formData.singlePersonName,
+        age: formData.singlePersonAge,
+        nationality: formData.singlePersonNationality,
+        preferences: formData.singlePersonPreferences
+      });
+    } else if (formData.bookingType === 'group') {
+      console.log('Group Booking:', {
+        groupName: formData.groupName,
+        leaderName: formData.groupLeaderName,
+        groupSize: formData.groupSize,
+        groupType: formData.groupType,
+        specialRequests: formData.groupSpecialRequests
+      });
+    }
+    
+    console.log('Pricing Information:', {
+      discountPercentage: formData.discountPercentage,
+      validUntil: formData.validUntil,
+      pricingSchedule: formData.pricingSchedule
+    });
+    
+    console.log('Inclusion/Exclusion:', {
+      includes: formData.includes,
+      excludes: formData.excludes
+    });
+    
+    console.log('Additional Information:', {
+      languages: formData.languages,
+      nearbyAttractions: formData.nearbyAttractions,
+      thingsToBring: formData.thingsToBring
+    });
+    
+    console.log('Cancellation Policy:', {
+      freeCancellation: formData.freeCancellation,
+      deadlineHours: formData.deadlineHours,
+      cancellationNote: formData.cancellationNote,
+      reserveNowPayLater: formData.reserveNowPayLater,
+      reserveNote: formData.reserveNote
+    });
+    
+    console.log('Accessibility:', {
+      wheelchairAccessible: formData.wheelchairAccessible,
+      infantSeats: formData.infantSeats,
+      strollerAccessible: formData.strollerAccessible,
+      serviceAnimals: formData.serviceAnimals,
+      accessibilityNotes: formData.accessibilityNotes
+    });
+    
+    console.log('Itinerary Items:', formData.itineraryItems);
+    console.log('Included Destinations:', formData.includedDestinations);
+    console.log('FAQs:', formData.faqs);
+    console.log('Activities:', formData.activities);
+    
+    console.log('Images:', {
+      mainImage: formData.mainImage?.name,
+      additionalImages: formData.additionalImages.map(f => f.name),
+      galleryImages: formData.galleryImages.map(f => f.name)
+    });
+
+    alert('Tour created successfully! Check console for complete data.');
   };
 
   // Reset Form
@@ -2325,7 +2435,6 @@ const TourBookingForm = () => {
     setFormData({
       title: '',
       category: '',
-      status: '',
       tagline: '',
       tourType: '',
       description: '',
@@ -2342,11 +2451,7 @@ const TourBookingForm = () => {
       hotel: '',
       includes: '',
       excludes: '',
-      rules: '',
-      explorationWays: '',
-      thingsToCare: '',
       languages: '',
-      tips: '',
       nearbyAttractions: '',
       freeCancellation: false,
       deadlineHours: '',
@@ -2362,9 +2467,7 @@ const TourBookingForm = () => {
       singlePersonName: '',
       singlePersonAge: '',
       singlePersonNationality: '',
-      singlePersonEmail: '',
       singlePersonPreferences: '',
-      singlePersonDietaryReq: '',
       groupName: '',
       groupLeaderName: '',
       groupSize: '',
@@ -2377,6 +2480,11 @@ const TourBookingForm = () => {
       pricingSchedule: [],
       highlightsList: [],
       taglinesList: [],
+      sameDropOff: true,
+      dropArea: '',
+      dropLocation: '',
+      dropPoint: '',
+      dropDetails: '',
       themesList: [],
       selectedSellingPoints: [],
       thingsToBring: [],
@@ -2467,7 +2575,7 @@ const TourBookingForm = () => {
           <div className="bg-white rounded-xl shadow-2xl p-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-4xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Product Managment System
+                Product Management System
               </h1>
               <button
                 onClick={() => setShowForm(false)}
@@ -2509,19 +2617,6 @@ const TourBookingForm = () => {
                         </select>
                       </div>
                       
-                      {/* <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select 
-                          name="status" 
-                          value={formData.status} 
-                          onChange={handleInputChange} 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Status</option>
-                          {statuses.map(status => <option key={status} value={status}>{status}</option>)}
-                        </select>
-                      </div> */}
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Tour Type</label>
                         <select 
@@ -2564,43 +2659,6 @@ const TourBookingForm = () => {
                                 type="button" 
                                 onClick={() => removeTagline(index)}
                                 className="text-blue-600 hover:text-blue-800"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Theme */}
-                    <div className="space-y-3">
-                      {/* <label className="block text-sm font-medium text-gray-700 mb-1">Theme</label>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          value={currentTheme} 
-                          onChange={(e) => setCurrentTheme(e.target.value)}
-                          placeholder="Enter a theme"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <button 
-                          type="button" 
-                          onClick={addTheme}
-                          className="flex items-center gap-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-                        >
-                          <Plus size={16} /> Add
-                        </button>
-                      </div> */}
-                      {formData.themesList.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {formData.themesList.map((theme, index) => (
-                            <div key={index} className="flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
-                              {theme}
-                              <button 
-                                type="button" 
-                                onClick={() => removeTheme(index)}
-                                className="text-purple-600 hover:text-purple-800"
                               >
                                 <Trash2 size={14} />
                               </button>
@@ -2865,6 +2923,80 @@ const TourBookingForm = () => {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
+
+                      {/* Toggle for Drop-off */}
+                      <div className="md:col-span-2 flex items-center justify-between bg-white px-4 py-3 rounded-md border">
+                        <span className="text-sm font-medium text-gray-700">
+                          Same Drop-off as Pickup?
+                        </span>
+                        <label className="inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={formData.sameDropOff}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                sameDropOff: e.target.checked,
+                                dropArea: e.target.checked ? prev.pickupLocation : "",
+                                dropLocation: e.target.checked ? prev.pickupLocation : "",
+                                dropPoint: e.target.checked ? prev.pickupLocation : "",
+                                dropDetails: e.target.checked ? prev.locationDetails : "",
+                              }))
+                            }
+                          />
+                          <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
+                      </div>
+
+                      {/* Drop-off fields (show only if toggle OFF) */}
+                      {!formData.sameDropOff && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Drop-off Area</label>
+                            <input
+                              type="text"
+                              name="dropArea"
+                              value={formData.dropArea}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Drop-off Location</label>
+                            <input
+                              type="text"
+                              name="dropLocation"
+                              value={formData.dropLocation}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Drop-off Point</label>
+                            <input
+                              type="text"
+                              name="dropPoint"
+                              value={formData.dropPoint}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Drop-off Details</label>
+                            <textarea
+                              name="dropDetails"
+                              value={formData.dropDetails}
+                              onChange={handleInputChange}
+                              rows="3"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -2942,29 +3074,6 @@ const TourBookingForm = () => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                           </div>
-
-                          {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input
-                              type="email"
-                              name="singlePersonEmail"
-                              value={formData.singlePersonEmail}
-                              onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div> */}
-
-                          {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Dietary Requirements</label>
-                            <input
-                              type="text"
-                              name="singlePersonDietaryReq"
-                              value={formData.singlePersonDietaryReq}
-                              onChange={handleInputChange}
-                              placeholder="e.g., Vegetarian, Gluten-free"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div> */}
                           
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Preferences</label>
@@ -3061,10 +3170,6 @@ const TourBookingForm = () => {
                           value={formData.discountPercentage} 
                           onChange={(e) => {
                             handleInputChange(e);
-                            if (currentPricing.actualPrice) {
-                              const netPrice = calculateNetPrice(currentPricing.actualPrice, e.target.value);
-                              setCurrentPricing(prev => ({ ...prev, netPrice }));
-                            }
                           }}
                           min="0" 
                           max="100" 
@@ -3178,17 +3283,17 @@ const TourBookingForm = () => {
                             />
                           </div>
 
-                          {/* Net Price
+                          {/* Net Price */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Net Price</label>
                             <input
                               type="text"
                               value={currentPricing.netPrice}
                               readOnly
-                              className="w-full px-3 py-2 border rounded-lg shadow-sm bg-gray-100 text-gray-700"
+                              className="w-full px-3 py-2 border rounded-lg shadow-sm bg-gray-100 text-gray-700 font-semibold"
                               placeholder="Calculated automatically"
                             />
-                          </div> */}
+                          </div>
 
                           {/* Currency */}
                           <div>
@@ -3250,8 +3355,8 @@ const TourBookingForm = () => {
                                   </div>
                                   <div>
                                     <span className="font-medium">Duration:</span> {schedule.duration} |{" "}
-                                    <span className="font-medium">Price:</span> {schedule.currency} {schedule.actualPrice} |{" "}
-                                    <span className="font-medium">Net:</span> {schedule.currency} {schedule.netPrice}
+                                    <span className="font-medium">Actual Price:</span> {schedule.currency} {schedule.actualPrice} |{" "}
+                                    <span className="font-medium">Net Price:</span> {schedule.currency} {schedule.netPrice}
                                   </div>
                                 </div>
                               </div>
@@ -3299,18 +3404,6 @@ const TourBookingForm = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                       />
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Rules</label>
-                      <textarea 
-                        name="rules" 
-                        value={formData.rules} 
-                        onChange={handleInputChange} 
-                        rows="3" 
-                        placeholder="Tour rules and regulations" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
                   </div>
                 )}
               </div>
@@ -3355,28 +3448,6 @@ const TourBookingForm = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Exploration Ways</label>
-                      <textarea 
-                        name="explorationWays" 
-                        value={formData.explorationWays} 
-                        onChange={handleInputChange} 
-                        rows="2" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Things to Care</label>
-                      <textarea 
-                        name="thingsToCare" 
-                        value={formData.thingsToCare} 
-                        onChange={handleInputChange} 
-                        rows="2" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                    
-                    <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
                       <input 
                         type="text" 
@@ -3384,17 +3455,6 @@ const TourBookingForm = () => {
                         value={formData.languages} 
                         onChange={handleInputChange} 
                         placeholder="e.g., English, Urdu, Arabic" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tips</label>
-                      <textarea 
-                        name="tips" 
-                        value={formData.tips} 
-                        onChange={handleInputChange} 
-                        rows="2" 
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                       />
                     </div>
