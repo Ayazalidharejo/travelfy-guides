@@ -1997,9 +1997,7 @@ const TourBookingForm = () => {
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlotsOptions = [
     '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30',
-    '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00',
-    '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30', '18:00'
+    '10:00', '10:30', '11:00', '11:30', '12:00', 
   ];
   const durationOptions = ['2 Hours', '4 Hours', '6 Hours', '1 Day', '2 Days', '3 Days'];
   const currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
@@ -2454,7 +2452,7 @@ const TourBookingForm = () => {
           <div className="text-center">
             <div className="bg-white rounded-xl shadow-2xl p-12 mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Tour Management System
+                Product Management System
               </h1>
               <button
                 onClick={() => setShowForm(true)}
