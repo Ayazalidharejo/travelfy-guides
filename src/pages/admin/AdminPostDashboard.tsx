@@ -3377,101 +3377,107 @@ const TourBookingForm = () => {
               </div>
 
               {/* Inclusion/Exclusion */}
-              <div>
-                <SectionHeader title="Inclusion/Exclusion" section="inclusion" />
-                {expandedSections.inclusion && (
-                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Includes</label>
-                      <textarea 
-                        name="includes" 
-                        value={formData.includes} 
-                        onChange={handleInputChange} 
-                        rows="3" 
-                        placeholder="What's included in the tour" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Excludes</label>
-                      <textarea 
-                        name="excludes" 
-                        value={formData.excludes} 
-                        onChange={handleInputChange} 
-                        rows="3" 
-                        placeholder="What's not included" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+           <div>
+  <SectionHeader title=" Additional Information" section="inclusion" />
+  {expandedSections.inclusion && (
+    <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+      
+      {/* Things to Bring */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-700">Things to Bring</label>
+        <div className="space-y-2">
+          <select 
+            onChange={handleThingsToBringChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Select items to bring...</option>
+            {thingsToBringOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <p className="text-sm text-gray-500">Select from the dropdown to add items</p>
+          
+          {formData.thingsToBring.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.thingsToBring.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                >
+                  {item}
+                  <button 
+                    type="button" 
+                    onClick={() => removeThingToBring(item)}
+                    className="text-green-600 hover:text-green-800 ml-1"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Languages */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
+        <input 
+          type="text" 
+          name="languages" 
+          value={formData.languages} 
+          onChange={handleInputChange} 
+          placeholder="e.g., English, Urdu, Arabic" 
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+        />
+      </div>
+      
+      {/* Tips */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Tips</label>
+        <textarea 
+          name="nearbyAttractions" 
+          value={formData.nearbyAttractions} 
+          onChange={handleInputChange} 
+          placeholder="Instead of tips" 
+          rows="2" 
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+        />
+      </div>
+
+      {/* Includes */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Includes</label>
+        <textarea 
+          name="includes" 
+          value={formData.includes} 
+          onChange={handleInputChange} 
+          rows="3" 
+          placeholder="What's included in the tour" 
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+        />
+      </div>
+      
+      {/* Excludes */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Excludes</label>
+        <textarea 
+          name="excludes" 
+          value={formData.excludes} 
+          onChange={handleInputChange} 
+          rows="3" 
+          placeholder="What's not included" 
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+        />
+      </div>
+
+    </div>
+  )}
+</div>
+
 
               {/* Additional Information */}
-              <div>
-                <SectionHeader title="Additional Information" section="additional" />
-                {expandedSections.additional && (
-                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
-                    {/* Things to Bring */}
-                    <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">Things to Bring</label>
-                      <div className="space-y-2">
-                        <select 
-                          onChange={handleThingsToBringChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select items to bring...</option>
-                          {thingsToBringOptions.map(option => (
-                            <option key={option} value={option}>{option}</option>
-                          ))}
-                        </select>
-                        <p className="text-sm text-gray-500">Select from the dropdown to add items</p>
-                        
-                        {formData.thingsToBring.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {formData.thingsToBring.map((item, index) => (
-                              <div key={index} className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                                {item}
-                                <button 
-                                  type="button" 
-                                  onClick={() => removeThingToBring(item)}
-                                  className="text-green-600 hover:text-green-800 ml-1"
-                                >
-                                  <X size={14} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
-                      <input 
-                        type="text" 
-                        name="languages" 
-                        value={formData.languages} 
-                        onChange={handleInputChange} 
-                        placeholder="e.g., English, Urdu, Arabic" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tips</label>
-                      <textarea 
-                        name="nearbyAttractions" 
-                        value={formData.nearbyAttractions} 
-                        onChange={handleInputChange} placeholder='instead of tips'
-                        rows="2" 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+             
 
               {/* Cancellation & Reservation */}
               <div>
