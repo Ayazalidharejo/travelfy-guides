@@ -1628,12 +1628,12 @@ const TourBookingForm = () => {
       
       {/* Tips */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">instead of tips</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Insider Tips</label>
         <textarea 
           name="nearbyAttractions" 
           value={formData.nearbyAttractions} 
           onChange={handleInputChange} 
-          placeholder="Instead of tips" 
+          placeholder="Insider Tips" 
           rows="2" 
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
         />
