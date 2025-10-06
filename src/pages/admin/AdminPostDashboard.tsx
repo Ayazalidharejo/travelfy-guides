@@ -2509,7 +2509,7 @@ const TourBookingForm = () => {
                         </select>
                       </div>
                       
-                      <div>
+                      {/* <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select 
                           name="status" 
@@ -2520,7 +2520,7 @@ const TourBookingForm = () => {
                           <option value="">Select Status</option>
                           {statuses.map(status => <option key={status} value={status}>{status}</option>)}
                         </select>
-                      </div>
+                      </div> */}
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Tour Type</label>
