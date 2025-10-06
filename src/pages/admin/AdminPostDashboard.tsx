@@ -2467,7 +2467,7 @@ const TourBookingForm = () => {
           <div className="bg-white rounded-xl shadow-2xl p-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-4xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Tour Booking Form
+                Product Managment System
               </h1>
               <button
                 onClick={() => setShowForm(false)}
