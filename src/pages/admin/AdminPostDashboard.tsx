@@ -3459,7 +3459,16 @@ const TourBookingForm = () => {
                       />
                     </div>
                     
-                   
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tips</label>
+                      <textarea 
+                        name="nearbyAttractions" 
+                        value={formData.nearbyAttractions} 
+                        onChange={handleInputChange} placeholder='instead of tips'
+                        rows="2" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -3600,23 +3609,15 @@ const TourBookingForm = () => {
                   <div className="mt-4 p-6 bg-gray-50 rounded-lg">
                     <div className="bg-white p-4 rounded-md border-2 border-purple-200 space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                       
+                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                          <input 
-                            type="time" 
-                            value={currentItinerary.time} 
-                            onChange={(e) => setCurrentItinerary({...currentItinerary, time: e.target.value})} 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Activity</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Activity Name</label>
                           <input 
                             type="text" 
                             value={currentItinerary.activity} 
                             onChange={(e) => setCurrentItinerary({...currentItinerary, activity: e.target.value})} 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md row-1" 
                           />
                         </div>
                         
