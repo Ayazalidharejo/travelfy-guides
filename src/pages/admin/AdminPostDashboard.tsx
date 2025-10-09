@@ -3036,7 +3036,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           </div> */}
                           
                           {/* Option 2: File Upload */}
-                          <div className="flex items-center gap-2">
+                          {/* <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">OR</span>
                             <input 
                               type="file" 
@@ -3044,7 +3044,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                               onChange={handleItineraryImageChange}
                               className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" 
                             />
-                          </div>
+                          </div> */}
                           
                           {currentItinerary.image && (
                             <div className="mt-2">
