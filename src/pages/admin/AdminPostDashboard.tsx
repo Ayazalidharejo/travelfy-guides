@@ -665,12 +665,65 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     }));
   };
 
-  const addItinerary = () => {
+  const addItinerary = async () => {
     if (currentItinerary.activity) {
+      let imageUrl = null;
+      
+      // Upload image to Cloudinary if file is selected
+      if (currentItinerary.image && currentItinerary.image instanceof File) {
+        try {
+          setUploading(true);
+          console.log('📸 Uploading itinerary image to Cloudinary...');
+          
+          const formData = new FormData();
+          formData.append('file', currentItinerary.image);
+          formData.append('upload_preset', 'ml_default');
+          
+          const response = await fetch(
+            'https://api.cloudinary.com/v1_1/dro4ujlqv/image/upload',
+            {
+              method: 'POST',
+              body: formData,
+            }
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            imageUrl = data.secure_url;
+            console.log('✅ Itinerary image uploaded:', imageUrl);
+            toast({
+              title: "Image Uploaded",
+              description: "Itinerary image uploaded successfully!",
+            });
+          } else {
+            console.error('❌ Image upload failed');
+            toast({
+              title: "Upload Failed",
+              description: "Failed to upload itinerary image",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error uploading itinerary image:', error);
+          toast({
+            title: "Upload Error",
+            description: "Error uploading itinerary image",
+            variant: "destructive",
+          });
+        } finally {
+          setUploading(false);
+        }
+      }
+      
+      // Add itinerary item with uploaded image URL
       setFormData(prev => ({
         ...prev,
-        itineraryItems: [...prev.itineraryItems, { ...currentItinerary }]
+        itineraryItems: [...prev.itineraryItems, { 
+          ...currentItinerary,
+          image: imageUrl || currentItinerary.image 
+        }]
       }));
+      
       setCurrentItinerary({
         time: '',
         activity: '',
