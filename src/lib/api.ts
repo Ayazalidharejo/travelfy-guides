@@ -1,11 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
-// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api';
+// Environment-based API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV 
+    ? 'http://localhost:5000/api' 
+    : 'https://tour-backend-eight.vercel.app/api'
+  );
+
+// *** IMMEDIATE FIX: Force production URL for Vercel deployment ***
+const PRODUCTION_API_URL = 'https://tour-backend-eight.vercel.app/api';
+const FINAL_API_URL = window.location.hostname.includes('vercel.app') || 
+                     window.location.hostname.includes('localhost') === false 
+  ? PRODUCTION_API_URL 
+  : API_BASE_URL;
+
+// Debug logging
+console.log('🔧 API Configuration:');
+console.log('🔧 NODE_ENV:', import.meta.env.MODE);
+console.log('🔧 DEV:', import.meta.env.DEV);
+console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
+console.log('🔧 Hostname:', window.location.hostname);
+console.log('🔧 FINAL_API_URL:', FINAL_API_URL);
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: FINAL_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

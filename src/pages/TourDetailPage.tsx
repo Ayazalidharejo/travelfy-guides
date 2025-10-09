@@ -1721,7 +1721,17 @@ const TourDetailPage = () => {
               <TabsContent value="itinerary" className="space-y-4">
                 {(tour.itinerary && tour.itinerary.length > 0) || (tour.itineraryItems && tour.itineraryItems.length > 0) ? (
                   <div className="space-y-4">
-                    {(tour.itineraryItems || tour.itinerary || []).map((item: any, index: number) => (
+                    {(() => {
+                      console.log('🔍 ITINERARY DEBUG - Tour Data:');
+                      console.log('🔍 tour.itineraryItems:', tour.itineraryItems);
+                      console.log('🔍 tour.itinerary:', tour.itinerary);
+                      console.log('🔍 Total items:', (tour.itineraryItems || tour.itinerary || []).length);
+                      return null;
+                    })()}
+                    {(tour.itineraryItems || tour.itinerary || []).map((item: any, index: number) => {
+                      console.log(`🔍 Item ${index}:`, item);
+                      console.log(`🔍 Item ${index} image:`, item.image);
+                      return (
                       <Card key={index}>
                         <CardContent className="p-4">
                           <div className="flex gap-4">
@@ -1738,6 +1748,13 @@ const TourDetailPage = () => {
                               <p className="text-muted-foreground text-sm">{item.description}</p>
                               
                               {/* Itinerary Image */}
+                              {(() => {
+                                console.log(`🖼️ IMAGE DEBUG - Item ${index}:`);
+                                console.log(`🖼️ item.image:`, item.image);
+                                console.log(`🖼️ item.image type:`, typeof item.image);
+                                console.log(`🖼️ item.image truthy:`, !!item.image);
+                                return null;
+                              })()}
                               {item.image && (
                                 <div className="mt-3 rounded-lg overflow-hidden">
                                   <img 
@@ -1745,7 +1762,19 @@ const TourDetailPage = () => {
                                     alt={item.activity || item.title || 'Itinerary item'} 
                                     className="w-full h-48 object-cover rounded-lg hover:scale-105 transition-smooth cursor-pointer"
                                     onClick={() => window.open(item.image, '_blank')}
+                                    onError={(e) => {
+                                      console.error('🖼️ IMAGE LOAD ERROR:', e);
+                                      console.error('🖼️ Failed to load image:', item.image);
+                                    }}
+                                    onLoad={() => {
+                                      console.log('🖼️ IMAGE LOADED SUCCESSFULLY:', item.image);
+                                    }}
                                   />
+                                </div>
+                              )}
+                              {!item.image && (
+                                <div className="mt-3 p-4 bg-gray-100 rounded-lg">
+                                  <p className="text-sm text-gray-500">No image available</p>
                                 </div>
                               )}
                               
@@ -1768,7 +1797,8 @@ const TourDetailPage = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <Card>
