@@ -3022,10 +3022,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         
                         {/* Image Field for Itinerary - BOTH FILE UPLOAD AND URL */}
                         <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Activity Image</label>
+                          {/* <label className="block text-sm font-medium text-gray-700 mb-1">Activity Image</label> */}
                           
                           {/* Option 1: Image URL */}
-                          <div className="mb-2">
+                          {/* <div className="mb-2">
                             <input 
                               type="url" 
                               value={typeof currentItinerary.image === 'string' ? currentItinerary.image : ''}
@@ -3033,7 +3033,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                               placeholder="Paste image URL (https://...)"
                               className="w-full px-3 py-2 border border-gray-300 rounded-md" 
                             />
-                          </div>
+                          </div> */}
                           
                           {/* Option 2: File Upload */}
                           <div className="flex items-center gap-2">
