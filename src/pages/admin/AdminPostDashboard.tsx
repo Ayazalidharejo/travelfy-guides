@@ -666,63 +666,127 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   };
 
   const addItinerary = async () => {
+    console.log('🎯 Add Itinerary button clicked!');
+    console.log('📊 Current Itinerary Data:', currentItinerary);
+    
     if (currentItinerary.activity) {
+      console.log('✅ Activity name present, proceeding...');
       let imageUrl = null;
       
-      // Upload image to Cloudinary if file is selected
-      if (currentItinerary.image && currentItinerary.image instanceof File) {
+      // Check if image is a URL string (pasted URL)
+      if (currentItinerary.image && typeof currentItinerary.image === 'string') {
+        console.log('🔗 Using image URL directly:', currentItinerary.image);
+        imageUrl = currentItinerary.image;
+      }
+      // Upload image using backend API (same as main image upload)
+      else if (currentItinerary.image && currentItinerary.image instanceof File) {
         try {
           setUploading(true);
-          console.log('📸 Uploading itinerary image to Cloudinary...');
+          console.log('📸 Uploading itinerary image via backend API...');
+          console.log('📸 Image file:', currentItinerary.image.name, currentItinerary.image.size, 'bytes');
           
-          const formData = new FormData();
-          formData.append('file', currentItinerary.image);
-          formData.append('upload_preset', 'ml_default');
+          const uploadFormData = new FormData();
+          uploadFormData.append('images', currentItinerary.image);
           
-          const response = await fetch(
-            'https://api.cloudinary.com/v1_1/dro4ujlqv/image/upload',
-            {
-              method: 'POST',
-              body: formData,
-            }
-          );
+          console.log('📸 Making request to:', '/api/upload');
+          console.log('📸 Request body (FormData):', uploadFormData);
           
-          if (response.ok) {
-            const data = await response.json();
-            imageUrl = data.secure_url;
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadFormData,
+          });
+          
+          console.log('📸 Response status:', response.status);
+          console.log('📸 Response headers:', Object.fromEntries(response.headers.entries()));
+          
+          const result = await response.json();
+          console.log('📸 Upload response:', result);
+          
+          if (result.success) {
+            const uploadedImageUrl = result.imageUrl || result.url || result.data?.url;
+            imageUrl = uploadedImageUrl;
             console.log('✅ Itinerary image uploaded:', imageUrl);
             toast({
               title: "Image Uploaded",
               description: "Itinerary image uploaded successfully!",
             });
           } else {
-            console.error('❌ Image upload failed');
-            toast({
-              title: "Upload Failed",
-              description: "Failed to upload itinerary image",
-              variant: "destructive",
-            });
+            console.error('❌ Backend API upload failed');
+            console.error('❌ Upload error details:', result);
+            
+            // Try direct Cloudinary as fallback
+            console.log('🔄 Trying direct Cloudinary upload as fallback...');
+            try {
+              const cloudinaryFormData = new FormData();
+              cloudinaryFormData.append('file', currentItinerary.image);
+              cloudinaryFormData.append('upload_preset', 'travelfy_uploads');
+              
+              const cloudinaryResponse = await fetch(
+                'https://api.cloudinary.com/v1_1/dro4ujlqv/image/upload',
+                {
+                  method: 'POST',
+                  body: cloudinaryFormData,
+                }
+              );
+              
+              if (cloudinaryResponse.ok) {
+                const cloudinaryData = await cloudinaryResponse.json();
+                imageUrl = cloudinaryData.secure_url;
+                console.log('✅ Cloudinary fallback successful:', imageUrl);
+                toast({
+                  title: "Image Uploaded",
+                  description: "Itinerary image uploaded successfully!",
+                });
+              } else {
+                console.error('❌ Cloudinary fallback also failed');
+                imageUrl = null;
+                toast({
+                  title: "Upload Failed",
+                  description: "Failed to upload itinerary image. Will continue without image.",
+                  variant: "destructive",
+                });
+              }
+            } catch (cloudinaryError) {
+              console.error('❌ Cloudinary fallback error:', cloudinaryError);
+              imageUrl = null;
+              toast({
+                title: "Upload Failed",
+                description: "Failed to upload itinerary image. Will continue without image.",
+                variant: "destructive",
+              });
+            }
           }
         } catch (error) {
           console.error('❌ Error uploading itinerary image:', error);
           toast({
             title: "Upload Error",
-            description: "Error uploading itinerary image",
+            description: "Error uploading itinerary image. Will continue without image.",
             variant: "destructive",
           });
+          imageUrl = null;
         } finally {
           setUploading(false);
         }
       }
       
-      // Add itinerary item with uploaded image URL
-      setFormData(prev => ({
-        ...prev,
-        itineraryItems: [...prev.itineraryItems, { 
-          ...currentItinerary,
-          image: imageUrl || currentItinerary.image 
-        }]
-      }));
+      // Add itinerary item with uploaded image URL (NEVER store File objects)
+      const newItem = { 
+        ...currentItinerary,
+        image: imageUrl || null  // Only store URL or null, NEVER File object
+      };
+      
+      console.log('➕ Adding itinerary item:', newItem);
+      console.log('🖼️ Image URL in new item:', newItem.image);
+      
+      setFormData(prev => {
+        const updatedItems = [...prev.itineraryItems, newItem];
+        console.log('✅ Updated itineraryItems count:', updatedItems.length);
+        console.log('✅ All itinerary items:', updatedItems);
+        return {
+          ...prev,
+          itineraryItems: updatedItems
+        };
+      });
       
       setCurrentItinerary({
         time: '',
@@ -732,6 +796,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         included: false,
         additionalCost: '',
         image: null
+      });
+      
+      console.log('🎉 Itinerary item added successfully!');
+    } else {
+      console.log('❌ Cannot add itinerary: Activity name is required');
+      toast({
+        title: "Activity Required",
+        description: "Please enter an activity name",
+        variant: "destructive",
       });
     }
   };
@@ -916,6 +989,30 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       console.log('✅ Final fallback priceNumber set:', formatted.priceNumber);
     }
     
+    // *** FIX: Clean up itineraryItems - remove File objects ***
+    if (formatted.itineraryItems && formatted.itineraryItems.length > 0) {
+      console.log('🧹 Cleaning itineraryItems - removing File objects...');
+      formatted.itineraryItems = formatted.itineraryItems.map((item: any) => {
+        const cleanItem = { ...item };
+        
+        // If image is a File object, remove it (should have been uploaded)
+        if (cleanItem.image && cleanItem.image instanceof File) {
+          console.log('⚠️ WARNING: Itinerary item has File object instead of URL!');
+          console.log('⚠️ File name:', cleanItem.image.name);
+          console.log('⚠️ This means image was NOT uploaded. Removing...');
+          delete cleanItem.image;
+        }
+        
+        // If image is empty string, remove it
+        if (cleanItem.image === '') {
+          delete cleanItem.image;
+        }
+        
+        return cleanItem;
+      });
+      console.log('✅ Cleaned itineraryItems:', formatted.itineraryItems);
+    }
+    
     // *** FIX: Set discount info if available ***
     if (formatted.discountPercentage && formatted.pricingSchedule && formatted.pricingSchedule.length > 0) {
       formatted.discount = {
@@ -1082,9 +1179,16 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       console.log('🖼️ Form Data - Images Array:', formData.images);
       console.log('👥 Form Data - Min/Max Group:', formData.minGroup, '/', formData.maxGroup);
       console.log('📍 Form Data - City:', formData.city);
+      console.log('📋 Form Data - Itinerary Items:', formData.itineraryItems);
+      console.log('📋 Itinerary Items Count:', formData.itineraryItems?.length || 0);
+      if (formData.itineraryItems?.length > 0) {
+        console.log('🎯 First Itinerary Item:', formData.itineraryItems[0]);
+        console.log('🖼️ First Itinerary Image:', formData.itineraryItems[0].image);
+      }
       console.log('---');
       console.log('🔄 Formatted - mainImage:', tourData.mainImage);
       console.log('🔄 Formatted - additionalImages:', tourData.additionalImages);
+      console.log('🔄 Formatted - itineraryItems:', tourData.itineraryItems);
       console.log('💰 Formatted - priceNumber:', tourData.priceNumber, '(BACKEND EXPECTS THIS)');
       console.log('📊 Formatted - pricingSchedule:', tourData.pricingSchedule?.length, 'schedules');
       console.log('🔄 Formatted - duration:', tourData.duration);
@@ -2909,19 +3013,49 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           />
                         </div>
                         
-                        {/* Image Field for Itinerary */}
+                        {/* Image Field for Itinerary - BOTH FILE UPLOAD AND URL */}
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-1">Activity Image</label>
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={handleItineraryImageChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                          />
+                          
+                          {/* Option 1: Image URL */}
+                          <div className="mb-2">
+                            <input 
+                              type="url" 
+                              value={typeof currentItinerary.image === 'string' ? currentItinerary.image : ''}
+                              onChange={(e) => setCurrentItinerary({...currentItinerary, image: e.target.value})}
+                              placeholder="Paste image URL (https://...)"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                            />
+                          </div>
+                          
+                          {/* Option 2: File Upload */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">OR</span>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={handleItineraryImageChange}
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" 
+                            />
+                          </div>
+                          
                           {currentItinerary.image && (
-                            <p className="text-sm text-green-600 mt-1">
-                              Selected: {(currentItinerary.image as any).name}
-                            </p>
+                            <div className="mt-2">
+                              {typeof currentItinerary.image === 'string' ? (
+                                <div className="flex items-center gap-2">
+                                  <img 
+                                    src={currentItinerary.image} 
+                                    alt="Preview" 
+                                    className="h-16 w-24 object-cover rounded border"
+                                  />
+                                  <p className="text-sm text-green-600">✓ Image URL ready</p>
+                                </div>
+                              ) : (
+                                <p className="text-sm text-green-600">
+                                  ✓ File selected: {(currentItinerary.image as any).name}
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
                         
@@ -2938,11 +3072,22 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       
                       <button 
                         type="button" 
-                        onClick={addItinerary} 
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        onClick={() => {
+                          console.log('🔵 BUTTON CLICKED - Add Itinerary Item');
+                          console.log('🔵 Current Activity:', currentItinerary.activity);
+                          console.log('🔵 Current Image:', currentItinerary.image);
+                          addItinerary();
+                        }} 
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg transition-all transform hover:scale-105"
+                        disabled={uploading || !currentItinerary.activity}
                       >
-                        <Plus size={16} /> Add Itinerary Item
+                        <Plus size={20} /> {uploading ? '⏳ Uploading Image...' : '➕ Add Itinerary Item'}
                       </button>
+                      {!currentItinerary.activity && (
+                        <p className="text-sm text-red-500 mt-2">
+                          ⚠️ Activity Name is required to add itinerary item
+                        </p>
+                      )}
                     </div>
 
                     {formData.itineraryItems.length > 0 && (
@@ -2955,9 +3100,18 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                               <div className="text-sm text-gray-500">
                                 Duration: {item.duration} | {item.included ? 'Included' : `Additional: ${item.additionalCost}`}
                                 {item.image && (
-                                  <span className="ml-2 text-blue-600">• Image: {item.image.name}</span>
+                                  <span className="ml-2 text-green-600">✓ Image uploaded</span>
                                 )}
                               </div>
+                              {item.image && (
+                                <div className="mt-2">
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.activity} 
+                                    className="h-20 w-32 object-cover rounded border"
+                                  />
+                                </div>
+                              )}
                             </div>
                             <button 
                               type="button" 
