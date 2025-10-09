@@ -686,7 +686,14 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
           console.log('📸 Image file:', currentItinerary.image.name, currentItinerary.image.size, 'bytes');
           
           const uploadFormData = new FormData();
+          console.log('📸 Before append - currentItinerary.image:', currentItinerary.image);
+          console.log('📸 File type:', typeof currentItinerary.image);
+          console.log('📸 Is File object:', currentItinerary.image instanceof File);
           uploadFormData.append('images', currentItinerary.image);
+          console.log('📸 After append - FormData entries:');
+          for (let [key, value] of uploadFormData.entries()) {
+            console.log(`📸 ${key}:`, value);
+          }
           
           console.log('📸 Making request to:', '/api/upload');
           console.log('📸 Request body (FormData):', uploadFormData);
