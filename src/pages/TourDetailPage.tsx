@@ -1731,11 +1731,24 @@ const TourDetailPage = () => {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-semibold">{item.time}</span>
+                                <span className="font-semibold">{item.time || item.title || 'Time not specified'}</span>
                                 {item.duration && <span className="text-sm text-muted-foreground">({item.duration})</span>}
                               </div>
-                              <h4 className="font-semibold mb-1">{item.activity}</h4>
+                              <h4 className="font-semibold mb-1">{item.activity || item.title || 'Activity'}</h4>
                               <p className="text-muted-foreground text-sm">{item.description}</p>
+                              
+                              {/* Itinerary Image */}
+                              {item.image && (
+                                <div className="mt-3 rounded-lg overflow-hidden">
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.activity || item.title || 'Itinerary item'} 
+                                    className="w-full h-48 object-cover rounded-lg hover:scale-105 transition-smooth cursor-pointer"
+                                    onClick={() => window.open(item.image, '_blank')}
+                                  />
+                                </div>
+                              )}
+                              
                               {item.location && (
                                 <div className="flex items-center gap-1 mt-2">
                                   <MapPin className="h-3 w-3" />
