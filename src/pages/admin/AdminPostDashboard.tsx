@@ -482,7 +482,12 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       actualPrice: currentPricing.actualPrice,
       netPrice: currentPricing.netPrice,
       duration: currentPricing.duration,
-      existingSchedules: formData.pricingSchedule.length
+      existingSchedules: formData.pricingSchedule.length,
+      transportDetails: {
+        transportType: formData.transportType,
+        transportModal: formData.transportModal,
+        makeVariant: formData.makeVariant
+      }
     });
     
     // *** FIX: Only require actualPrice to add schedule, use defaults for rest ***
@@ -515,7 +520,11 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         duration: currentPricing.duration || '4 Hours',
         actualPrice: currentPricing.actualPrice,
         netPrice: calculatedNetPrice,
-        currency: currentPricing.currency
+        currency: currentPricing.currency,
+        // *** ADD: Transport Details from formData ***
+        transportType: formData.transportType || '',
+        transportModal: formData.transportModal || '',
+        makeVariant: formData.makeVariant || ''
       };
       
       console.log('✅ New Schedule Created:', newSchedule);
@@ -657,133 +666,21 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   };
 
   // Itinerary Handlers
-  const handleItineraryImageChange = (e: any) => {
-    const file = e.target.files[0];
-    setCurrentItinerary(prev => ({
-      ...prev,
-      image: file
-    }));
-  };
 
-  const addItinerary = async () => {
+  const addItinerary = () => {
     console.log('🎯 Add Itinerary button clicked!');
     console.log('📊 Current Itinerary Data:', currentItinerary);
     
     if (currentItinerary.activity) {
       console.log('✅ Activity name present, proceeding...');
-      let imageUrl = null;
       
-      // Check if image is a URL string (pasted URL)
-      if (currentItinerary.image && typeof currentItinerary.image === 'string') {
-        console.log('🔗 Using image URL directly:', currentItinerary.image);
-        imageUrl = currentItinerary.image;
-      }
-      // Upload image using backend API (same as main image upload)
-      else if (currentItinerary.image && currentItinerary.image instanceof File) {
-        try {
-          setUploading(true);
-          console.log('📸 Uploading itinerary image via backend API...');
-          console.log('📸 Image file:', currentItinerary.image.name, currentItinerary.image.size, 'bytes');
-          
-          const uploadFormData = new FormData();
-          console.log('📸 Before append - currentItinerary.image:', currentItinerary.image);
-          console.log('📸 File type:', typeof currentItinerary.image);
-          console.log('📸 Is File object:', currentItinerary.image instanceof File);
-          uploadFormData.append('images', currentItinerary.image);
-          console.log('📸 After append - FormData entries:');
-          for (let [key, value] of uploadFormData.entries()) {
-            console.log(`📸 ${key}:`, value);
-          }
-          
-          console.log('📸 Making request to:', '/api/upload');
-          console.log('📸 Request body (FormData):', uploadFormData);
-          
-          const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: uploadFormData,
-          });
-          
-          console.log('📸 Response status:', response.status);
-          console.log('📸 Response headers:', Object.fromEntries(response.headers.entries()));
-          
-          const result = await response.json();
-          console.log('📸 Upload response:', result);
-          
-          if (result.success) {
-            const uploadedImageUrl = result.imageUrl || result.url || result.data?.url;
-            imageUrl = uploadedImageUrl;
-            console.log('✅ Itinerary image uploaded:', imageUrl);
-            toast({
-              title: "Image Uploaded",
-              description: "Itinerary image uploaded successfully!",
-            });
-          } else {
-            console.error('❌ Backend API upload failed');
-            console.error('❌ Upload error details:', result);
-            
-            // Try direct Cloudinary as fallback
-            console.log('🔄 Trying direct Cloudinary upload as fallback...');
-            try {
-              const cloudinaryFormData = new FormData();
-              cloudinaryFormData.append('file', currentItinerary.image);
-              cloudinaryFormData.append('upload_preset', 'travelfy_uploads');
-              
-              const cloudinaryResponse = await fetch(
-                'https://api.cloudinary.com/v1_1/dro4ujlqv/image/upload',
-                {
-                  method: 'POST',
-                  body: cloudinaryFormData,
-                }
-              );
-              
-              if (cloudinaryResponse.ok) {
-                const cloudinaryData = await cloudinaryResponse.json();
-                imageUrl = cloudinaryData.secure_url;
-                console.log('✅ Cloudinary fallback successful:', imageUrl);
-                toast({
-                  title: "Image Uploaded",
-                  description: "Itinerary image uploaded successfully!",
-                });
-              } else {
-                console.error('❌ Cloudinary fallback also failed');
-                imageUrl = null;
-                toast({
-                  title: "Upload Failed",
-                  description: "Failed to upload itinerary image. Will continue without image.",
-                  variant: "destructive",
-                });
-              }
-            } catch (cloudinaryError) {
-              console.error('❌ Cloudinary fallback error:', cloudinaryError);
-              imageUrl = null;
-              toast({
-                title: "Upload Failed",
-                description: "Failed to upload itinerary image. Will continue without image.",
-                variant: "destructive",
-              });
-            }
-          }
-        } catch (error) {
-          console.error('❌ Error uploading itinerary image:', error);
-          toast({
-            title: "Upload Error",
-            description: "Error uploading itinerary image. Will continue without image.",
-            variant: "destructive",
-          });
-          imageUrl = null;
-        } finally {
-          setUploading(false);
-        }
-      }
-      
-      // Add itinerary item with uploaded image URL (NEVER store File objects)
+      // Add itinerary item without image
       const newItem = { 
         ...currentItinerary,
-        image: imageUrl || null  // Only store URL or null, NEVER File object
+        image: null  // No image field
       };
       
       console.log('➕ Adding itinerary item:', newItem);
-      console.log('🖼️ Image URL in new item:', newItem.image);
       
       setFormData(prev => {
         const updatedItems = [...prev.itineraryItems, newItem];
@@ -795,6 +692,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         };
       });
       
+      // Clear the form
       setCurrentItinerary({
         time: '',
         activity: '',
@@ -806,6 +704,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       });
       
       console.log('🎉 Itinerary item added successfully!');
+      toast({
+        title: "Success",
+        description: "Itinerary item added successfully!",
+      });
     } else {
       console.log('❌ Cannot add itinerary: Activity name is required');
       toast({
@@ -1186,6 +1088,31 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       console.log('🖼️ Form Data - Images Array:', formData.images);
       console.log('👥 Form Data - Min/Max Group:', formData.minGroup, '/', formData.maxGroup);
       console.log('📍 Form Data - City:', formData.city);
+      console.log('🎯 Form Data - Booking Type:', formData.bookingType);
+      console.log('👤 Form Data - Single Person:', {
+        name: formData.singlePersonName,
+        age: formData.singlePersonAge,
+        nationality: formData.singlePersonNationality,
+        preferences: formData.singlePersonPreferences
+      });
+      console.log('👥 Form Data - Group Booking:', {
+        groupName: formData.groupName,
+        groupLeaderName: formData.groupLeaderName,
+        groupSize: formData.groupSize,
+        groupType: formData.groupType,
+        groupSpecialRequests: formData.groupSpecialRequests
+      });
+      console.log('💰 Form Data - Pricing Info:', {
+        discountPercentage: formData.discountPercentage,
+        validUntil: formData.validUntil,
+        pricingSchedule: formData.pricingSchedule,
+        priceNumber: formData.priceNumber
+      });
+      console.log('🚗 Form Data - Transport Details:', {
+        transportType: formData.transportType,
+        transportModal: formData.transportModal,
+        makeVariant: formData.makeVariant
+      });
       console.log('📋 Form Data - Itinerary Items:', formData.itineraryItems);
       console.log('📋 Itinerary Items Count:', formData.itineraryItems?.length || 0);
       if (formData.itineraryItems?.length > 0) {
@@ -1350,10 +1277,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   };
 
   const openEditModal = (tour: any) => {
-    console.log('Opening edit for tour:', tour);
+    console.log('🔧 Opening edit for tour:', tour);
+    console.log('🔧 Tour title:', tour.title);
+    console.log('🔧 Tour description:', tour.description);
+    console.log('🔧 Tour transportType:', tour.transportType);
+    console.log('🔧 Tour transportModal:', tour.transportModal);
+    console.log('🔧 Tour makeVariant:', tour.makeVariant);
     setFieldErrors({});
     
-    setFormData({
+    const editFormData = {
       ...tour,
       // Already converted by fetchTours
       imageUrl: tour.imageUrl || '',
@@ -1376,9 +1308,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       discountPercentage: tour.discountPercentage ? tour.discountPercentage.toString() : '',
       deadlineHours: tour.deadlineHours ? tour.deadlineHours.toString() : '',
       sameDropOff: tour.sameDropOff !== undefined ? tour.sameDropOff : true,
-    });
+    };
     
-    console.log('Form data set with imageUrl:', tour.imageUrl);
+    console.log('🔧 Setting form data:', editFormData);
+    console.log('🔧 Form data title:', editFormData.title);
+    console.log('🔧 Form data transportType:', editFormData.transportType);
+    
+    setFormData(editFormData);
+    
+    console.log('🔧 Form data set successfully');
     
     setModalMode('edit');
     setSelectedTour(tour);
@@ -1907,53 +1845,6 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                 )}
               </div>
 
-              {/* Transport Details */}
-              <div>
-                <SectionHeader title="Transport Details" section="transport" />
-                {expandedSections.transport && (
-                  <div className="mt-4 p-6 bg-gray-50 rounded-lg">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Transport Type</label>
-                        <select 
-                          name="transportType" 
-                          value={formData.transportType} 
-                          onChange={handleInputChange} 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Transport Type</option>
-                          {transportTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Transport Modal</label>
-                        <select 
-                          name="transportModal" 
-                          value={formData.transportModal} 
-                          onChange={handleInputChange} 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Year</option>
-                          {transportModals.map(modal => <option key={modal} value={modal}>{modal}</option>)}
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Make & Variant</label>
-                        <input 
-                          type="text" 
-                          name="makeVariant" 
-                          value={formData.makeVariant} 
-                          onChange={handleInputChange} 
-                          placeholder="e.g., Toyota Hiace" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Images */}
               <div>
@@ -2472,6 +2363,69 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       )}
                     </div>
 
+                    {/* Transport Details Section */}
+                    <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+                      <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        🚗 Transport Details
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Transport Type</label>
+                          <select 
+                            name="transportType" 
+                            value={formData.transportType} 
+                            onChange={handleInputChange} 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select Transport Type</option>
+                            {transportTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Transport Year</label>
+                          <select 
+                            name="transportModal" 
+                            value={formData.transportModal} 
+                            onChange={handleInputChange} 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select Year</option>
+                            {transportModals.map(modal => <option key={modal} value={modal}>{modal}</option>)}
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Make & Variant</label>
+                          <input 
+                            type="text" 
+                            name="makeVariant" 
+                            value={formData.makeVariant} 
+                            onChange={handleInputChange} 
+                            placeholder="e.g., Toyota Hiace, Mercedes Benz" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Transport Details Preview */}
+                      {(formData.transportType || formData.transportModal || formData.makeVariant) && (
+                        <div className="mt-4 p-3 bg-white border border-blue-300 rounded-lg">
+                          <h5 className="text-sm font-medium text-blue-800 mb-2">🔍 Transport Details Preview:</h5>
+                          <p className="text-sm text-blue-700">
+                            <span className="font-medium">
+                              {formData.transportType || 'Transport Type'}
+                              {formData.transportModal && ` (${formData.transportModal})`}
+                              {formData.makeVariant && ` - ${formData.makeVariant}`}
+                            </span>
+                          </p>
+                          <p className="text-xs text-blue-600 mt-1">
+                            ✅ Click "Add Schedule" button below to save these transport details with pricing schedule
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Pricing Schedule Section */}
                     <div className={`bg-white p-6 rounded-xl border-2 shadow-sm ${
                       fieldErrors.pricingSchedule ? 'border-red-500 bg-red-50' : 'border-blue-200'
@@ -2624,6 +2578,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                             </select>
                           </div>
                         </div>
+
 
                         {/* Add Schedule Button */}
                         <button
@@ -3020,51 +2975,6 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           />
                         </div>
                         
-                        {/* Image Field for Itinerary - BOTH FILE UPLOAD AND URL */}
-                        <div className="md:col-span-2">
-                          {/* <label className="block text-sm font-medium text-gray-700 mb-1">Activity Image</label> */}
-                          
-                          {/* Option 1: Image URL */}
-                          {/* <div className="mb-2">
-                            <input 
-                              type="url" 
-                              value={typeof currentItinerary.image === 'string' ? currentItinerary.image : ''}
-                              onChange={(e) => setCurrentItinerary({...currentItinerary, image: e.target.value})}
-                              placeholder="Paste image URL (https://...)"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                            />
-                          </div> */}
-                          
-                          {/* Option 2: File Upload */}
-                          {/* <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">OR</span>
-                            <input 
-                              type="file" 
-                              accept="image/*" 
-                              onChange={handleItineraryImageChange}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" 
-                            />
-                          </div> */}
-                          
-                          {currentItinerary.image && (
-                            <div className="mt-2">
-                              {typeof currentItinerary.image === 'string' ? (
-                                <div className="flex items-center gap-2">
-                                  <img 
-                                    src={currentItinerary.image} 
-                                    alt="Preview" 
-                                    className="h-16 w-24 object-cover rounded border"
-                                  />
-                                  <p className="text-sm text-green-600">✓ Image URL ready</p>
-                                </div>
-                              ) : (
-                                <p className="text-sm text-green-600">
-                                  ✓ File selected: {(currentItinerary.image as any).name}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
                         
                         <div className="flex items-center gap-3">
                           <input 
@@ -3082,13 +2992,12 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         onClick={() => {
                           console.log('🔵 BUTTON CLICKED - Add Itinerary Item');
                           console.log('🔵 Current Activity:', currentItinerary.activity);
-                          console.log('🔵 Current Image:', currentItinerary.image);
                           addItinerary();
                         }} 
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg transition-all transform hover:scale-105"
-                        disabled={uploading || !currentItinerary.activity}
+                        disabled={!currentItinerary.activity}
                       >
-                        <Plus size={20} /> {uploading ? '⏳ Uploading Image...' : '➕ Add Itinerary Item'}
+                        <Plus size={20} /> ➕ Add Itinerary Item
                       </button>
                       {!currentItinerary.activity && (
                         <p className="text-sm text-red-500 mt-2">

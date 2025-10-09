@@ -206,6 +206,89 @@ export const postsAPI = {
     const response = await api.post(`/posts/${id}/reviews`, review);
     return response.data;
   },
+
+  // Rating System APIs
+  getRatings: async (tourId: string) => {
+    try {
+      const response = await api.get(`/posts/${tourId}/ratings`);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch ratings',
+        data: [],
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  addRating: async (tourId: string, ratingData: { 
+    rating: number; 
+    comment: string; 
+    userName: string; 
+    userEmail: string;
+    tourId: string;
+  }) => {
+    try {
+      const response = await api.post(`/posts/${tourId}/ratings`, ratingData);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to add rating',
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  updateRating: async (tourId: string, ratingId: string, updateData: { 
+    rating: number; 
+    comment: string;
+  }) => {
+    try {
+      const response = await api.put(`/posts/${tourId}/ratings/${ratingId}`, updateData);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update rating',
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  deleteRating: async (tourId: string, ratingId: string) => {
+    try {
+      const response = await api.delete(`/posts/${tourId}/ratings/${ratingId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to delete rating',
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  // Get all ratings for homepage
+  getAllRatings: async () => {
+    try {
+      const response = await api.get('/ratings');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch all ratings',
+        data: [],
+        error: error.response?.data || error.message
+      };
+    }
+  },
 };
 
 // Bookings API calls
