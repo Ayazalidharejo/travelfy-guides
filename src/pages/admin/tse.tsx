@@ -6,1415 +6,2967 @@
 
 
 
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, Edit, Save, Eye, AlertCircle, CheckCircle } from 'lucide-react';
+import { postsAPI, uploadAPI } from './../../lib/api';
 
+const TourBookingForm = () => {
+  const [showForm, setShowForm] = useState(false);
+  const [tours, setTours] = useState([]);
+  const [currentTourId, setCurrentTourId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
+  const [showTourList, setShowTourList] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
 
+  const initialFormData = {
+    title: '',
+    category: '',
+    tagline: '',
+    tourType: '',
+    description: '',
+    transportType: '',
+    transportModal: '',
+    makeVariant: '',
+    mainImage: '',
+    additionalImages: [],
+    galleryImages: [],
+    pickupLocation: '',
+    bestTime: '',
+    locationDetails: '',
+    city: '',
+    hotel: '',
+    includes: '',
+    excludes: '',
+    languages: '',
+    nearbyAttractions: '',
+    freeCancellation: false,
+    deadlineHours: '',
+    cancellationNote: '',
+    reserveNowPayLater: false,
+    reserveNote: '',
+    wheelchairAccessible: false,
+    infantSeats: false,
+    strollerAccessible: false,
+    serviceAnimals: false,
+    accessibilityNotes: '',
+    bookingType: 'single',
+    singlePersonName: '',
+    singlePersonAge: '',
+    singlePersonNationality: '',
+    singlePersonPreferences: '',
+    groupName: '',
+    groupLeaderName: '',
+    groupSize: '',
+    groupType: '',
+    groupSpecialRequests: '',
+    itineraryItems: [],
+    includedDestinations: [],
+    faqs: [],
+    activities: [],
+    pricingSchedule: [],
+    highlightsList: [],
+    taglinesList: [],
+    sameDropOff: true,
+    dropArea: '',
+    dropLocation: '',
+    dropPoint: '',
+    dropDetails: '',
+    themesList: [],
+    selectedSellingPoints: [],
+    thingsToBring: [],
+    discountPercentage: '',
+    validUntil: '',
+    minGroup: '',
+    maxGroup: '',
+    capacity: '',
+    duration: '',
+    durationHours: '',
+    startTime: '',
+    endTime: '',
+    operatingHours: '',
+    price: '',
+    priceNumber: '',
+    pricePerPerson: '',
+    currency: 'USD',
+    status: 'draft',
+    featured: false
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
 
+  // Validation rules and all other existing functions remain the same...
+  const validationRules = {
+    title: { required: true, minLength: 5, maxLength: 100, message: 'Title must be between 5 and 100 characters' },
+    category: { required: true, message: 'Category is required' },
+    tagline: { maxLength: 200, message: 'Tagline must be less than 200 characters' },
+    tourType: { required: true, message: 'Tour type is required' },
+    description: { required: true, minLength: 50, maxLength: 2000, message: 'Description must be between 50 and 2000 characters' },
+    transportType: { required: true, message: 'Transport type is required' },
+    transportModal: { pattern: /^(19|20)\d{2}$/, message: 'Please select a valid year between 1900-2099' },
+    makeVariant: { maxLength: 50, message: 'Make & variant must be less than 50 characters' },
+    pickupLocation: { required: true, minLength: 5, message: 'Pickup location is required (min 5 characters)' },
+    bestTime: { maxLength: 50, message: 'Best time must be less than 50 characters' },
+    locationDetails: { maxLength: 500, message: 'Location details must be less than 500 characters' },
+    city: { required: true, message: 'City is required' },
+    hotel: { maxLength: 100, message: 'Hotel name must be less than 100 characters' },
+    dropArea: { required: (data) => !data.sameDropOff, message: 'Drop-off area is required when different from pickup' },
+    dropLocation: { required: (data) => !data.sameDropOff, message: 'Drop-off location is required when different from pickup' },
+    dropPoint: { maxLength: 100, message: 'Drop-off point must be less than 100 characters' },
+    dropDetails: { maxLength: 500, message: 'Drop-off details must be less than 500 characters' },
+    includes: { required: true, minLength: 10, message: 'Please specify what is included in the tour (min 10 characters)' },
+    excludes: { required: true, minLength: 10, message: 'Please specify what is not included in the tour (min 10 characters)' },
+    languages: { pattern: /^[a-zA-Z,\s]+$/, message: 'Please enter valid languages separated by commas' },
+    nearbyAttractions: { maxLength: 500, message: 'Nearby attractions must be less than 500 characters' },
+    deadlineHours: { pattern: /^[1-9]\d*$/, min: 1, max: 720, message: 'Deadline hours must be between 1 and 720' },
+    cancellationNote: { maxLength: 200, message: 'Cancellation note must be less than 200 characters' },
+    reserveNote: { maxLength: 200, message: 'Reservation note must be less than 200 characters' },
+    accessibilityNotes: { maxLength: 500, message: 'Accessibility notes must be less than 500 characters' },
+    singlePersonName: { required: (data) => data.bookingType === 'single', pattern: /^[a-zA-Z\s]{2,50}$/, message: 'Name must be 2-50 letters only' },
+    singlePersonAge: { required: (data) => data.bookingType === 'single', pattern: /^(1[0-9]|[2-9][0-9]|100)$/, message: 'Age must be between 10 and 100' },
+    singlePersonNationality: { pattern: /^[a-zA-Z\s]{2,50}$/, message: 'Nationality must be 2-50 letters only' },
+    singlePersonPreferences: { maxLength: 200, message: 'Preferences must be less than 200 characters' },
+    groupName: { required: (data) => data.bookingType === 'group', minLength: 2, maxLength: 100, message: 'Group name must be between 2 and 100 characters' },
+    groupLeaderName: { required: (data) => data.bookingType === 'group', pattern: /^[a-zA-Z\s]{2,50}$/, message: 'Group leader name must be 2-50 letters only' },
+    groupSize: { required: (data) => data.bookingType === 'group', pattern: /^[2-9]\d*$/, min: 2, max: 1000, message: 'Group size must be between 2 and 1000' },
+    groupType: { required: (data) => data.bookingType === 'group', message: 'Group type is required for group booking' },
+    groupSpecialRequests: { maxLength: 500, message: 'Special requests must be less than 500 characters' },
+    discountPercentage: { pattern: /^(100|[1-9]?\d)$/, message: 'Discount must be between 0 and 100' },
+    validUntil: { validate: (value) => !value || new Date(value) > new Date(), message: 'Valid until date must be in the future' },
+    minGroup: { pattern: /^[1-9]\d*$/, message: 'Minimum group size must be a positive number' },
+    maxGroup: { pattern: /^[1-9]\d*$/, message: 'Maximum group size must be a positive number' },
+    capacity: { pattern: /^[1-9]\d*$/, message: 'Capacity must be a positive number' },
+    duration: { required: true, message: 'Duration is required' },
+    durationHours: { pattern: /^[1-9]\d*$/, message: 'Duration hours must be a positive number' },
+    startTime: { pattern: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, message: 'Please enter a valid start time (HH:MM)' },
+    endTime: { pattern: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, message: 'Please enter a valid end time (HH:MM)' },
+    operatingHours: { maxLength: 100, message: 'Operating hours must be less than 100 characters' },
+    price: { required: true, pattern: /^\$?\d+(\.\d{2})?$/, message: 'Please enter a valid price format (e.g., 100 or $100.00)' },
+    priceNumber: { pattern: /^\d+(\.\d{2})?$/, message: 'Please enter a valid price number' },
+    pricePerPerson: { pattern: /^\$?\d+(\.\d{2})?$/, message: 'Please enter a valid price per person' },
+    highlightsList: { validate: (value) => value.length > 0, message: 'At least one highlight is required' },
+    itineraryItems: { validate: (value) => value.length > 0, message: 'At least one itinerary item is required' }
+  };
 
+  // All existing validation functions remain the same...
+  const validateField = (name, value, formData) => {
+    const rules = validationRules[name];
+    if (!rules) return '';
 
-
-
-// import React, { useState, useEffect } from 'react';
-// import { Plus, Edit, Trash2, Eye, Search, Star, ChevronDown, ChevronRight, Save, X, MapPin, Clock, Users, Calendar, Image, DollarSign, Globe, Shield, Heart, Accessibility } from 'lucide-react';
-// import axios from 'axios';
-
-// const BlogManagement = () => {
-//   const [posts, setPosts] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState('');
-//   const [success, setSuccess] = useState('');
-//   const [showModal, setShowModal] = useState(false);
-//   const [editingPost, setEditingPost] = useState(null);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [totalPages, setTotalPages] = useState(1);
-  
-//   const [expandedSections, setExpandedSections] = useState({
-//     basic: true,
-//     content: false,
-//     pricing: false,
-//     images: false,
-//     location: false,
-//     tour: false,
-//     policies: false,
-//     itinerary: false,
-//     destinations: false,
-//     languages: false,
-//     faqs: false,
-//     foods: false,
-//     activities: false,
-//     events: false,
-//     accommodations: false,
-//     transport: false,
-//     safety: false,
-//     shopping: false,
-//     guides: false,
-//     photos: false,
-//     culture: false,
-//     medical: false,
-//     insurance: false,
-//     packing: false,
-//     seasonal: false,
-//     accessibility: false,
-//     sustainability: false,
-//     social: false,
-//     admin: false
-//   });
-
-//   const [filters, setFilters] = useState({
-//     search: '',
-//     category: '',
-//     status: '',
-//     featured: '',
-//     difficulty: ''
-//   });
-
-//   // Complete initial form data with ALL fields
-//   const initialFormData = {
-//     // ============ BASIC INFORMATION ============
-//     title: '',
-//     content: '',
-//     author: 'Admin',
-//     slug: '',
-    
-//     // ============ PRICING ============
-//     price: '',
-//     priceNumber: 0,
-//     pricePerPerson: 0,
-//     currency: 'USD',
-//     pricingTiers: [],
-//     discount: {
-//       percentage: 0,
-//       amount: 0,
-//       validUntil: '',
-//       description: ''
-//     },
-//     paymentMethods: [],
-//     depositRequired: false,
-//     depositAmount: 0,
-    
-//     // ============ CATEGORIES & TAGS ============
-//     category: '',
-//     tags: [],
-//     status: 'published',
-//     featured: false,
-//     views: 0,
-    
-//     // ============ IMAGES ============
-//     imageUrl: '',
-//     images: [],
-//     coverImage: '',
-//     gallery: [],
-    
-//     // ============ LOCATION ============
-//     prefecture: '',
-//     location: {
-//       address: '',
-//       city: '',
-//       country: '',
-//       coordinates: { lat: 0, lng: 0 },
-//       meetingPoint: '',
-//       area: ''
-//     },
-    
-//     // ============ MULTI-LANGUAGE NAMES ============
-//     nameJp: '',
-//     nameEn: '',
-//     nameLocal: '',
-    
-//     // ============ DURATION & TIMING ============
-//     duration: '',
-//     durationHours: 8,
-//     durationDays: 0,
-//     startTime: '',
-//     endTime: '',
-//     operatingHours: '',
-//     bestTimeToVisit: '',
-//     bestTime: '',
-    
-//     // ============ DESCRIPTIONS ============
-//     about: '',
-//     details: '',
-//     description: '',
-//     fullDescription: '',
-//     summary: '',
-//     quickFacts: [],
-//     keyFeatures: [],
-    
-//     // ============ ACTIVITY DETAILS ============
-//     highlights: [],
-//     includes: [],
-//     excludes: [],
-//     notSuitableFor: [],
-//     rules: [],
-//     guides: [],
-//     explorationWays: [],
-//     requirements: [],
-//     preparationTips: [],
-//     whatToBring: [],
-    
-//     // ============ TRAVEL INFORMATION ============
-//     difficulty: 'Easy',
-//     meetingPoint: '',
-//     importantInformation: [],
-    
-//     // ============ NEARBY SERVICES ============
-//     nearbyAttractions: [],
-//     dining: [],
-//     accommodation: [],
-//     tips: [],
-//     shoppingAreas: [],
-//     emergencyServices: [],
-    
-//     // ============ LANGUAGES ============
-//     languages: [],
-//     languagesDetailed: [],
-    
-//     // ============ POLICIES ============
-//     freeCancellation: {
-//       available: true,
-//       deadlineHours: 24,
-//       note: ''
-//     },
-//     reserveNowPayLater: {
-//       available: true,
-//       note: ''
-//     },
-//     cancellationPolicy: 'Free cancellation up to 24 hours before the tour',
-//     refundPolicy: 'Full refund for cancellations made 24+ hours in advance',
-//     termsConditions: '',
-//     privacyPolicy: '',
-    
-//     // ============ GUIDE INFORMATION ============
-//     liveTourGuide: {
-//       available: true,
-//       languages: [],
-//       certification: [],
-//       experience: ''
-//     },
-    
-//     // ============ RATING SYSTEM ============
-//     rating: {
-//       average: 0,
-//       count: 0
-//     },
-//     averageRating: 0,
-//     totalReviews: 0,
-//     reviewSummary: {
-//       excellent: 0,
-//       good: 0,
-//       average: 0,
-//       poor: 0,
-//       terrible: 0
-//     },
-    
-//     // ============ REVIEWS ============
-//     reviews: [],
-//     extendedReviews: [],
-    
-//     // ============ TOUR GUIDE SPECIFIC FIELDS ============
-//     availableDates: [],
-//     groupSize: {
-//       min: 1,
-//       max: 20
-//     },
-//     tourType: 'Group',
-//     capacity: 0,
-//     currentBookings: 0,
-//     bookingDeadline: 24,
-//     confirmationTime: '',
-    
-//     // ============ AGE & REQUIREMENTS ============
-//     minAge: 0,
-//     maxAge: 99,
-//     physicalRequirements: '',
-//     fitnessLevel: '',
-//     equipmentProvided: [],
-//     equipmentRequired: [],
-//     skillLevel: '',
-    
-//     // ============ NESTED COMPLEX DATA ============
-//     destinations: [],
-//     itinerary: [],
-//     pickupPoints: [],
-//     faqs: [],
-//     foods: [],
-//     activities: [],
-//     events: [],
-//     accommodations: [],
-//     transport: [],
-//     safetyInfo: [],
-//     shopping: [],
-//     localGuides: [],
-//     photoSpots: [],
-//     culture: [],
-//     medical: [],
-//     insurance: [],
-//     packingList: [],
-//     seasonalInfo: [],
-    
-//     // ============ FEATURES ============
-//     features: {
-//       comfortableTransport: false,
-//       authenticMeals: false,
-//       expertGuides: false,
-//       photoOpportunities: false,
-//       culturalExperience: false,
-//       wifi: false,
-//       mealsIncluded: false,
-//       hotelPickup: false,
-//       insuranceIncluded: false,
-//       equipmentProvided: false
-//     },
-    
-//     // ============ BOOKING & MANAGEMENT ============
-//     bookingStatus: 'Available',
-//     bestSeasons: [],
-//     weatherConsiderations: '',
-//     seasonalPricing: false,
-    
-//     // ============ EMERGENCY CONTACT ============
-//     emergencyContact: {
-//       name: '',
-//       phone: '',
-//       email: '',
-//       alternatePhone: ''
-//     },
-    
-//     // ============ BUSINESS LOGIC ============
-//     commissionRate: 0,
-//     partnerInfo: {
-//       name: '',
-//       contact: '',
-//       commission: 0
-//     },
-//     revenue: 0,
-//     popularityScore: 0,
-    
-//     // ============ ACCESSIBILITY ============
-//     accessibility: {
-//       wheelchair: false,
-//       visuallyImpaired: false,
-//       hearingImpaired: false,
-//       notes: ''
-//     },
-    
-//     // ============ SUSTAINABILITY ============
-//     sustainability: {
-//       ecoFriendly: false,
-//       localCommunitySupport: false,
-//       carbonNeutral: false,
-//       certifications: [],
-//       practices: []
-//     },
-    
-//     // ============ SOCIAL MEDIA & MARKETING ============
-//     socialMedia: {
-//       instagram: '',
-//       facebook: '',
-//       twitter: '',
-//       website: ''
-//     },
-//     seo: {
-//       metaTitle: '',
-//       metaDescription: '',
-//       keywords: []
-//     },
-    
-//     // ============ ADMIN FIELDS ============
-//     isActive: true,
-//     isFeatured: false,
-//     isPopular: false,
-//     isRecommended: false,
-//     priority: 0,
-//     lastBooked: '',
-//     createdFrom: 'admin'
-//   };
-
-//   const [formData, setFormData] = useState(initialFormData);
-
-//   // Axios configuration
-//   const api = axios.create({
-//     baseURL: 'https://tour-backend-eight.vercel.app/api',
-//     headers: { 'Content-Type': 'application/json' }
-//   });
-
-//   api.interceptors.request.use((config) => {
-//     const token = localStorage.getItem('token');
-//     if (token) config.headers.Authorization = `Bearer ${token}`;
-//     return config;
-//   });
-
-//   api.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//       if (error.response?.status === 401) {
-//         setError('Please login first. Session expired.');
-//       }
-//       return Promise.reject(error);
-//     }
-//   );
-
-//   // Constants for dropdowns
-//   const categories = ['blog', 'tour', 'mountain', 'urban', 'cultural', 'nature', 'temple', 'modern', 'adventure', 'food', 'accommodation', 'Cultural', 'Nature', 'Adventure', 'Food', 'Shopping', 'Historical', 'Spiritual', 'Beach', 'Wildlife', 'City'];
-//   const difficulties = ['Easy', 'Moderate', 'Challenging', 'Hard', 'Expert'];
-//   const statuses = ['draft', 'published', 'archived', 'active', 'inactive'];
-//   const tourTypes = ['Group', 'Private', 'Premium', 'Custom'];
-//   const bookingStatuses = ['Available', 'Limited', 'Sold Out', 'Suspended', 'Coming Soon'];
-//   const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
-//   const languageLevels = ['Native', 'Fluent', 'Conversational', 'Basic'];
-//   const accommodationTypes = ['Hotel', 'Hostel', 'Resort', 'Homestay', 'Camping', 'Villa', 'Apartment'];
-//   const transportTypes = ['Bus', 'Car', 'Train', 'Flight', 'Boat', 'Bicycle', 'Walking', 'Taxi', 'Metro'];
-//   const activityCategories = ['Adventure', 'Cultural', 'Relaxation', 'Food', 'Shopping', 'Historical', 'Nature'];
-//   const comfortLevels = ['Economy', 'Standard', 'Premium', 'Luxury'];
-//   const severityLevels = ['Low', 'Medium', 'High', 'Critical'];
-//   const importanceLevels = ['Low', 'Medium', 'High'];
-//   const paymentMethods = ['Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer', 'Cash', 'Digital Wallet'];
-
-//   // Utility functions
-//   const cleanFormData = (data) => {
-//     const clean = { ...data };
-//     delete clean._id;
-//     delete clean.__v;
-//     delete clean.createdAt;
-//     delete clean.updatedAt;
-//     delete clean.reviewCount;
-//     delete clean.extendedReviewCount;
-//     delete clean.createdBy;
-//     delete clean.lastUpdatedBy;
-//     delete clean.durationInHours;
-//     delete clean.remainingSpots;
-//     return clean;
-//   };
-
-//   const fetchPosts = async (page = 1) => {
-//     setLoading(true);
-//     setError('');
-//     try {
-//       const params = { page: page.toString(), limit: '10' };
-//       Object.keys(filters).forEach(key => {
-//         if (filters[key] && filters[key] !== '') params[key] = filters[key];
-//       });
-//       const response = await api.get('/posts', { params });
-//       if (response.data.success) {
-//         setPosts(Array.isArray(response.data.data) ? response.data.data : []);
-//         setTotalPages(response.data.pagination?.totalPages || 1);
-//         setCurrentPage(response.data.pagination?.currentPage || 1);
-//       }
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Unable to fetch posts');
-//       setPosts([]);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const createPost = async () => {
-//     setLoading(true);
-//     setError('');
-//     try {
-//       const cleanData = cleanFormData(formData);
-//       const token = localStorage.getItem("token");
+    if (rules.required) {
+      const isRequired = typeof rules.required === 'function' 
+        ? rules.required(formData) 
+        : rules.required;
       
-//       const response = await api.post('/posts', cleanData, {
-//         headers: { Authorization: `Bearer ${token}` }
-//       });
+      if (isRequired && (!value || value.toString().trim() === '')) {
+        return rules.message || `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+      }
+    }
 
-//       if (response.data.success) {
-//         setSuccess('Post created successfully!');
-//         setShowModal(false);
-//         resetForm();
-//         await fetchPosts(currentPage);
-//       }
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Unable to create post');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+    if (!value || value.toString().trim() === '') return '';
 
-//   const updatePost = async () => {
-//     if (!editingPost?._id) return;
-//     setLoading(true);
-//     setError('');
-//     try {
-//       const cleanData = cleanFormData(formData);
-//       const response = await api.put(`/posts/${editingPost._id}`, cleanData);
-//       if (response.data.success) {
-//         setSuccess('Post updated successfully!');
-//         setShowModal(false);
-//         setEditingPost(null);
-//         resetForm();
-//         await fetchPosts(currentPage);
-//       }
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Unable to update post');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+    if (rules.minLength && value.length < rules.minLength) {
+      return rules.message || `Must be at least ${rules.minLength} characters`;
+    }
 
-//   const deletePost = async (id) => {
-//     if (!id || !window.confirm('Are you sure?')) return;
-//     setLoading(true);
-//     try {
-//       await api.delete(`/posts/${id}`);
-//       setSuccess('Post deleted successfully!');
-//       await fetchPosts(currentPage);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Unable to delete post');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+    if (rules.maxLength && value.length > rules.maxLength) {
+      return rules.message || `Must be less than ${rules.maxLength} characters`;
+    }
 
-//   const resetForm = () => {
-//     setFormData(initialFormData);
-//   };
+    if (rules.pattern && !rules.pattern.test(value.toString())) {
+      return rules.message || 'Invalid format';
+    }
 
-//   const handleEditClick = (post) => {
-//     if (!post) return;
-//     setEditingPost(post);
+    if (rules.min !== undefined && parseFloat(value) < rules.min) {
+      return rules.message || `Must be at least ${rules.min}`;
+    }
+
+    if (rules.max !== undefined && parseFloat(value) > rules.max) {
+      return rules.message || `Must be less than ${rules.max}`;
+    }
+
+    if (rules.validate && !rules.validate(value)) {
+      return rules.message || 'Invalid value';
+    }
+
+    return '';
+  };
+
+  const validateForm = (data) => {
+    const errors = {};
     
-//     const mergedData = { ...initialFormData };
-//     const deepMerge = (target, source) => {
-//       for (const key in source) {
-//         if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-//           if (!target[key]) target[key] = {};
-//           deepMerge(target[key], source[key]);
-//         } else if (Array.isArray(source[key])) {
-//           target[key] = Array.isArray(source[key]) ? [...source[key]] : [];
-//         } else {
-//           target[key] = source[key];
-//         }
-//       }
-//       return target;
-//     };
+    Object.keys(validationRules).forEach(field => {
+      const error = validateField(field, data[field], data);
+      if (error) {
+        errors[field] = error;
+      }
+    });
+
+    if (data.minGroup && data.maxGroup && parseInt(data.minGroup) > parseInt(data.maxGroup)) {
+      errors.minGroup = 'Minimum group size cannot be greater than maximum';
+    }
+
+    if (data.startTime && data.endTime && data.startTime >= data.endTime) {
+      errors.endTime = 'End time must be after start time';
+    }
+
+    if (data.discountPercentage && data.price && parseFloat(data.discountPercentage) > 0) {
+      const price = parseFloat(data.price.replace(/[^\d.]/g, ''));
+      const discount = parseFloat(data.discountPercentage);
+      if (discount >= 100) {
+        errors.discountPercentage = 'Discount cannot be 100% or more';
+      }
+    }
+
+    if (data.highlightsList.length === 0) {
+      errors.highlightsList = 'At least one highlight is required';
+    }
+
+    if (data.itineraryItems.length === 0) {
+      errors.itineraryItems = 'At least one itinerary item is required';
+    }
+
+    if (!data.mainImage) {
+      errors.mainImage = 'Main image is required';
+    }
+
+    return errors;
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
     
-//     setFormData(deepMerge(mergedData, post));
-//     setShowModal(true);
-//   };
+    const error = validateField(name, value, formData);
+    setValidationErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+  };
 
-//   // Field handlers
-//   const handleArrayFieldChange = (fieldName, index, value) => {
-//     const newArray = [...(formData[fieldName] || [])];
-//     newArray[index] = value;
-//     setFormData({ ...formData, [fieldName]: newArray });
-//   };
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue
+    }));
 
-//   const addArrayField = (fieldName, defaultValue = '') => {
-//     setFormData({ ...formData, [fieldName]: [...(formData[fieldName] || []), defaultValue] });
-//   };
+    if (touchedFields[name]) {
+      const error = validateField(name, newValue, { ...formData, [name]: newValue });
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: error
+      }));
+    }
 
-//   const removeArrayField = (fieldName, index) => {
-//     const newArray = (formData[fieldName] || []).filter((_, i) => i !== index);
-//     setFormData({ ...formData, [fieldName]: newArray });
-//   };
+    if (name === 'price' && newValue) {
+      const priceMatch = newValue.match(/(\d+\.?\d*)/);
+      if (priceMatch) {
+        setFormData(prev => ({
+          ...prev,
+          priceNumber: priceMatch[1]
+        }));
+      }
+    }
+  };
 
-//   const addComplexField = (fieldName, template) => {
-//     setFormData({ ...formData, [fieldName]: [...(formData[fieldName] || []), template] });
-//   };
+  useEffect(() => {
+    fetchTours();
+  }, []);
 
-//   const updateComplexField = (fieldName, index, field, value) => {
-//     const newArray = [...(formData[fieldName] || [])];
-//     if (!newArray[index]) newArray[index] = {};
-//     newArray[index] = { ...newArray[index], [field]: value };
-//     setFormData({ ...formData, [fieldName]: newArray });
-//   };
+  const fetchTours = async () => {
+    try {
+      setLoading(true);
+      const response = await postsAPI.getPosts();
+      if (response.success) {
+        setTours(response.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching tours:', err);
+      setError('Failed to load tours');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//   const removeComplexField = (fieldName, index) => {
-//     const newArray = (formData[fieldName] || []).filter((_, i) => i !== index);
-//     setFormData({ ...formData, [fieldName]: newArray });
-//   };
-
-//   const updateNestedObject = (parentField, childField, value) => {
-//     setFormData({ 
-//       ...formData, 
-//       [parentField]: { 
-//         ...formData[parentField], 
-//         [childField]: value 
-//       } 
-//     });
-//   };
-
-//   const updateDeepNestedObject = (parentField, childField, grandChildField, value) => {
-//     setFormData({ 
-//       ...formData, 
-//       [parentField]: { 
-//         ...formData[parentField], 
-//         [childField]: {
-//           ...formData[parentField]?.[childField],
-//           [grandChildField]: value
-//         } 
-//       } 
-//     });
-//   };
-
-//   const toggleSection = (section) => {
-//     setExpandedSections({ ...expandedSections, [section]: !expandedSections[section] });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     if (!formData.title?.trim() || !formData.content?.trim() || !formData.category || !formData.duration?.trim() || !formData.price?.trim()) {
-//       setError('Please fill all required fields');
-//       return;
-//     }
-//     editingPost ? updatePost() : createPost();
-//   };
-
-//   // Render functions
-//   const renderArrayField = (fieldName, label, placeholder = '', type = 'text') => (
-//     <div className="space-y-2">
-//       <label className="block text-sm font-medium text-gray-700">{label}</label>
-//       {(formData[fieldName] || []).map((item, index) => (
-//         <div key={index} className="flex items-center space-x-2">
-//           {type === 'textarea' ? (
-//             <textarea 
-//               value={item || ''} 
-//               onChange={(e) => handleArrayFieldChange(fieldName, index, e.target.value)}
-//               className="flex-1 px-3 py-2 border rounded-md" 
-//               placeholder={placeholder}
-//               rows={2}
-//             />
-//           ) : (
-//             <input 
-//               type={type} 
-//               value={item || ''} 
-//               onChange={(e) => handleArrayFieldChange(fieldName, index, e.target.value)}
-//               className="flex-1 px-3 py-2 border rounded-md" 
-//               placeholder={placeholder} 
-//             />
-//           )}
-//           <button type="button" onClick={() => removeArrayField(fieldName, index)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
-//             <Trash2 size={16} />
-//           </button>
-//         </div>
-//       ))}
-//       <button type="button" onClick={() => addArrayField(fieldName, '')} className="text-blue-600 text-sm flex items-center">
-//         <Plus size={16} className="mr-1" /> Add {label}
-//       </button>
-//     </div>
-//   );
-
-//   const renderComplexField = (fieldName, label, fieldsConfig, template) => (
-//     <div className="border p-4 rounded space-y-4">
-//       <h5 className="font-medium text-lg">{label}</h5>
-//       {(formData[fieldName] || []).map((item, index) => (
-//         <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded bg-gray-50">
-//           {fieldsConfig.map((fieldConfig) => (
-//             <div key={fieldConfig.name} className={fieldConfig.fullWidth ? 'col-span-2' : ''}>
-//               <label className="block text-sm font-medium mb-1">{fieldConfig.label}</label>
-//               {fieldConfig.type === 'textarea' ? (
-//                 <textarea
-//                   rows={fieldConfig.rows || 2}
-//                   value={item[fieldConfig.name] || ''}
-//                   onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, e.target.value)}
-//                   className="w-full px-3 py-2 border rounded-md"
-//                   placeholder={fieldConfig.placeholder}
-//                 />
-//               ) : fieldConfig.type === 'select' ? (
-//                 <select
-//                   value={item[fieldConfig.name] || ''}
-//                   onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, e.target.value)}
-//                   className="w-full px-3 py-2 border rounded-md"
-//                 >
-//                   <option value="">Select {fieldConfig.label}</option>
-//                   {fieldConfig.options.map(option => (
-//                     <option key={option} value={option}>{option}</option>
-//                   ))}
-//                 </select>
-//               ) : fieldConfig.type === 'checkbox' ? (
-//                 <label className="flex items-center">
-//                   <input
-//                     type="checkbox"
-//                     checked={item[fieldConfig.name] || false}
-//                     onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, e.target.checked)}
-//                     className="h-4 w-4 text-blue-600 rounded"
-//                   />
-//                   <span className="ml-2 text-sm">{fieldConfig.placeholder}</span>
-//                 </label>
-//               ) : fieldConfig.type === 'number' ? (
-//                 <input
-//                   type="number"
-//                   value={item[fieldConfig.name] || ''}
-//                   onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, parseFloat(e.target.value) || 0)}
-//                   className="w-full px-3 py-2 border rounded-md"
-//                   placeholder={fieldConfig.placeholder}
-//                 />
-//               ) : fieldConfig.type === 'date' ? (
-//                 <input
-//                   type="date"
-//                   value={item[fieldConfig.name] || ''}
-//                   onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, e.target.value)}
-//                   className="w-full px-3 py-2 border rounded-md"
-//                 />
-//               ) : (
-//                 <input
-//                   type={fieldConfig.type || 'text'}
-//                   value={item[fieldConfig.name] || ''}
-//                   onChange={(e) => updateComplexField(fieldName, index, fieldConfig.name, e.target.value)}
-//                   className="w-full px-3 py-2 border rounded-md"
-//                   placeholder={fieldConfig.placeholder}
-//                 />
-//               )}
-//             </div>
-//           ))}
-//           <div className="col-span-2">
-//             <button type="button" onClick={() => removeComplexField(fieldName, index)} className="text-red-600 text-sm flex items-center">
-//               <Trash2 size={16} className="mr-1" /> Remove
-//             </button>
-//           </div>
-//         </div>
-//       ))}
-//       <button type="button" onClick={() => addComplexField(fieldName, template)} className="text-blue-600 text-sm flex items-center">
-//         <Plus size={16} className="mr-1" /> Add {label}
-//       </button>
-//     </div>
-//   );
-
-//   // Template objects for complex fields
-//   const destinationTemplate = {
-//     name: '',
-//     description: '',
-//     duration: '',
-//     difficulty: 'Easy',
-//     highlights: [],
-//     tips: '',
-//     bestTimeToVisit: '',
-//     localAttractions: [],
-//     nearbyPlaces: [],
-//     entryFee: '',
-//     location: {
-//       address: '',
-//       coordinates: { lat: 0, lng: 0 }
-//     },
-//     images: [],
-//     openingHours: '',
-//     contactInfo: {
-//       phone: '',
-//       email: '',
-//       website: ''
-//     }
-//   };
-
-//   const itineraryTemplate = {
-//     time: '',
-//     activity: '',
-//     description: '',
-//     duration: '',
-//     location: '',
-//     images: [],
-//     notes: '',
-//     included: true,
-//     cost: 0
-//   };
-
-//   const faqTemplate = {
-//     question: '',
-//     answer: '',
-//     category: '',
-//     priority: 0
-//   };
-
-//   const foodTemplate = {
-//     name: '',
-//     description: '',
-//     image: '',
-//     isVeg: false,
-//     recommended: false,
-//     priceRange: '',
-//     restaurant: '',
-//     dietaryInfo: [],
-//     tastingNotes: '',
-//     bestTimeToEat: ''
-//   };
-
-//   const activityTemplate = {
-//     title: '',
-//     description: '',
-//     duration: '',
-//     category: 'Adventure',
-//     image: '',
-//     cost: 0,
-//     ageLimit: '',
-//     safetyNotes: '',
-//     location: '',
-//     included: true,
-//     requirements: [],
-//     bestTime: ''
-//   };
-
-//   // Use effects
-//   useEffect(() => { fetchPosts(1); }, []);
-//   useEffect(() => {
-//     const timeoutId = setTimeout(() => { fetchPosts(1); }, 500);
-//     return () => clearTimeout(timeoutId);
-//   }, [filters]);
-//   useEffect(() => {
-//     if (success || error) {
-//       const timer = setTimeout(() => { setSuccess(''); setError(''); }, 5000);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [success, error]);
-
-//   return (
-//     <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
-//       <div className="flex justify-between items-center mb-6">
+  const createTour = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const errors = validateForm(formData);
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        setTouchedFields(Object.keys(validationRules).reduce((acc, field) => {
+          acc[field] = true;
+          return acc;
+        }, {}));
+        setError('Please fix all validation errors before submitting');
         
-//         <h1 className="text-3xl font-bold">Blog Management</h1>
-//         <button onClick={() => { setEditingPost(null); resetForm(); setShowModal(true); }}
-//           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
-//           <Plus size={20} /> Add New Post
-//         </button>
-//       </div>
+        const firstErrorField = Object.keys(errors)[0];
+        const element = document.querySelector(`[name="${firstErrorField}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.focus();
+        }
+        return;
+      }
 
-//       {success && <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">{success}</div>}
-//       {error && <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">{error}</div>}
+      const tourData = cleanFormData(formData);
+      const response = await postsAPI.createPost(tourData);
+      
+      if (response.success) {
+        await fetchTours();
+        resetForm();
+        setShowForm(false);
+        alert('Tour created successfully!');
+      } else {
+        setError(response.message || 'Failed to create tour');
+      }
+    } catch (err) {
+      console.error('Error creating tour:', err);
+      setError(err.response?.data?.message || 'Failed to create tour');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//       {/* Filters */}
-//       <div className="bg-white p-4 rounded-lg shadow mb-6">
-//         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-//           <div className="relative">
-//             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-//             <input type="text" placeholder="Search..." value={filters.search} onChange={(e) => setFilters({...filters, search: e.target.value})}
-//               className="w-full pl-10 pr-4 py-2 border rounded-lg" />
-//           </div>
-//           <select value={filters.category} onChange={(e) => setFilters({...filters, category: e.target.value})} className="px-3 py-2 border rounded-lg">
-//             <option value="">All Categories</option>
-//             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-//           </select>
-//           <select value={filters.status} onChange={(e) => setFilters({...filters, status: e.target.value})} className="px-3 py-2 border rounded-lg">
-//             <option value="">All Status</option>
-//             {statuses.map(status => <option key={status} value={status}>{status}</option>)}
-//           </select>
-//           <select value={filters.difficulty} onChange={(e) => setFilters({...filters, difficulty: e.target.value})} className="px-3 py-2 border rounded-lg">
-//             <option value="">All Difficulties</option>
-//             {difficulties.map(diff => <option key={diff} value={diff}>{diff}</option>)}
-//           </select>
-//           <select value={filters.featured} onChange={(e) => setFilters({...filters, featured: e.target.value})} className="px-3 py-2 border rounded-lg">
-//             <option value="">All Posts</option>
-//             <option value="true">Featured</option>
-//             <option value="false">Non-Featured</option>
-//           </select>
-//         </div>
-//       </div>
+  const readTour = async (tourId) => {
+    try {
+      setLoading(true);
+      const response = await postsAPI.getPost(tourId);
+      if (response.success) {
+        setFormData(response.data);
+        setIsViewing(true);
+        setShowForm(true);
+        setCurrentTourId(tourId);
+        setValidationErrors({});
+        setTouchedFields({});
+      } else {
+        setError('Failed to load tour details');
+      }
+    } catch (err) {
+      console.error('Error reading tour:', err);
+      setError('Failed to load tour details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//       {/* Posts Table */}
-//       <div className="bg-white rounded-lg shadow overflow-hidden">
-//         {loading ? (
-//           <div className="p-12 text-center">
-//             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-//             <p className="mt-4 text-gray-600">Loading...</p>
-//           </div>
-//         ) : posts.length === 0 ? (
-//           <div className="p-12 text-center text-gray-500">No posts found</div>
-//         ) : (
-//           <>
-//             <table className="w-full">
-//               <thead className="bg-gray-50">
-//                 <tr>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Views</th>
-//                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody className="bg-white divide-y divide-gray-200">
-//                 {posts.map((post) => (
-//                   <tr key={post._id} className="hover:bg-gray-50">
-//                     <td className="px-6 py-4">
-//                       <div className="flex items-center">
-//                         <div className="text-sm font-medium text-gray-900">{post.title}</div>
-//                         {post.featured && <Star className="ml-2 h-4 w-4 text-yellow-400 fill-current" />}
-//                       </div>
-//                     </td>
-//                     <td className="px-6 py-4"><span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{post.category}</span></td>
-//                     <td className="px-6 py-4 text-sm">{post.price}</td>
-//                     <td className="px-6 py-4">
-//                       <span className={`px-2 py-1 text-xs rounded-full ${post.status === 'published' ? 'bg-green-100 text-green-800' : post.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-//                         {post.status}
-//                       </span>
-//                     </td>
-//                     <td className="px-6 py-4 text-sm"><div className="flex items-center"><Eye className="h-4 w-4 text-gray-400 mr-1" />{post.views || 0}</div></td>
-//                     <td className="px-6 py-4">
-//                       <div className="flex space-x-2">
-//                         <button onClick={() => handleEditClick(post)} className="text-indigo-600 hover:text-indigo-900"><Edit size={16} /></button>
-//                         <button onClick={() => deletePost(post._id)} className="text-red-600 hover:text-red-900"><Trash2 size={16} /></button>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//             {totalPages > 1 && (
-//               <div className="px-4 py-3 border-t flex justify-between items-center">
-//                 <button onClick={() => fetchPosts(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="px-4 py-2 border rounded-md disabled:opacity-50">Previous</button>
-//                 <span>Page {currentPage} of {totalPages}</span>
-//                 <button onClick={() => fetchPosts(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="px-4 py-2 border rounded-md disabled:opacity-50">Next</button>
-//               </div>
-//             )}
-//           </>
-//         )}
-//       </div>
+  const updateTour = async () => {
+    try {
+      if (!currentTourId) return;
+      
+      setLoading(true);
+      setError('');
 
-//       {/* Modal - Complete with ALL sections */}
-//       {showModal && (
-//         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50">
-//           <div className="relative top-4 mx-auto p-5 border w-11/12 max-w-7xl shadow-lg rounded-lg bg-white mb-8 max-h-[95vh] overflow-y-auto">
-//             <div className="flex justify-between items-center mb-4 sticky top-0 bg-white pb-4 border-b z-10">
-//               <h3 className="text-xl font-bold">{editingPost ? 'Edit Post' : 'Create Post'}</h3>
-//               <button onClick={() => { setShowModal(false); setEditingPost(null); resetForm(); }} className="text-gray-400 hover:text-gray-600">
-//                 <X size={24} />
-//               </button>
-//             </div>
+      const errors = validateForm(formData);
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        setTouchedFields(Object.keys(validationRules).reduce((acc, field) => {
+          acc[field] = true;
+          return acc;
+        }, {}));
+        setError('Please fix all validation errors before submitting');
+        return;
+      }
 
-//             <form onSubmit={handleSubmit} className="space-y-6">
-//               {/* SECTION 1: Basic Information */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('basic')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-t-lg">
-//                   <h4 className="text-lg font-medium flex items-center"><Star className="mr-2" size={20} /> Basic Information</h4>
-//                   {expandedSections.basic ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.basic && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Title *</label>
-//                         <input type="text" required value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-                     
-//                     </div>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Category *</label>
-//                         <select required value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           <option value="">Select</option>
-//                           {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-//                         </select>
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Status</label>
-//                         <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           {statuses.map(s => <option key={s} value={s}>{s}</option>)}
-//                         </select>
-//                       </div>
-                   
-//                     </div>
-//                     <div><label className="block text-sm font-medium mb-1">tagline *</label>
-//                       <textarea required rows={6} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                     </div>
-                   
-//                     <div className="mb-4">
-//   <label className="block text-sm font-medium mb-2">Select Tour Type</label>
-//   <select
-//     value={formData.tourType}
-//     onChange={(e) => setFormData({ ...formData, tourType: e.target.value })}
-//     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-//   >
-//     <option value="">-- Select --</option>
-//     <option value="private">Private</option>
-//     <option value="public">Public</option>
-//     <option value="shared">Shared</option>
-//     <option value="other">Other</option>
-//   </select>
-// </div>
+      const tourData = cleanFormData(formData);
+      const response = await postsAPI.updatePost(currentTourId, tourData);
+      
+      if (response.success) {
+        await fetchTours();
+        resetForm();
+        setIsEditing(false);
+        setCurrentTourId(null);
+        setShowForm(false);
+        alert('Tour updated successfully!');
+      } else {
+        setError(response.message || 'Failed to update tour');
+      }
+    } catch (err) {
+      console.error('Error updating tour:', err);
+      setError(err.response?.data?.message || 'Failed to update tour');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//                     {renderArrayField('tags', 'Tags', 'Enter tag')}
-//                   </div>
-//                 )}
-//               </div>
+  const deleteTour = async (tourId) => {
+    if (!window.confirm('Are you sure you want to delete this tour?')) return;
 
-//               {/* SECTION 2: Content & Descriptions */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('content')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Edit className="mr-2" size={20} /> Descriptions</h4>
-//                   {expandedSections.content ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.content && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     
-//                       <div><label className="block text-sm font-medium mb-1">Description</label>
-//                         <textarea rows={3} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-                     
-//                     </div>
-                  
-//                     {renderArrayField('quickFacts', 'Highlightes', 'Enter quick fact')}
-//                     {renderArrayField('keyFeatures', 'Sealing point', 'Enter key feature')}
-//                   </div>
-//                 )}
-//               </div>
+    try {
+      setLoading(true);
+      const response = await postsAPI.deletePost(tourId);
+      
+      if (response.success) {
+        await fetchTours();
+        if (currentTourId === tourId) {
+          resetForm();
+        }
+        alert('Tour deleted successfully!');
+      } else {
+        setError(response.message || 'Failed to delete tour');
+      }
+    } catch (err) {
+      console.error('Error deleting tour:', err);
+      setError('Failed to delete tour');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//               {/* SECTION 3: Pricing */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('pricing')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><DollarSign className="mr-2" size={20} /> Pricing & Duration</h4>
-//                   {expandedSections.pricing ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.pricing && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Transport type</label>
-//                         <select value={formData.currency} onChange={(e) => setFormData({...formData, currency: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           <option value="USD">Bus</option><option value="EUR">when</option><option value="JPY">Car</option><option value="GBP">GBP</option>
-//                         </select>
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Transport modal</label>
-//                         <select value={formData.currency} onChange={(e) => setFormData({...formData, currency: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           <option value="USD">2001</option><option value="EUR">2206</option><option value="JPY">2007</option><option value="GBP">2003</option>
-//                         </select>
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Make & varitent</label>
-//                         <select value={formData.currency} onChange={(e) => setFormData({...formData, currency: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           <option value="USD">2001</option><option value="EUR">2206</option><option value="JPY">2007</option><option value="GBP">2003</option>
-//                         </select>
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Price *</label>
-//                         <input type="text" required value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Price Number</label>
-//                         <input type="number" value={formData.priceNumber} onChange={(e) => setFormData({...formData, priceNumber: parseFloat(e.target.value) || 0})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Price Per Person</label>
-//                         <input type="number" value={formData.pricePerPerson} onChange={(e) => setFormData({...formData, pricePerPerson: parseFloat(e.target.value) || 0})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Currency</label>
-//                         <select value={formData.currency} onChange={(e) => setFormData({...formData, currency: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           <option value="USD">USD</option><option value="EUR">EUR</option><option value="JPY">JPY</option><option value="GBP">GBP</option>
-//                         </select>
-//                       </div>
-//                     </div>
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Duration *</label>
-//                         <input type="text" required value={formData.duration} onChange={(e) => setFormData({...formData, duration: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Duration Hours</label>
-//                         <input type="number" value={formData.durationHours} onChange={(e) => setFormData({...formData, durationHours: parseInt(e.target.value) || 8})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Start Time</label>
-//                         <input type="text" value={formData.startTime} onChange={(e) => setFormData({...formData, startTime: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">End Time</label>
-//                         <input type="text" value={formData.endTime} onChange={(e) => setFormData({...formData, endTime: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Operating Hours</label>
-//                         <input type="text" value={formData.operatingHours} onChange={(e) => setFormData({...formData, operatingHours: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-//                     <div className="border p-4 rounded bg-gray-50">
-//                       <h5 className="font-medium mb-3">Discount Information</h5>
-//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                         <div><label className="block text-sm font-medium mb-1">Discount Percentage</label>
-//                           <input type="number" value={formData.discount.percentage} onChange={(e) => setFormData({...formData, discount: {...formData.discount, percentage: parseFloat(e.target.value) || 0}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Discount Amount</label>
-//                           <input type="number" value={formData.discount.amount} onChange={(e) => setFormData({...formData, discount: {...formData.discount, amount: parseFloat(e.target.value) || 0}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Valid Until</label>
-//                           <input type="date" value={formData.discount.validUntil} onChange={(e) => setFormData({...formData, discount: {...formData.discount, validUntil: e.target.value}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Description</label>
-//                           <input type="text" value={formData.discount.description} onChange={(e) => setFormData({...formData, discount: {...formData.discount, description: e.target.value}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                       </div>
-//                     </div>
-                    
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <label className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           checked={formData.depositRequired}
-//                           onChange={(e) => setFormData({...formData, depositRequired: e.target.checked})}
-//                           className="h-4 w-4 text-blue-600 rounded"
-//                         />
-//                         <span className="ml-2 text-sm">Deposit Required</span>
-//                       </label>
-//                       {formData.depositRequired && (
-//                         <div>
-//                           <label className="block text-sm font-medium mb-1">Deposit Amount</label>
-//                           <input
-//                             type="number"
-//                             value={formData.depositAmount}
-//                             onChange={(e) => setFormData({...formData, depositAmount: parseFloat(e.target.value) || 0})}
-//                             className="w-full px-3 py-2 border rounded-md"
-//                           />
-//                         </div>
-//                       )}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
+  const editTour = async (tourId) => {
+    try {
+      setLoading(true);
+      const response = await postsAPI.getPost(tourId);
+      if (response.success) {
+        setFormData(response.data);
+        setIsEditing(true);
+        setIsViewing(false);
+        setShowForm(true);
+        setCurrentTourId(tourId);
+        setValidationErrors({});
+        setTouchedFields({});
+      } else {
+        setError('Failed to load tour for editing');
+      }
+    } catch (err) {
+      console.error('Error loading tour for edit:', err);
+      setError('Failed to load tour for editing');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//               {/* SECTION 4: Images */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('images')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Image className="mr-2" size={20} /> Images</h4>
-//                   {expandedSections.images ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.images && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Main Image URL</label>
-//                         <input type="url" value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Cover Image</label>
-//                         <input type="url" value={formData.coverImage} onChange={(e) => setFormData({...formData, coverImage: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-//                     {renderArrayField('images', 'Additional Images', 'https://example.com/image.jpg')}
-                    
-//                     {/* Gallery */}
-//                     <div className="border p-4 rounded">
-//                       <h5 className="font-medium mb-3">Gallery</h5>
-//                       {(formData.gallery || []).map((item, index) => (
-//                         <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-3 border rounded bg-gray-50">
-//                           <div><label className="block text-sm font-medium mb-1">Image URL</label>
-//                             <input type="url" value={item.url || ''} onChange={(e) => updateComplexField('gallery', index, 'url', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                           </div>
-//                           <div><label className="block text-sm font-medium mb-1">Caption</label>
-//                             <input type="text" value={item.caption || ''} onChange={(e) => updateComplexField('gallery', index, 'caption', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                           </div>
-//                           <div className="col-span-2">
-//                             <button type="button" onClick={() => removeComplexField('gallery', index)} className="text-red-600 text-sm flex items-center">
-//                               <Trash2 size={16} className="mr-1" /> Remove
-//                             </button>
-//                           </div>
-//                         </div>
-//                       ))}
-//                       <button type="button" onClick={() => addComplexField('gallery', {url: '', caption: '', category: ''})} className="text-blue-600 text-sm flex items-center">
-//                         <Plus size={16} className="mr-1" /> Add Gallery Item
-//                       </button>
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
+  const cleanFormData = (data) => {
+    const cleaned = { ...data };
+    
+    Object.keys(cleaned).forEach(key => {
+      if (Array.isArray(cleaned[key]) && cleaned[key].length === 0) {
+        delete cleaned[key];
+      }
+      if (cleaned[key] === '' || cleaned[key] === null || cleaned[key] === undefined) {
+        delete cleaned[key];
+      }
+    });
 
-//               {/* SECTION 5: Location */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('location')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><MapPin className="mr-2" size={20} /> Location & Tour Details</h4>
-//                   {expandedSections.location ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.location && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Pick up Location</label>
-//                         <input type="text" value={formData.prefecture} onChange={(e) => setFormData({...formData, prefecture: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Meeting Point</label>
-//                         <input type="text" value={formData.meetingPoint} onChange={(e) => setFormData({...formData, meetingPoint: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Best Time</label>
-//                         <input type="text" value={formData.bestTime} onChange={(e) => setFormData({...formData, bestTime: e.target.value})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-                    
-//                     <div className="border p-4 rounded bg-gray-50">
-//                       <h5 className="font-medium mb-3">Location Details</h5>
-//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                         <div><label className="block text-sm font-medium mb-1">Address</label>
-//                           <input type="text" value={formData.location.address} onChange={(e) => updateNestedObject('location', 'address', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">City</label>
-//                           <input type="text" value={formData.location.city} onChange={(e) => updateNestedObject('location', 'city', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Country</label>
-//                           <input type="text" value={formData.location.country} onChange={(e) => updateNestedObject('location', 'country', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Area</label>
-//                           <input type="text" value={formData.location.area} onChange={(e) => updateNestedObject('location', 'area', e.target.value)} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-                       
-//                       </div>
-//                     </div>
+    return cleaned;
+  };
 
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Difficulty</label>
-//                         <select value={formData.difficulty} onChange={(e) => setFormData({...formData, difficulty: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           {difficulties.map(d => <option key={d} value={d}>{d}</option>)}
-//                         </select>
-//                       </div>
-                    
-//                       <div><label className="block text-sm font-medium mb-1">Booking Status</label>
-//                         <select value={formData.bookingStatus} onChange={(e) => setFormData({...formData, bookingStatus: e.target.value})} className="w-full px-3 py-2 border rounded-md">
-//                           {bookingStatuses.map(b => <option key={b} value={b}>{b}</option>)}
-//                         </select>
-//                       </div>
-//                     </div>
-//                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    
-//                       <div><label className="block text-sm font-medium mb-1">Min Group</label>
-//                         <input type="number" value={formData.groupSize.min} onChange={(e) => setFormData({...formData, groupSize: {...formData.groupSize, min: parseInt(e.target.value) || 1}})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                       <div><label className="block text-sm font-medium mb-1">Max Group</label>
-//                         <input type="number" value={formData.groupSize.max} onChange={(e) => setFormData({...formData, groupSize: {...formData.groupSize, max: parseInt(e.target.value) || 20}})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div><label className="block text-sm font-medium mb-1">Capacity</label>
-//                         <input type="number" value={formData.capacity} onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-                     
-//                       <div><label className="block text-sm font-medium mb-1">Booking Deadline (hours)</label>
-//                         <input type="number" value={formData.bookingDeadline} onChange={(e) => setFormData({...formData, bookingDeadline: parseInt(e.target.value) || 24})} className="w-full px-3 py-2 border rounded-md" />
-//                       </div>
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setCurrentHighlight('');
+    setCurrentTagline('');
+    setCurrentTheme('');
+    setCurrentItinerary({
+      time: '',
+      activity: '',
+      description: '',
+      duration: '',
+      included: false,
+      additionalCost: '',
+      image: null
+    });
+    setCurrentDestination({
+      name: '',
+      description: '',
+      duration: '',
+      bestTimeToVisit: '',
+      entryFee: '',
+      openingHours: ''
+    });
+    setCurrentFaq({
+      question: '',
+      answer: '',
+    });
+    setCurrentActivity({
+      title: '',
+      description: '',
+      duration: '',
+      category: ''
+    });
+    setCurrentPricing({
+      days: [],
+      timeSlots: [],
+      duration: '',
+      actualPrice: '',
+      netPrice: '',
+      currency: 'USD'
+    });
+    setIsEditing(false);
+    setIsViewing(false);
+    setCurrentTourId(null);
+    setError('');
+    setValidationErrors({});
+    setTouchedFields({});
+  };
 
-//               {/* SECTION 6: Tour Arrays */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('tour')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Users className="mr-2" size={20} /> Tour Information</h4>
-//                   {expandedSections.tour ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.tour && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-//                       {renderArrayField('includes', 'Includes', 'Included item')}
-//                       {renderArrayField('excludes', 'Excludes', 'Excluded item')}
-                    
-//                       {renderArrayField('rules', 'Rules', 'Enter rule')}
-                     
-//                       {renderArrayField('explorationWays', 'Exploration Ways', 'Way to explore')}
-//                       {renderArrayField('thinks to care', 'thinks to care', 'thinks to care')}
-                     
-//                       {renderArrayField('languages', 'Languages', 'Language')}
-//                       {renderArrayField('nearbyAttractions', 'Nearby Attractions', 'Attraction')}
-                     
-//                       {renderArrayField('tips', 'Tips', 'Tip')}
-                 
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-//               {/* SECTION 7: Policies */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('policies')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Shield className="mr-2" size={20} /> Policies & Features</h4>
-//                   {expandedSections.policies ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.policies && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     
-//                     </div>
-                    
-//                     <div className="border p-4 rounded bg-gray-50">
-//                       <h5 className="font-medium mb-3">Free Cancellation</h5>
-//                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                         <label className="flex items-center">
-//                           <input type="checkbox" checked={formData.freeCancellation.available} onChange={(e) => setFormData({...formData, freeCancellation: {...formData.freeCancellation, available: e.target.checked}})} className="h-4 w-4 text-blue-600 rounded" />
-//                           <span className="ml-2 text-sm">Available</span>
-//                         </label>
-//                         <div><label className="block text-sm font-medium mb-1">Deadline Hours</label>
-//                           <input type="number" value={formData.freeCancellation.deadlineHours} onChange={(e) => setFormData({...formData, freeCancellation: {...formData.freeCancellation, deadlineHours: parseInt(e.target.value) || 24}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                         <div><label className="block text-sm font-medium mb-1">Note</label>
-//                           <input type="text" value={formData.freeCancellation.note} onChange={(e) => setFormData({...formData, freeCancellation: {...formData.freeCancellation, note: e.target.value}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                       </div>
-//                     </div>
+    const allTouched = Object.keys(validationRules).reduce((acc, field) => {
+      acc[field] = true;
+      return acc;
+    }, {});
+    setTouchedFields(allTouched);
 
-//                     <div className="border p-4 rounded bg-gray-50">
-//                       <h5 className="font-medium mb-3">Reserve Now Pay Later</h5>
-//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                         <label className="flex items-center">
-//                           <input type="checkbox" checked={formData.reserveNowPayLater.available} onChange={(e) => setFormData({...formData, reserveNowPayLater: {...formData.reserveNowPayLater, available: e.target.checked}})} className="h-4 w-4 text-blue-600 rounded" />
-//                           <span className="ml-2 text-sm">Available</span>
-//                         </label>
-//                         <div><label className="block text-sm font-medium mb-1">Note</label>
-//                           <input type="text" value={formData.reserveNowPayLater.note} onChange={(e) => setFormData({...formData, reserveNowPayLater: {...formData.reserveNowPayLater, note: e.target.value}})} className="w-full px-3 py-2 border rounded-md" />
-//                         </div>
-//                       </div>
-//                     </div>
+    if (isEditing) {
+      await updateTour();
+    } else {
+      await createTour();
+    }
+  };
 
-                 
-//                   </div>
-//                 )}
-//               </div>
+  const handleFileUpload = async (file) => {
+    try {
+      const response = await uploadAPI.uploadImage(file);
+      return response.data.url || response.data.imageUrl || response.url;
+    } catch (err) {
+      console.error('Error uploading file:', err);
+      return URL.createObjectURL(file);
+    }
+  };
 
-//               {/* SECTION 8: Itinerary */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('itinerary')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Clock className="mr-2" size={20} /> Itinerary</h4>
-//                   {expandedSections.itinerary ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.itinerary && (
-//                   <div className="p-4">
-//                     {renderComplexField('itinerary', 'Itinerary Items', [
-//                       { name: 'time', label: 'Time', type: 'text', placeholder: '9:00 AM' },
-//                       { name: 'activity', label: 'Activity', type: 'text', placeholder: 'Activity name' },
-//                       { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Activity description', fullWidth: true },
-//                       { name: 'duration', label: 'Duration', type: 'text', placeholder: '2 hours' },
-//                       // { name: 'location', label: 'Location', type: 'text', placeholder: 'Location' },
-//                       { name: 'included', label: 'Included', type: 'checkbox', placeholder: 'Included in package' },
-//                       { name: 'cost', label: 'Additional Cost', type: 'number', placeholder: '0' }
-//                     ], itineraryTemplate)}
-//                   </div>
-//                 )}
-//               </div>
+  const handleFileChange = async (e, field) => {
+    const files = Array.from(e.target.files);
+    
+    if (field === 'mainImage' && files[0]) {
+      const imageUrl = await handleFileUpload(files[0]);
+      setFormData(prev => ({ ...prev, mainImage: imageUrl }));
+      setValidationErrors(prev => ({ ...prev, mainImage: '' }));
+    } else if (files.length > 0) {
+      const imageUrls = await Promise.all(
+        files.map(file => handleFileUpload(file))
+      );
+      setFormData(prev => ({ ...prev, [field]: imageUrls }));
+    }
+  };
 
-//               {/* SECTION 9: Destinations */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('destinations')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Globe className="mr-2" size={20} /> Destinations</h4>
-//                   {expandedSections.destinations ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.destinations && (
-//                   <div className="p-4">
-//                     {renderComplexField('destinations', 'Destinations', [
-//                       { name: 'name', label: 'Destination Name', type: 'text', placeholder: 'Destination name' },
-//                       { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Destination description' },
-//                       { name: 'duration', label: 'Duration', type: 'text', placeholder: '2 hours' },
-//                       // { name: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Moderate', 'Hard'] },
-//                       { name: 'bestTimeToVisit', label: 'Best Time to Visit', type: 'text', placeholder: 'Morning' },
-//                       { name: 'entryFee', label: 'Entry Fee', type: 'text', placeholder: 'Free' },
-//                       { name: 'openingHours', label: 'Opening Hours', type: 'text', placeholder: '9 AM - 5 PM' }
-//                     ], destinationTemplate)}
-//                   </div>
-//                 )}
-//               </div>
+  const handleItineraryImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = await handleFileUpload(file);
+      setCurrentItinerary(prev => ({
+        ...prev,
+        image: imageUrl
+      }));
+    }
+  };
 
-//               {/* SECTION 10: FAQs */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('faqs')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium">FAQs</h4>
-//                   {expandedSections.faqs ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.faqs && (
-//                   <div className="p-4">
-//                     {renderComplexField('faqs', 'Frequently Asked Questions', [
-//                       { name: 'question', label: 'Question', type: 'text', placeholder: 'Enter question', fullWidth: true },
-//                       { name: 'answer', label: 'Answer', type: 'textarea', placeholder: 'Enter answer', fullWidth: true },
-//                       { name: 'category', label: 'Category', type: 'text', placeholder: 'General' },
-//                       { name: 'priority', label: 'Priority', type: 'number', placeholder: '1' }
-//                     ], faqTemplate)}
-//                   </div>
-//                 )}
-//               </div>
+  const ValidationMessage = ({ error, touched }) => {
+    if (!touched || !error) return null;
+    
+    return (
+      <div className="flex items-center gap-1 mt-1 text-red-600 text-sm">
+        <AlertCircle size={14} />
+        <span>{error}</span>
+      </div>
+    );
+  };
 
+  const SuccessMessage = ({ message }) => {
+    if (!message) return null;
+    
+    return (
+      <div className="flex items-center gap-1 mt-1 text-green-600 text-sm">
+        <CheckCircle size={14} />
+        <span>{message}</span>
+      </div>
+    );
+  };
+
+  const FieldWrapper = ({ name, label, children, required = false, helperText = '' }) => {
+    const error = validationErrors[name];
+    const touched = touchedFields[name];
+    const isValid = touched && !error;
+
+    return (
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {children}
+        <ValidationMessage error={error} touched={touched} />
+        {isValid && helperText && (
+          <SuccessMessage message={helperText} />
+        )}
+        {helperText && !error && (
+          <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+        )}
+      </div>
+    );
+  };
+
+  // All other state variables and handlers...
+  const [currentHighlight, setCurrentHighlight] = useState('');
+  const [currentTagline, setCurrentTagline] = useState('');
+  const [currentTheme, setCurrentTheme] = useState('');
+  const [currentItinerary, setCurrentItinerary] = useState({
+    time: '',
+    activity: '',
+    description: '',
+    duration: '',
+    included: false,
+    additionalCost: '',
+    image: null
+  });
+
+  const [currentDestination, setCurrentDestination] = useState({
+    name: '',
+    description: '',
+    duration: '',
+    bestTimeToVisit: '',
+    entryFee: '',
+    openingHours: ''
+  });
+
+  const [currentFaq, setCurrentFaq] = useState({
+    question: '',
+    answer: '',
+  });
+
+  const [currentActivity, setCurrentActivity] = useState({
+    title: '',
+    description: '',
+    duration: '',
+    category: ''
+  });
+
+  const [currentPricing, setCurrentPricing] = useState({
+    days: [],
+    timeSlots: [],
+    duration: '',
+    actualPrice: '',
+    netPrice: '',
+    currency: 'USD'
+  });
+
+  const [expandedSections, setExpandedSections] = useState({
+    basic: true,
+    description: false,
+    transport: false,
+    pricing: false,
+    images: false,
+    location: false,
+    inclusion: false,
+    additional: false,
+    cancellation: false,
+    accessibility: false,
+    itinerary: false,
+    faqs: false,
+    activities: false,
+    destinations: false
+  });
+
+  // Options arrays
+  const categories = ['Tour', 'Transport', 'Hotel'];
+  const tourTypes = ['Private', 'Group', 'Shared', 'Custom', ''];
+  const transportTypes = ['Bus', 'Car', 'Van', 'Boat', 'Train', 'Airplane', 'Other'];
+  const transportModals = Array.from({ length: 10 }, (_, i) => (2001 + i).toString());
+  
+  const japanCities = [
+    'Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara', 'Yokohama', 
+    'Sapporo', 'Fukuoka', 'Nagoya', 'Kobe', 'Sendai', 'Kawasaki',
+    'Saitama', 'Chiba', 'Kitakyushu', 'Sakai', 'Niigata', 'Hamamatsu'
+  ];
+  
+  const japanHotels = [
+    'Park Hyatt Tokyo',
+    'The Ritz-Carlton, Tokyo',
+    'Imperial Hotel Tokyo',
+    'Hotel New Otani Tokyo',
+    'ANA InterContinental Tokyo',
+    'Grand Hyatt Tokyo',
+    'Conrad Tokyo',
+    'Four Seasons Hotel Tokyo',
+    'The Peninsula Tokyo',
+    'Mandarin Oriental, Tokyo'
+  ];
+
+  const sellingPointOptions = [
+    'Hiking', 'Adventure', 'Experience', 'Tour', 'Cultural',
+    'Historical', 'Nature', 'Wildlife', 'Photography', 'Food',
+    'Luxury', 'Budget', 'Family', 'Romantic', 'Educational'
+  ];
+
+  const thingsToBringOptions = [
+    'Comfortable walking shoes',
+    'Water bottle',
+    'Sunscreen',
+    'Hat/Cap',
+    'Camera',
+    'Rain jacket/Umbrella',
+    'Snacks',
+    'Medications',
+    'Swimwear',
+    'Extra clothes'
+  ];
+
+  const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const timeSlotsOptions = [
+    '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30',
+    '10:00', '10:30', '11:00', '11:30', '12:00'
+  ];
+  const durationOptions = ['2 Hours', '4 Hours', '6 Hours', '1 Day', '2 Days', '3 Days'];
+  const currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
+  const groupTypes = ['Family', 'Friends', 'Corporate', 'School', 'Other'];
+
+  // Section Toggle
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // Add Theme
+  const addTheme = () => {
+    if (currentTheme.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        themesList: [...prev.themesList, currentTheme.trim()]
+      }));
+      setCurrentTheme('');
+    }
+  };
+
+  const removeTheme = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      themesList: prev.themesList.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Selling Points Handlers
+  const handleSellingPointsChange = (e) => {
+    const value = e.target.value;
+    if (value && !formData.selectedSellingPoints.includes(value)) {
+      setFormData(prev => ({
+        ...prev,
+        selectedSellingPoints: [...prev.selectedSellingPoints, value]
+      }));
+    }
+    e.target.value = '';
+  };
+
+  const removeSellingPoint = (pointToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedSellingPoints: prev.selectedSellingPoints.filter(point => point !== pointToRemove)
+    }));
+  };
+
+  // Things to Bring Handlers
+  const handleThingsToBringChange = (e) => {
+    const value = e.target.value;
+    if (value && !formData.thingsToBring.includes(value)) {
+      setFormData(prev => ({
+        ...prev,
+        thingsToBring: [...prev.thingsToBring, value]
+      }));
+    }
+    e.target.value = '';
+  };
+
+  const removeThingToBring = (itemToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      thingsToBring: prev.thingsToBring.filter(item => item !== itemToRemove)
+    }));
+  };
+
+  // Highlights Handlers
+  const addHighlight = () => {
+    if (currentHighlight.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        highlightsList: [...prev.highlightsList, currentHighlight.trim()]
+      }));
+      setCurrentHighlight('');
+      setValidationErrors(prev => ({ ...prev, highlightsList: '' }));
+    }
+  };
+
+  const removeHighlight = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      highlightsList: prev.highlightsList.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Taglines Handlers
+  const addTagline = () => {
+    if (currentTagline.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        taglinesList: [...prev.taglinesList, currentTagline.trim()]
+      }));
+      setCurrentTagline('');
+    }
+  };
+
+  const removeTagline = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      taglinesList: prev.taglinesList.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Pricing Schedule Handlers
+  const handleDaySelection = (day) => {
+    setCurrentPricing(prev => ({
+      ...prev,
+      days: prev.days.includes(day) 
+        ? prev.days.filter(d => d !== day)
+        : [...prev.days, day]
+    }));
+  };
+
+  const handleTimeSlotSelection = (timeSlot) => {
+    setCurrentPricing(prev => ({
+      ...prev,
+      timeSlots: prev.timeSlots.includes(timeSlot)
+        ? prev.timeSlots.filter(t => t !== timeSlot)
+        : [...prev.timeSlots, timeSlot]
+    }));
+  };
+
+  const handleSelectAllDays = () => {
+    setCurrentPricing(prev => ({
+      ...prev,
+      days: prev.days.length === weekDays.length ? [] : [...weekDays]
+    }));
+  };
+
+  const handleSelectAllTimeSlots = () => {
+    setCurrentPricing(prev => ({
+      ...prev,
+      timeSlots: prev.timeSlots.length === timeSlotsOptions.length ? [] : [...timeSlotsOptions]
+    }));
+  };
+
+  // Calculate Net Price
+  const calculateNetPrice = (actualPrice, discountPercentage) => {
+    if (!actualPrice || !discountPercentage) return '';
+    const price = parseFloat(actualPrice);
+    const discount = parseFloat(discountPercentage);
+    const netPrice = (price - (price * discount / 100)).toFixed(2);
+    return netPrice;
+  };
+
+  const handleActualPriceChange = (e) => {
+    const price = e.target.value;
+    const netPrice = calculateNetPrice(price, formData.discountPercentage);
+    setCurrentPricing(prev => ({
+      ...prev,
+      actualPrice: price,
+      netPrice: netPrice
+    }));
+  };
+
+  React.useEffect(() => {
+    if (currentPricing.actualPrice && formData.discountPercentage) {
+      const netPrice = calculateNetPrice(currentPricing.actualPrice, formData.discountPercentage);
+      setCurrentPricing(prev => ({
+        ...prev,
+        netPrice: netPrice
+      }));
+    }
+  }, [formData.discountPercentage, currentPricing.actualPrice]);
+
+  // Add Pricing Schedule
+  const addPricingSchedule = () => {
+    if (currentPricing.days.length > 0 && currentPricing.timeSlots.length > 0 && currentPricing.actualPrice && currentPricing.duration) {
+      const newSchedule = {
+        days: [...currentPricing.days],
+        timeSlots: [...currentPricing.timeSlots],
+        duration: currentPricing.duration,
+        actualPrice: currentPricing.actualPrice,
+        netPrice: currentPricing.netPrice || calculateNetPrice(currentPricing.actualPrice, formData.discountPercentage),
+        currency: currentPricing.currency
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        pricingSchedule: [...prev.pricingSchedule, newSchedule]
+      }));
+
+      setCurrentPricing({
+        days: [],
+        timeSlots: [],
+        duration: '',
+        actualPrice: '',
+        netPrice: '',
+        currency: 'USD'
+      });
+    } else {
+      alert('Please fill all required fields: Days, Time Slots, Duration, and Actual Price');
+    }
+  };
+
+  const removePricingSchedule = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      pricingSchedule: prev.pricingSchedule.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Itinerary Handlers with validation
+  const addItinerary = () => {
+    if (currentItinerary.activity && currentItinerary.activity.trim()) {
+      const newItinerary = { ...currentItinerary };
+      setFormData(prev => ({
+        ...prev,
+        itineraryItems: [...prev.itineraryItems, newItinerary]
+      }));
+      setCurrentItinerary({
+        time: '',
+        activity: '',
+        description: '',
+        duration: '',
+        included: false,
+        additionalCost: '',
+        image: null
+      });
+      setValidationErrors(prev => ({ ...prev, itineraryItems: '' }));
+    } else {
+      alert('Activity name is required for itinerary item');
+    }
+  };
+
+  const removeItinerary = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      itineraryItems: prev.itineraryItems.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Destination Handlers
+  const addDestination = () => {
+    if (currentDestination.name) {
+      setFormData(prev => ({
+        ...prev,
+        includedDestinations: [...prev.includedDestinations, { ...currentDestination }]
+      }));
+      setCurrentDestination({
+        name: '',
+        description: '',
+        duration: '',
+        bestTimeToVisit: '',
+        entryFee: '',
+        openingHours: ''
+      });
+    }
+  };
+
+  const removeDestination = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      includedDestinations: prev.includedDestinations.filter((_, i) => i !== index)
+    }));
+  };
+
+  // FAQ Handlers with validation
+  const addFaq = () => {
+    if (currentFaq.question && currentFaq.answer && currentFaq.question.trim() && currentFaq.answer.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        faqs: [...prev.faqs, { ...currentFaq }]
+      }));
+      setCurrentFaq({
+        question: '',
+        answer: '',
+      });
+    } else {
+      alert('Both question and answer are required for FAQ');
+    }
+  };
+
+  const removeFaq = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Activity Handlers
+  const addActivity = () => {
+    if (currentActivity.title) {
+      setFormData(prev => ({
+        ...prev,
+        activities: [...prev.activities, { ...currentActivity }]
+      }));
+      setCurrentActivity({
+        title: '',
+        description: '',
+        duration: '',
+        category: ''
+      });
+    }
+  };
+
+  const removeActivity = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      activities: prev.activities.filter((_, i) => i !== index)
+    }));
+  };
+
+  const SectionHeader = ({ title, section }) => (
+    <div 
+      className="flex items-center justify-between cursor-pointer bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:from-blue-100 hover:to-indigo-100 transition-all"
+      onClick={() => toggleSection(section)}
+    >
+      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+      {expandedSections[section] ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+    </div>
+  );
+
+  // Form Progress Indicator
+  const calculateFormProgress = () => {
+    const requiredFields = Object.keys(validationRules).filter(field => 
+      validationRules[field].required
+    );
+    
+    const filledFields = requiredFields.filter(field => {
+      const value = formData[field];
+      if (Array.isArray(value)) {
+        return value.length > 0;
+      }
+      return value && value.toString().trim() !== '';
+    });
+    
+    return Math.round((filledFields.length / requiredFields.length) * 100);
+  };
+
+  const formProgress = calculateFormProgress();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-center gap-2">
+            <AlertCircle size={20} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Form Progress */}
+        {showForm && !isViewing && (
+          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">Form Completion</span>
+              <span className="text-sm font-bold text-blue-600">{formProgress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-green-600 h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${formProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {formProgress < 50 ? 'Keep going! Fill in more required fields.' : 
+               formProgress < 80 ? 'Good progress! Almost there.' : 
+               'Excellent! Your form is almost complete.'}
+            </p>
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Processing...</p>
+            </div>
+          </div>
+        )}
+
+        {!showForm ? (
+          <div className="text-center">
+            <div className="bg-white rounded-xl shadow-2xl p-12 mb-8">
+              <h1 className="text-4xl font-bold text-gray-800 mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Tour Management System
+              </h1>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setShowForm(true);
+                    resetForm();
+                  }}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 font-semibold text-lg shadow-lg transition-all transform hover:scale-105"
+                >
+                  <Plus size={24} className="inline mr-2" />
+                  Create New Tour
+                </button>
+                <button
+                  onClick={() => setShowTourList(true)}
+                  className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 font-semibold text-lg shadow-lg transition-all transform hover:scale-105"
+                >
+                  <Eye size={24} className="inline mr-2" />
+                  View All Tours ({tours.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Tours List */}
+            {showTourList && (
+              <div className="bg-white rounded-xl shadow-2xl p-8 mt-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">All Tours ({tours.length})</h2>
+                  <button
+                    onClick={() => setShowTourList(false)}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+                
+                {tours.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 text-lg">No tours found.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {tours.map((tour) => (
+                      <div key={tour._id} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-gray-800">{tour.title}</h3>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                {tour.category}
+                              </span>
+                              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                {tour.tourType}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                tour.status === 'published' ? 'bg-green-100 text-green-800' :
+                                tour.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {tour.status}
+                              </span>
+                              {tour.featured && (
+                                <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                                  Featured
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-2">
+                              Created: {new Date(tour.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <button
+                              onClick={() => readTour(tour._id)}
+                              className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                              title="View"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button
+                              onClick={() => editTour(tour._id)}
+                              className="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => deleteTour(tour._id)}
+                              className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-2xl p-8">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  {isEditing ? 'Edit Tour' : isViewing ? 'View Tour' : 'Create New Tour'}
+                </h1>
+                {currentTourId && (
+                  <p className="text-gray-600 mt-2">
+                    Tour ID: {currentTourId}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setShowForm(false);
+                    resetForm();
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                >
+                  ← Back to List
+                </button>
+                {isViewing && (
+                  <button
+                    onClick={() => {
+                      setIsViewing(false);
+                      setIsEditing(true);
+                    }}
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                  >
+                    <Edit size={16} className="inline mr-1" />
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
             
-
-//               {/* SECTION 12: Activities */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('activities')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium">Activities</h4>
-//                   {expandedSections.activities ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.activities && (
-//                   <div className="p-4">
-//                     {renderComplexField('activities', 'Activities', [
-//                       { name: 'title', label: 'Activity Title', type: 'text', placeholder: 'Activity title' },
-//                       { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Activity description' },
-//                       { name: 'duration', label: 'Duration', type: 'text', placeholder: '2 hours' },
-//                       { name: 'category', label: 'Category', type: 'select', options: activityCategories },
-//                       { name: 'cost', label: 'Cost', type: 'number', placeholder: '0' },
-//                       { name: 'ageLimit', label: 'Age Limit', type: 'text', placeholder: '12+' },
-//                       { name: 'location', label: 'Location', type: 'text', placeholder: 'Activity location' }
-//                     ], activityTemplate)}
-//                   </div>
-//                 )}
-//               </div>
-
-            
-
-//               {/* SECTION 15: Accessibility */}
-//               <div className="border rounded-lg">
-//                 <button type="button" onClick={() => toggleSection('accessibility')} className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100">
-//                   <h4 className="text-lg font-medium flex items-center"><Accessibility className="mr-2" size={20} /> Accessibility</h4>
-//                   {expandedSections.accessibility ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-//                 </button>
-//                 {expandedSections.accessibility && (
-//                   <div className="p-4 space-y-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <label className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           checked={formData.accessibility.wheelchair}
-//                           onChange={(e) => updateNestedObject('accessibility', 'wheelchair', e.target.checked)}
-//                           className="h-4 w-4 text-blue-600 rounded"
-//                         />
-//                         <span className="ml-2 text-sm">Wheelchair</span>
-//                       </label>
-             
-//                       <label className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           checked={formData.accessibility.wheelchair}
-//                           onChange={(e) => updateNestedObject('accessibility', 'wheelchair', e.target.checked)}
-//                           className="h-4 w-4 text-blue-600 rounded"
-//                         />
-//                         <span className="ml-2 text-sm">Infront Seats </span>
-//                       </label>
-//                       <label className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           checked={formData.accessibility.visuallyImpaired}
-//                           onChange={(e) => updateNestedObject('accessibility', 'visuallyImpaired', e.target.checked)}
-//                           className="h-4 w-4 text-blue-600 rounded"
-//                         />
-//                         <span className="ml-2 text-sm">Stroler</span>
-//                       </label>
-//                       <label className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           checked={formData.accessibility.hearingImpaired}
-//                           onChange={(e) => updateNestedObject('accessibility', 'hearingImpaired', e.target.checked)}
-//                           className="h-4 w-4 text-blue-600 rounded"
-//                         />
-//                         <span className="ml-2 text-sm">Service Animals</span>
-//                       </label>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* Basic Information Section */}
+              <div>
+                <SectionHeader title="Basic Information" section="basic" />
+                {expandedSections.basic && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldWrapper name="title" label="Title" required>
+                        <input 
+                          type="text" 
+                          name="title" 
+                          value={formData.title} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                          placeholder="Enter tour title"
+                        />
+                      </FieldWrapper>
                       
-//                     </div>
-//                     <div>
-//                       <label className="block text-sm font-medium mb-1">Accessibility Notes</label>
-//                       <textarea
-//                         rows={3}
-//                         value={formData.accessibility.notes}
-//                         onChange={(e) => updateNestedObject('accessibility', 'notes', e.target.value)}
-//                         className="w-full px-3 py-2 border rounded-md"
-//                         placeholder="Additional accessibility information..."
-//                       />
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
+                      <FieldWrapper name="category" label="Category" required>
+                        <select 
+                          name="category" 
+                          value={formData.category} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Category</option>
+                          {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                      </FieldWrapper>
+                      
+                      <FieldWrapper name="tourType" label="Tour Type" required>
+                        <select 
+                          name="tourType" 
+                          value={formData.tourType} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Tour Type</option>
+                          {tourTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                        </select>
+                      </FieldWrapper>
 
-           
+                      <FieldWrapper name="status" label="Status">
+                        <select 
+                          name="status" 
+                          value={formData.status} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="draft">Draft</option>
+                          <option value="published">Published</option>
+                          <option value="archived">Archived</option>
+                        </select>
+                      </FieldWrapper>
+                    </div>
 
-//               {/* Add more sections as needed... */}
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="checkbox" 
+                        name="featured" 
+                        checked={formData.featured} 
+                        onChange={handleInputChange} 
+                        disabled={isViewing}
+                        className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                      />
+                      <label className="text-sm font-medium text-gray-700">Featured Tour</label>
+                    </div>
 
-//               {/* Form Actions */}
-//               <div className="flex justify-end space-x-3 pt-6 border-t sticky bottom-0 bg-white z-10">
-//                 <button type="button" onClick={() => { setShowModal(false); setEditingPost(null); resetForm(); }} className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-//                   Cancel
-//                 </button>
-//                 <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center">
-//                   {loading ? (
-//                     <>
-//                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-//                       {editingPost ? 'Updating...' : 'Creating...'}
-//                     </>
-//                   ) : (
-//                     <>
-//                       <Save size={16} className="mr-2" />
-//                       {editingPost ? 'Update Post' : 'Create Post'}
-//                     </>
-//                   )}
-//                 </button>
-//               </div>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
+                    <FieldWrapper name="tagline" label="Tagline" helperText="A catchy one-line description of your tour">
+                      <input 
+                        type="text" 
+                        name="tagline" 
+                        value={formData.tagline} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        placeholder="Enter catchy tagline"
+                      />
+                    </FieldWrapper>
 
-// export default BlogManagement;
+                    {/* Taglines List */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Additional Taglines</label>
+                      {!isViewing && (
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value={currentTagline} 
+                            onChange={(e) => setCurrentTagline(e.target.value)}
+                            placeholder="Enter a tagline"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <button 
+                            type="button" 
+                            onClick={addTagline}
+                            className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                          >
+                            <Plus size={16} /> Add
+                          </button>
+                        </div>
+                      )}
+                      {formData.taglinesList.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {formData.taglinesList.map((tagline, index) => (
+                            <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                              {tagline}
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeTagline(index)}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Selling Points */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700">Selling Points</label>
+                      {!isViewing && (
+                        <div className="space-y-2">
+                          <select 
+                            onChange={handleSellingPointsChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select selling points...</option>
+                            {sellingPointOptions.map(option => (
+                              <option key={option} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      
+                      {formData.selectedSellingPoints.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {formData.selectedSellingPoints.map((point, index) => (
+                            <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                              {point}
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeSellingPoint(point)}
+                                  className="text-blue-600 hover:text-blue-800 ml-1"
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Description & Highlights Section */}
+              <div>
+                <SectionHeader title="Description & Highlights" section="description" />
+                {expandedSections.description && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
+                    <FieldWrapper 
+                      name="description" 
+                      label="Description" 
+                      required 
+                      helperText="Provide detailed information about your tour (50-2000 characters)"
+                    >
+                      <textarea 
+                        name="description" 
+                        value={formData.description} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        disabled={isViewing}
+                        rows="4" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        placeholder="Detailed description of the tour"
+                      />
+                    </FieldWrapper>
+                    
+                    {/* Highlights */}
+                    <div className="space-y-3">
+                      <FieldWrapper 
+                        name="highlightsList" 
+                        label="Highlights" 
+                        required
+                        helperText="Add key features that make your tour special"
+                      >
+                        {!isViewing && (
+                          <div className="flex gap-2">
+                            <input 
+                              type="text" 
+                              value={currentHighlight} 
+                              onChange={(e) => setCurrentHighlight(e.target.value)}
+                              placeholder="Enter a highlight"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <button 
+                              type="button" 
+                              onClick={addHighlight}
+                              className="flex items-center gap-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                            >
+                              <Plus size={16} /> Add
+                            </button>
+                          </div>
+                        )}
+                      </FieldWrapper>
+                      {formData.highlightsList.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          {formData.highlightsList.map((highlight, index) => (
+                            <div key={index} className="flex items-center justify-between bg-purple-50 p-3 rounded-md border border-purple-200">
+                              <span className="text-purple-800">{highlight}</span>
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeHighlight(index)}
+                                  className="text-purple-600 hover:text-purple-800"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Transport Details Section */}
+              <div>
+                <SectionHeader title="Transport Details" section="transport" />
+                {expandedSections.transport && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldWrapper name="transportType" label="Transport Type" required>
+                        <select 
+                          name="transportType" 
+                          value={formData.transportType} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Transport Type</option>
+                          {transportTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                        </select>
+                      </FieldWrapper>
+                      
+                      <FieldWrapper name="transportModal" label="Transport Modal" helperText="Select vehicle year">
+                        <select 
+                          name="transportModal" 
+                          value={formData.transportModal} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Year</option>
+                          {transportModals.map(modal => <option key={modal} value={modal}>{modal}</option>)}
+                        </select>
+                      </FieldWrapper>
+                      
+                      <FieldWrapper name="makeVariant" label="Make & Variant" helperText="e.g., Toyota Hiace">
+                        <input 
+                          type="text" 
+                          name="makeVariant" 
+                          value={formData.makeVariant} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., Toyota Hiace" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Images Section */}
+              <div>
+                <SectionHeader title="Images" section="images" />
+                {expandedSections.images && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
+                    <FieldWrapper name="mainImage" label="Cover Image" required helperText="Main image for your tour">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileChange(e, 'mainImage')} 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                      {formData.mainImage && (
+                        <p className="text-sm text-green-600 mt-1">✓ Image selected</p>
+                      )}
+                    </FieldWrapper>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Additional Images</label>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={(e) => handleFileChange(e, 'additionalImages')} 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                      {formData.additionalImages.length > 0 && (
+                        <p className="text-sm text-green-600 mt-1">
+                          ✓ {formData.additionalImages.length} images selected
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Gallery Images</label>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={(e) => handleFileChange(e, 'galleryImages')} 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                      {formData.galleryImages.length > 0 && (
+                        <p className="text-sm text-green-600 mt-1">
+                          ✓ {formData.galleryImages.length} gallery images selected
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Location Section */}
+              <div>
+                <SectionHeader title="Pick-up and Drop-off" section="location" />
+                {expandedSections.location && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldWrapper name="city" label="City" required>
+                        <select
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select City</option>
+                          {japanCities.map((city) => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </FieldWrapper>
+
+                      <FieldWrapper name="hotel" label="Hotels" helperText="Select associated hotel">
+                        <select
+                          name="hotel"
+                          value={formData.hotel}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Hotel</option>
+                          {japanHotels.map((hotel) => (
+                            <option key={hotel} value={hotel}>{hotel}</option>
+                          ))}
+                        </select>
+                      </FieldWrapper>
+
+                      <FieldWrapper name="pickupLocation" label="Pickup Location" required helperText="Detailed pickup location address">
+                        <input
+                          type="text"
+                          name="pickupLocation"
+                          value={formData.pickupLocation}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          placeholder="Enter pickup location details"
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="bestTime" label="Best Time" helperText="e.g., Morning, Evening">
+                        <input
+                          type="text"
+                          name="bestTime"
+                          value={formData.bestTime}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., Morning, Evening"
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="locationDetails" label="Location Details" helperText="Additional location information">
+                        <textarea
+                          name="locationDetails"
+                          value={formData.locationDetails}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          rows="3"
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          placeholder="Additional location details"
+                        />
+                      </FieldWrapper>
+
+                      {!isViewing && (
+                        <div className="md:col-span-2 flex items-center justify-between bg-white px-4 py-3 rounded-md border">
+                          <span className="text-sm font-medium text-gray-700">
+                            Same Drop-off as Pickup?
+                          </span>
+                          <label className="inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="sr-only peer"
+                              checked={formData.sameDropOff}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  sameDropOff: e.target.checked,
+                                  dropArea: e.target.checked ? prev.pickupLocation : "",
+                                  dropLocation: e.target.checked ? prev.pickupLocation : "",
+                                  dropPoint: e.target.checked ? prev.pickupLocation : "",
+                                  dropDetails: e.target.checked ? prev.locationDetails : "",
+                                }))
+                              }
+                            />
+                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                          </label>
+                        </div>
+                      )}
+
+                      {!formData.sameDropOff && (
+                        <>
+                          <FieldWrapper name="dropArea" label="Drop-off Area" required>
+                            <input
+                              type="text"
+                              name="dropArea"
+                              value={formData.dropArea}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              disabled={isViewing}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            />
+                          </FieldWrapper>
+
+                          <FieldWrapper name="dropLocation" label="Drop-off Location" required>
+                            <input
+                              type="text"
+                              name="dropLocation"
+                              value={formData.dropLocation}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              disabled={isViewing}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            />
+                          </FieldWrapper>
+
+                          <FieldWrapper name="dropPoint" label="Drop-off Point">
+                            <input
+                              type="text"
+                              name="dropPoint"
+                              value={formData.dropPoint}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              disabled={isViewing}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            />
+                          </FieldWrapper>
+
+                          <FieldWrapper name="dropDetails" label="Drop-off Details">
+                            <textarea
+                              name="dropDetails"
+                              value={formData.dropDetails}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                              rows="3"
+                              disabled={isViewing}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            />
+                          </FieldWrapper>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Information Section */}
+              <div>
+                <SectionHeader title="Additional Information" section="inclusion" />
+                {expandedSections.inclusion && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    
+                    {/* Things to Bring */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700">Things to Bring</label>
+                      {!isViewing && (
+                        <div className="space-y-2">
+                          <select 
+                            onChange={handleThingsToBringChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select items to bring...</option>
+                            {thingsToBringOptions.map(option => (
+                              <option key={option} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      
+                      {formData.thingsToBring.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {formData.thingsToBring.map((item, index) => (
+                            <div 
+                              key={index} 
+                              className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                            >
+                              {item}
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeThingToBring(item)}
+                                  className="text-green-600 hover:text-green-800 ml-1"
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <FieldWrapper name="languages" label="Languages" helperText="e.g., English, Urdu, Arabic">
+                      <input 
+                        type="text" 
+                        name="languages" 
+                        value={formData.languages} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        placeholder="e.g., English, Urdu, Arabic" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+                    
+                    <FieldWrapper name="nearbyAttractions" label="Insider Tips" helperText="Share local insights and tips">
+                      <textarea 
+                        name="nearbyAttractions" 
+                        value={formData.nearbyAttractions} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        placeholder="Insider Tips" 
+                        rows="2" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+
+                    <FieldWrapper name="includes" label="Includes" required helperText="What's included in the tour package">
+                      <textarea 
+                        name="includes" 
+                        value={formData.includes} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        rows="3" 
+                        placeholder="What's included in the tour" 
+                        disabled={isViewing}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+
+                    <FieldWrapper name="excludes" label="Excludes" required helperText="What's not included in the tour package">
+                      <textarea 
+                        name="excludes" 
+                        value={formData.excludes} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        rows="3" 
+                        placeholder="What's not included in the tour" 
+                        disabled={isViewing}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+                  </div>
+                )}
+              </div>
+
+              {/* Cancellation Policy Section */}
+              <div>
+                <SectionHeader title="Cancellation Policy" section="cancellation" />
+                {expandedSections.cancellation && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="checkbox" 
+                        name="freeCancellation" 
+                        checked={formData.freeCancellation} 
+                        onChange={handleInputChange} 
+                        disabled={isViewing}
+                        className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                      />
+                      <label className="text-sm font-medium text-gray-700">Free Cancellation Available</label>
+                    </div>
+
+                    <FieldWrapper name="deadlineHours" label="Cancellation Deadline (Hours)" helperText="Hours before tour start when cancellation is allowed">
+                      <input 
+                        type="number" 
+                        name="deadlineHours" 
+                        value={formData.deadlineHours} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        placeholder="e.g., 24" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+
+                    <FieldWrapper name="cancellationNote" label="Cancellation Policy Details">
+                      <textarea 
+                        name="cancellationNote" 
+                        value={formData.cancellationNote} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        rows="3" 
+                        placeholder="Detailed cancellation policy" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="checkbox" 
+                        name="reserveNowPayLater" 
+                        checked={formData.reserveNowPayLater} 
+                        onChange={handleInputChange} 
+                        disabled={isViewing}
+                        className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                      />
+                      <label className="text-sm font-medium text-gray-700">Reserve Now & Pay Later Available</label>
+                    </div>
+
+                    <FieldWrapper name="reserveNote" label="Reservation Policy Details">
+                      <textarea 
+                        name="reserveNote" 
+                        value={formData.reserveNote} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        rows="2" 
+                        placeholder="Reservation policy details" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+                  </div>
+                )}
+              </div>
+
+              {/* Accessibility Section */}
+              <div>
+                <SectionHeader title="Accessibility Features" section="accessibility" />
+                {expandedSections.accessibility && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="checkbox" 
+                          name="wheelchairAccessible" 
+                          checked={formData.wheelchairAccessible} 
+                          onChange={handleInputChange} 
+                          disabled={isViewing}
+                          className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                        />
+                        <label className="text-sm font-medium text-gray-700">Wheelchair Accessible</label>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="checkbox" 
+                          name="infantSeats" 
+                          checked={formData.infantSeats} 
+                          onChange={handleInputChange} 
+                          disabled={isViewing}
+                          className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                        />
+                        <label className="text-sm font-medium text-gray-700">Infant Seats Available</label>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="checkbox" 
+                          name="strollerAccessible" 
+                          checked={formData.strollerAccessible} 
+                          onChange={handleInputChange} 
+                          disabled={isViewing}
+                          className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                        />
+                        <label className="text-sm font-medium text-gray-700">Stroller Accessible</label>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="checkbox" 
+                          name="serviceAnimals" 
+                          checked={formData.serviceAnimals} 
+                          onChange={handleInputChange} 
+                          disabled={isViewing}
+                          className="w-4 h-4 text-blue-600 disabled:cursor-not-allowed" 
+                        />
+                        <label className="text-sm font-medium text-gray-700">Service Animals Allowed</label>
+                      </div>
+                    </div>
+
+                    <FieldWrapper name="accessibilityNotes" label="Additional Accessibility Notes">
+                      <textarea 
+                        name="accessibilityNotes" 
+                        value={formData.accessibilityNotes} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        rows="3" 
+                        placeholder="Additional accessibility information" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+                  </div>
+                )}
+              </div>
+
+              {/* Booking Type Section */}
+              <div>
+                <SectionHeader title="Booking Type & Details" section="additional" />
+                {expandedSections.additional && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    <FieldWrapper name="bookingType" label="Booking Type" required>
+                      <select 
+                        name="bookingType" 
+                        value={formData.bookingType} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        disabled={isViewing}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      >
+                        <option value="single">Single Person</option>
+                        <option value="group">Group Booking</option>
+                      </select>
+                    </FieldWrapper>
+
+                    {formData.bookingType === 'single' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FieldWrapper name="singlePersonName" label="Name" required>
+                          <input 
+                            type="text" 
+                            name="singlePersonName" 
+                            value={formData.singlePersonName} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Enter full name"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="singlePersonAge" label="Age" required>
+                          <input 
+                            type="number" 
+                            name="singlePersonAge" 
+                            value={formData.singlePersonAge} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Enter age"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="singlePersonNationality" label="Nationality">
+                          <input 
+                            type="text" 
+                            name="singlePersonNationality" 
+                            value={formData.singlePersonNationality} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Enter nationality"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="singlePersonPreferences" label="Preferences/Special Requirements">
+                          <textarea 
+                            name="singlePersonPreferences" 
+                            value={formData.singlePersonPreferences} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            rows="2"
+                            disabled={isViewing}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Any special preferences or requirements"
+                          />
+                        </FieldWrapper>
+                      </div>
+                    )}
+
+                    {formData.bookingType === 'group' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FieldWrapper name="groupName" label="Group Name" required>
+                          <input 
+                            type="text" 
+                            name="groupName" 
+                            value={formData.groupName} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Enter group name"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="groupLeaderName" label="Group Leader Name" required>
+                          <input 
+                            type="text" 
+                            name="groupLeaderName" 
+                            value={formData.groupLeaderName} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Enter group leader name"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="groupSize" label="Group Size" required>
+                          <input 
+                            type="number" 
+                            name="groupSize" 
+                            value={formData.groupSize} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Number of people"
+                          />
+                        </FieldWrapper>
+
+                        <FieldWrapper name="groupType" label="Group Type" required>
+                          <select 
+                            name="groupType" 
+                            value={formData.groupType} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            disabled={isViewing}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          >
+                            <option value="">Select Group Type</option>
+                            {groupTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                          </select>
+                        </FieldWrapper>
+
+                        <FieldWrapper name="groupSpecialRequests" label="Special Requests" className="md:col-span-2">
+                          <textarea 
+                            name="groupSpecialRequests" 
+                            value={formData.groupSpecialRequests} 
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            rows="3"
+                            disabled={isViewing}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                            placeholder="Any special requests for the group"
+                          />
+                        </FieldWrapper>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Itinerary Section */}
+              <div>
+                <SectionHeader title="Tour Itinerary" section="itinerary" />
+                {expandedSections.itinerary && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    <FieldWrapper 
+                      name="itineraryItems" 
+                      label="Itinerary Items" 
+                      required
+                      helperText="Add detailed itinerary for your tour"
+                    >
+                      {!isViewing && (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input 
+                              type="text" 
+                              value={currentItinerary.time} 
+                              onChange={(e) => setCurrentItinerary(prev => ({ ...prev, time: e.target.value }))}
+                              placeholder="Time (e.g., 09:00 AM)"
+                              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <input 
+                              type="text" 
+                              value={currentItinerary.activity} 
+                              onChange={(e) => setCurrentItinerary(prev => ({ ...prev, activity: e.target.value }))}
+                              placeholder="Activity name"
+                              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                          
+                          <textarea 
+                            value={currentItinerary.description} 
+                            onChange={(e) => setCurrentItinerary(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Activity description"
+                            rows="2"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <input 
+                              type="text" 
+                              value={currentItinerary.duration} 
+                              onChange={(e) => setCurrentItinerary(prev => ({ ...prev, duration: e.target.value }))}
+                              placeholder="Duration"
+                              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <input 
+                              type="text" 
+                              value={currentItinerary.additionalCost} 
+                              onChange={(e) => setCurrentItinerary(prev => ({ ...prev, additionalCost: e.target.value }))}
+                              placeholder="Additional cost (if any)"
+                              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="checkbox" 
+                                checked={currentItinerary.included} 
+                                onChange={(e) => setCurrentItinerary(prev => ({ ...prev, included: e.target.checked }))}
+                                className="w-4 h-4 text-blue-600"
+                              />
+                              <label className="text-sm text-gray-700">Included in price</label>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={handleItineraryImageChange}
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                            <button 
+                              type="button" 
+                              onClick={addItinerary}
+                              className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                              <Plus size={16} /> Add Itinerary
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </FieldWrapper>
+
+                    {formData.itineraryItems.length > 0 && (
+                      <div className="space-y-4 mt-4">
+                        <h4 className="font-semibold text-gray-700">Added Itinerary Items:</h4>
+                        {formData.itineraryItems.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-semibold text-blue-600">{item.time}</span>
+                                  <span className="font-medium">{item.activity}</span>
+                                  {item.included && (
+                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                      Included
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-gray-600 mb-2">{item.description}</p>
+                                <div className="flex gap-4 text-sm text-gray-500">
+                                  {item.duration && <span>Duration: {item.duration}</span>}
+                                  {item.additionalCost && <span>Extra Cost: {item.additionalCost}</span>}
+                                </div>
+                              </div>
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeItinerary(index)}
+                                  className="text-red-600 hover:text-red-800 ml-4"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Destinations Section */}
+              <div>
+                <SectionHeader title="Included Destinations" section="destinations" />
+                {expandedSections.destinations && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    {!isViewing && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <input 
+                            type="text" 
+                            value={currentDestination.name} 
+                            onChange={(e) => setCurrentDestination(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder="Destination name"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <input 
+                            type="text" 
+                            value={currentDestination.duration} 
+                            onChange={(e) => setCurrentDestination(prev => ({ ...prev, duration: e.target.value }))}
+                            placeholder="Visit duration"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <textarea 
+                          value={currentDestination.description} 
+                          onChange={(e) => setCurrentDestination(prev => ({ ...prev, description: e.target.value }))}
+                          placeholder="Destination description"
+                          rows="2"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <input 
+                            type="text" 
+                            value={currentDestination.bestTimeToVisit} 
+                            onChange={(e) => setCurrentDestination(prev => ({ ...prev, bestTimeToVisit: e.target.value }))}
+                            placeholder="Best time to visit"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <input 
+                            type="text" 
+                            value={currentDestination.entryFee} 
+                            onChange={(e) => setCurrentDestination(prev => ({ ...prev, entryFee: e.target.value }))}
+                            placeholder="Entry fee (if any)"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <input 
+                          type="text" 
+                          value={currentDestination.openingHours} 
+                          onChange={(e) => setCurrentDestination(prev => ({ ...prev, openingHours: e.target.value }))}
+                          placeholder="Opening hours"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <button 
+                          type="button" 
+                          onClick={addDestination}
+                          className="flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                        >
+                          <Plus size={16} /> Add Destination
+                        </button>
+                      </div>
+                    )}
+
+                    {formData.includedDestinations.length > 0 && (
+                      <div className="space-y-4 mt-4">
+                        <h4 className="font-semibold text-gray-700">Included Destinations:</h4>
+                        {formData.includedDestinations.map((destination, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-lg text-gray-800">{destination.name}</h5>
+                                <p className="text-gray-600 mt-1">{destination.description}</p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                                  <div>
+                                    <span className="font-medium">Duration:</span>
+                                    <p className="text-gray-600">{destination.duration}</p>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Best Time:</span>
+                                    <p className="text-gray-600">{destination.bestTimeToVisit}</p>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Entry Fee:</span>
+                                    <p className="text-gray-600">{destination.entryFee || 'Included'}</p>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Hours:</span>
+                                    <p className="text-gray-600">{destination.openingHours}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeDestination(index)}
+                                  className="text-red-600 hover:text-red-800 ml-4"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* FAQs Section */}
+              <div>
+                <SectionHeader title="Frequently Asked Questions" section="faqs" />
+                {expandedSections.faqs && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    {!isViewing && (
+                      <div className="space-y-4">
+                        <input 
+                          type="text" 
+                          value={currentFaq.question} 
+                          onChange={(e) => setCurrentFaq(prev => ({ ...prev, question: e.target.value }))}
+                          placeholder="Enter question"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <textarea 
+                          value={currentFaq.answer} 
+                          onChange={(e) => setCurrentFaq(prev => ({ ...prev, answer: e.target.value }))}
+                          placeholder="Enter answer"
+                          rows="3"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <button 
+                          type="button" 
+                          onClick={addFaq}
+                          className="flex items-center gap-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                        >
+                          <Plus size={16} /> Add FAQ
+                        </button>
+                      </div>
+                    )}
+
+                    {formData.faqs.length > 0 && (
+                      <div className="space-y-4 mt-4">
+                        <h4 className="font-semibold text-gray-700">FAQs:</h4>
+                        {formData.faqs.map((faq, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-gray-800 mb-2">Q: {faq.question}</h5>
+                                <p className="text-gray-600">A: {faq.answer}</p>
+                              </div>
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeFaq(index)}
+                                  className="text-red-600 hover:text-red-800 ml-4"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Activities Section */}
+              <div>
+                <SectionHeader title="Activities" section="activities" />
+                {expandedSections.activities && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    {!isViewing && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <input 
+                            type="text" 
+                            value={currentActivity.title} 
+                            onChange={(e) => setCurrentActivity(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="Activity title"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <input 
+                            type="text" 
+                            value={currentActivity.category} 
+                            onChange={(e) => setCurrentActivity(prev => ({ ...prev, category: e.target.value }))}
+                            placeholder="Activity category"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <textarea 
+                          value={currentActivity.description} 
+                          onChange={(e) => setCurrentActivity(prev => ({ ...prev, description: e.target.value }))}
+                          placeholder="Activity description"
+                          rows="2"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <input 
+                          type="text" 
+                          value={currentActivity.duration} 
+                          onChange={(e) => setCurrentActivity(prev => ({ ...prev, duration: e.target.value }))}
+                          placeholder="Activity duration"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        
+                        <button 
+                          type="button" 
+                          onClick={addActivity}
+                          className="flex items-center gap-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                        >
+                          <Plus size={16} /> Add Activity
+                        </button>
+                      </div>
+                    )}
+
+                    {formData.activities.length > 0 && (
+                      <div className="space-y-4 mt-4">
+                        <h4 className="font-semibold text-gray-700">Activities:</h4>
+                        {formData.activities.map((activity, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-gray-800">{activity.title}</h5>
+                                <div className="flex gap-4 mt-1 text-sm text-gray-500">
+                                  <span>Category: {activity.category}</span>
+                                  <span>Duration: {activity.duration}</span>
+                                </div>
+                                <p className="text-gray-600 mt-2">{activity.description}</p>
+                              </div>
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeActivity(index)}
+                                  className="text-red-600 hover:text-red-800 ml-4"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Pricing & Duration Section */}
+              <div>
+                <SectionHeader title="Pricing & Duration" section="pricing" />
+                {expandedSections.pricing && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldWrapper name="duration" label="Tour Duration" required>
+                        <select 
+                          name="duration" 
+                          value={formData.duration} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">Select Duration</option>
+                          {durationOptions.map(duration => <option key={duration} value={duration}>{duration}</option>)}
+                        </select>
+                      </FieldWrapper>
+
+                      <FieldWrapper name="durationHours" label="Duration (Hours)" helperText="Total tour hours">
+                        <input 
+                          type="number" 
+                          name="durationHours" 
+                          value={formData.durationHours} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 4" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="capacity" label="Tour Capacity" helperText="Maximum number of participants">
+                        <input 
+                          type="number" 
+                          name="capacity" 
+                          value={formData.capacity} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 20" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldWrapper name="startTime" label="Start Time" helperText="Tour start time (HH:MM)">
+                        <input 
+                          type="text" 
+                          name="startTime" 
+                          value={formData.startTime} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 09:00" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="endTime" label="End Time" helperText="Tour end time (HH:MM)">
+                        <input 
+                          type="text" 
+                          name="endTime" 
+                          value={formData.endTime} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 17:00" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+
+                    <FieldWrapper name="operatingHours" label="Operating Hours" helperText="General operating hours description">
+                      <input 
+                        type="text" 
+                        name="operatingHours" 
+                        value={formData.operatingHours} 
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        placeholder="e.g., 9:00 AM - 6:00 PM" 
+                        disabled={isViewing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                      />
+                    </FieldWrapper>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldWrapper name="price" label="Base Price" required helperText="e.g., $100 or 100">
+                        <input 
+                          type="text" 
+                          name="price" 
+                          value={formData.price} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                          placeholder="Enter base price"
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="currency" label="Currency">
+                        <select 
+                          name="currency" 
+                          value={formData.currency} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          {currencyOptions.map(currency => <option key={currency} value={currency}>{currency}</option>)}
+                        </select>
+                      </FieldWrapper>
+
+                      <FieldWrapper name="pricePerPerson" label="Price Per Person" helperText="For group bookings">
+                        <input 
+                          type="text" 
+                          name="pricePerPerson" 
+                          value={formData.pricePerPerson} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., $50" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldWrapper name="discountPercentage" label="Discount Percentage" helperText="0-100%">
+                        <input 
+                          type="number" 
+                          name="discountPercentage" 
+                          value={formData.discountPercentage} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 10" 
+                          disabled={isViewing}
+                          min="0"
+                          max="100"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="validUntil" label="Discount Valid Until">
+                        <input 
+                          type="date" 
+                          name="validUntil" 
+                          value={formData.validUntil} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FieldWrapper name="minGroup" label="Minimum Group Size" helperText="For group bookings">
+                        <input 
+                          type="number" 
+                          name="minGroup" 
+                          value={formData.minGroup} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 2" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+
+                      <FieldWrapper name="maxGroup" label="Maximum Group Size" helperText="For group bookings">
+                        <input 
+                          type="number" 
+                          name="maxGroup" 
+                          value={formData.maxGroup} 
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          placeholder="e.g., 20" 
+                          disabled={isViewing}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                        />
+                      </FieldWrapper>
+                    </div>
+
+                    {/* Pricing Schedule */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-700">Pricing Schedule</h4>
+                      {!isViewing && (
+                        <div className="space-y-4 p-4 border rounded-lg bg-white">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">Select Days</label>
+                              <div className="space-y-2">
+                                <button 
+                                  type="button" 
+                                  onClick={handleSelectAllDays}
+                                  className="text-sm text-blue-600 hover:text-blue-800"
+                                >
+                                  Select All / Clear All
+                                </button>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {weekDays.map(day => (
+                                    <div key={day} className="flex items-center">
+                                      <input 
+                                        type="checkbox" 
+                                        checked={currentPricing.days.includes(day)}
+                                        onChange={() => handleDaySelection(day)}
+                                        className="w-4 h-4 text-blue-600 rounded"
+                                      />
+                                      <label className="ml-2 text-sm text-gray-700">{day}</label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">Select Time Slots</label>
+                              <div className="space-y-2">
+                                <button 
+                                  type="button" 
+                                  onClick={handleSelectAllTimeSlots}
+                                  className="text-sm text-blue-600 hover:text-blue-800"
+                                >
+                                  Select All / Clear All
+                                </button>
+                                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                                  {timeSlotsOptions.map(timeSlot => (
+                                    <div key={timeSlot} className="flex items-center">
+                                      <input 
+                                        type="checkbox" 
+                                        checked={currentPricing.timeSlots.includes(timeSlot)}
+                                        onChange={() => handleTimeSlotSelection(timeSlot)}
+                                        className="w-4 h-4 text-blue-600 rounded"
+                                      />
+                                      <label className="ml-2 text-sm text-gray-700">{timeSlot}</label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FieldWrapper name="pricingDuration" label="Duration">
+                              <select 
+                                value={currentPricing.duration} 
+                                onChange={(e) => setCurrentPricing(prev => ({ ...prev, duration: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              >
+                                <option value="">Select Duration</option>
+                                {durationOptions.map(duration => <option key={duration} value={duration}>{duration}</option>)}
+                              </select>
+                            </FieldWrapper>
+
+                            <FieldWrapper name="pricingActualPrice" label="Actual Price">
+                              <input 
+                                type="text" 
+                                value={currentPricing.actualPrice} 
+                                onChange={handleActualPriceChange}
+                                placeholder="e.g., 100"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            </FieldWrapper>
+
+                            <FieldWrapper name="pricingCurrency" label="Currency">
+                              <select 
+                                value={currentPricing.currency} 
+                                onChange={(e) => setCurrentPricing(prev => ({ ...prev, currency: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              >
+                                {currencyOptions.map(currency => <option key={currency} value={currency}>{currency}</option>)}
+                              </select>
+                            </FieldWrapper>
+                          </div>
+
+                          {currentPricing.netPrice && (
+                            <div className="bg-green-50 p-3 rounded-md">
+                              <p className="text-sm text-green-800">
+                                Net Price after {formData.discountPercentage || 0}% discount: {currentPricing.currency} {currentPricing.netPrice}
+                              </p>
+                            </div>
+                          )}
+
+                          <button 
+                            type="button" 
+                            onClick={addPricingSchedule}
+                            className="flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                          >
+                            <Plus size={16} /> Add to Pricing Schedule
+                          </button>
+                        </div>
+                      )}
+
+                      {formData.pricingSchedule.length > 0 && (
+                        <div className="space-y-3 mt-4">
+                          <h5 className="font-semibold text-gray-700">Current Pricing Schedule:</h5>
+                          {formData.pricingSchedule.map((schedule, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-white">
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                                    <div>
+                                      <span className="font-medium text-sm text-gray-600">Days:</span>
+                                      <p className="text-gray-800">{schedule.days.join(', ')}</p>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-sm text-gray-600">Time Slots:</span>
+                                      <p className="text-gray-800">{schedule.timeSlots.join(', ')}</p>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-sm text-gray-600">Duration:</span>
+                                      <p className="text-gray-800">{schedule.duration}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-4 text-sm">
+                                    <span className="text-gray-600 line-through">
+                                      Actual: {schedule.currency} {schedule.actualPrice}
+                                    </span>
+                                    <span className="text-green-600 font-semibold">
+                                      Net: {schedule.currency} {schedule.netPrice}
+                                    </span>
+                                  </div>
+                                </div>
+                                {!isViewing && (
+                                  <button 
+                                    type="button" 
+                                    onClick={() => removePricingSchedule(index)}
+                                    className="text-red-600 hover:text-red-800 ml-4"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Themes Section */}
+              <div>
+                <SectionHeader title="Tour Themes" section="additional" />
+                {expandedSections.additional && (
+                  <div className="mt-4 p-6 bg-gray-50 rounded-lg space-y-4">
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700">Tour Themes</label>
+                      {!isViewing && (
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value={currentTheme} 
+                            onChange={(e) => setCurrentTheme(e.target.value)}
+                            placeholder="Enter a theme (e.g., Cultural, Adventure)"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <button 
+                            type="button" 
+                            onClick={addTheme}
+                            className="flex items-center gap-1 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                          >
+                            <Plus size={16} /> Add
+                          </button>
+                        </div>
+                      )}
+                      {formData.themesList.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {formData.themesList.map((theme, index) => (
+                            <div key={index} className="flex items-center gap-1 bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm">
+                              {theme}
+                              {!isViewing && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeTheme(index)}
+                                  className="text-teal-600 hover:text-teal-800"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Submit Buttons */}
+              {!isViewing && (
+                <div className="flex justify-end gap-4 pt-6 border-t">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false);
+                      resetForm();
+                    }}
+                    className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 font-semibold shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Processing...
+                      </>
+                    ) : isEditing ? (
+                      <>
+                        <Save size={20} />
+                        Update Tour
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={20} />
+                        Create Tour
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TourBookingForm;

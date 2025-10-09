@@ -489,7 +489,8 @@ import {
   Phone,
   Mail,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Package
 } from 'lucide-react';
 
 const TourDetailPage = () => {
@@ -519,7 +520,45 @@ const TourDetailPage = () => {
       setLoading(true);
       const response = await postsAPI.getPost(id!);
       if (response.success) {
-        setTour(response.data);
+        // Convert backend mainImage to frontend imageUrl
+        const tourData = {
+          ...response.data,
+          imageUrl: response.data.mainImage 
+            ? (typeof response.data.mainImage === 'string' ? response.data.mainImage : response.data.mainImage.url)
+            : response.data.mainImageUrl || response.data.imageUrl,
+          images: response.data.additionalImages 
+            ? (Array.isArray(response.data.additionalImages) 
+                ? response.data.additionalImages.map((img: any) => typeof img === 'string' ? img : img.url)
+                : []
+              )
+            : (response.data.additionalImageUrls || response.data.images || []),
+          // *** FIX: Enhanced price mapping - prioritize priceNumber from backend ***
+          priceNumber: response.data.priceNumber || 
+                       (response.data.pricingSchedule?.[0]?.netPrice ? parseFloat(String(response.data.pricingSchedule[0].netPrice)) : 0) ||
+                       (response.data.pricingSchedule?.[0]?.actualPrice ? parseFloat(String(response.data.pricingSchedule[0].actualPrice)) : 0) ||
+                       100,
+          // Keep price for display (construct from priceNumber)
+          price: response.data.priceNumber 
+                 ? `$${response.data.priceNumber}` 
+                 : (response.data.pricingSchedule?.[0]?.netPrice ? `${response.data.pricingSchedule[0].currency || 'USD'} ${response.data.pricingSchedule[0].netPrice}` : '') ||
+                   (response.data.pricingSchedule?.[0]?.actualPrice ? `${response.data.pricingSchedule[0].currency || 'USD'} ${response.data.pricingSchedule[0].actualPrice}` : '') ||
+                   'USD 100',
+          discountPercentage: response.data.discountPercentage || response.data.discount?.percentage || 0,
+          // *** FIX: Ensure pricingSchedule is properly formatted with numbers ***
+          pricingSchedule: response.data.pricingSchedule ? response.data.pricingSchedule.map((schedule: any) => ({
+            ...schedule,
+            actualPrice: parseFloat(String(schedule.actualPrice)) || 0,
+            netPrice: parseFloat(String(schedule.netPrice)) || 0,
+            currency: schedule.currency || 'USD'
+          })) : []
+        };
+        
+        console.log('Tour detail loaded with imageUrl:', tourData.imageUrl);
+        console.log('💰 Tour detail price:', tourData.price);
+        console.log('💰 Tour detail priceNumber:', tourData.priceNumber);
+        console.log('💰 Tour detail pricingSchedule:', tourData.pricingSchedule);
+        console.log('🔥 Tour detail discountPercentage:', tourData.discountPercentage);
+        setTour(tourData);
       } else {
         navigate('/tours');
         toast({
@@ -984,6 +1023,168 @@ const TourDetailPage = () => {
                   </div>
                 )}
 
+                {/* Complete Tour Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Basic Information */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                      <div className="space-y-3">
+                        {tour.tagline && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Tagline:</span>
+                            <p className="text-sm">{tour.tagline}</p>
+                          </div>
+                        )}
+                        {tour.tourType && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Tour Type:</span>
+                            <p className="text-sm">{tour.tourType}</p>
+                          </div>
+                        )}
+                        {tour.city && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">City:</span>
+                            <p className="text-sm">{tour.city}</p>
+                          </div>
+                        )}
+                        {tour.duration && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Duration:</span>
+                            <p className="text-sm">{tour.duration}</p>
+                          </div>
+                        )}
+                        {tour.capacity && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Capacity:</span>
+                            <p className="text-sm">{tour.capacity} people</p>
+                          </div>
+                        )}
+                        {(tour.minGroup || tour.maxGroup) && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Group Size:</span>
+                            <p className="text-sm">{tour.minGroup || 1} - {tour.maxGroup || 'No limit'} people</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Transport & Location */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Transport & Location</h3>
+                      <div className="space-y-3">
+                        {tour.transportType && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Transport Type:</span>
+                            <p className="text-sm">{tour.transportType}</p>
+                          </div>
+                        )}
+                        {tour.transportModal && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Transport Modal:</span>
+                            <p className="text-sm">{tour.transportModal}</p>
+                          </div>
+                        )}
+                        {tour.makeVariant && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Make/Variant:</span>
+                            <p className="text-sm">{tour.makeVariant}</p>
+                          </div>
+                        )}
+                        {tour.pickupLocation && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Pickup Location:</span>
+                            <p className="text-sm">{tour.pickupLocation}</p>
+                          </div>
+                        )}
+                        {tour.bestTime && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Best Time:</span>
+                            <p className="text-sm">{tour.bestTime}</p>
+                          </div>
+                        )}
+                        {tour.locationDetails && (
+                          <div>
+                            <span className="font-medium text-sm text-muted-foreground">Location Details:</span>
+                            <p className="text-sm">{tour.locationDetails}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Taglines & Themes */}
+                {(tour.taglinesList || tour.themesList) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {tour.taglinesList && tour.taglinesList.length > 0 && (
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-semibold mb-4">Taglines</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {tour.taglinesList.map((tagline: string, index: number) => (
+                              <Badge key={index} variant="outline" className="text-sm">
+                                {tagline}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {tour.themesList && tour.themesList.length > 0 && (
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-semibold mb-4">Themes</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {tour.themesList.map((theme: string, index: number) => (
+                              <Badge key={index} variant="secondary" className="text-sm">
+                                {theme}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                )}
+
+                {/* Selling Points */}
+                {tour.selectedSellingPoints && tour.selectedSellingPoints.length > 0 && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Selling Points</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {tour.selectedSellingPoints.map((point: string, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            <span className="text-sm">{point}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Things to Bring */}
+                {tour.thingsToBring && tour.thingsToBring.length > 0 && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Things to Bring</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {tour.thingsToBring.map((item: string, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Package className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Quick Facts */}
                 {tour.quickFacts && tour.quickFacts.length > 0 && (
                   <div>
@@ -1015,17 +1216,298 @@ const TourDetailPage = () => {
                 )}
                 
                 {/* Highlights */}
-                {tour.highlights && tour.highlights.length > 0 && (
+                {(tour.highlights && tour.highlights.length > 0) || (tour.highlightsList && tour.highlightsList.length > 0) ? (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Highlights</h3>
                     <ul className="space-y-2">
-                      {tour.highlights.map((highlight: string, index: number) => (
+                      {(tour.highlightsList || tour.highlights || []).map((highlight: string, index: number) => (
                         <li key={index} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-success mt-0.5 shrink-0" />
                           <span>{highlight}</span>
                         </li>
                       ))}
                     </ul>
+                  </div>
+                ) : null}
+
+                {/* Taglines */}
+                {tour.taglinesList && tour.taglinesList.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Taglines</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tour.taglinesList.map((tagline: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="text-sm">
+                          {tagline}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Themes */}
+                {tour.themesList && tour.themesList.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Themes</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tour.themesList.map((theme: string, index: number) => (
+                        <Badge key={index} variant="outline" className="text-sm">
+                          {theme}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selling Points */}
+                {tour.selectedSellingPoints && tour.selectedSellingPoints.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Selling Points</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tour.selectedSellingPoints.map((point: string, index: number) => (
+                        <Badge key={index} className="bg-gradient-primary text-white text-sm">
+                          {point}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Things to Bring */}
+                {tour.thingsToBring && tour.thingsToBring.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Things to Bring</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {tour.thingsToBring.map((item: string, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500" />
+                          <span className="text-sm">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Transport Details */}
+                {(tour.transportType || tour.transportModal || tour.makeVariant) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Transport Details</h3>
+                    <div className="space-y-2 text-sm">
+                      {tour.transportType && (
+                        <div className="flex items-center gap-2">
+                          <strong>Type:</strong> {tour.transportType}
+                        </div>
+                      )}
+                      {tour.transportModal && (
+                        <div className="flex items-center gap-2">
+                          <strong>Model Year:</strong> {tour.transportModal}
+                        </div>
+                      )}
+                      {tour.makeVariant && (
+                        <div className="flex items-center gap-2">
+                          <strong>Make & Variant:</strong> {tour.makeVariant}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Booking Type */}
+                {tour.bookingType && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Booking Type</h3>
+                    <Badge className="bg-gradient-sunset text-white text-sm">
+                      {tour.bookingType === 'single' ? 'Single Person Booking' : 'Group Booking'}
+                    </Badge>
+                    
+                    {tour.bookingType === 'single' && (tour.singlePersonName || tour.singlePersonAge) && (
+                      <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                        {tour.singlePersonName && <p>Name: {tour.singlePersonName}</p>}
+                        {tour.singlePersonAge && <p>Age: {tour.singlePersonAge}</p>}
+                        {tour.singlePersonNationality && <p>Nationality: {tour.singlePersonNationality}</p>}
+                        {tour.singlePersonPreferences && <p>Preferences: {tour.singlePersonPreferences}</p>}
+                      </div>
+                    )}
+                    
+                    {tour.bookingType === 'group' && (tour.groupName || tour.groupSize) && (
+                      <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                        {tour.groupName && <p>Group: {tour.groupName}</p>}
+                        {tour.groupLeaderName && <p>Leader: {tour.groupLeaderName}</p>}
+                        {tour.groupSize && <p>Size: {tour.groupSize} people</p>}
+                        {tour.groupType && <p>Type: {tour.groupType}</p>}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Pricing Schedule */}
+                {tour.pricingSchedule && tour.pricingSchedule.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Pricing Schedule</h3>
+                    <div className="space-y-3">
+                      {tour.pricingSchedule.map((schedule: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <strong>Days:</strong>
+                                <div className="flex flex-wrap gap-1">
+                                  {schedule.days?.map((day: string, i: number) => (
+                                    <Badge key={i} variant="outline" className="text-xs">{day}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <strong>Time Slots:</strong>
+                                <div className="flex flex-wrap gap-1">
+                                  {schedule.timeSlots?.map((time: string, i: number) => (
+                                    <Badge key={i} variant="secondary" className="text-xs">{time}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div><strong>Duration:</strong> {schedule.duration}</div>
+                                <div className="text-right">
+                                  <div className="text-sm text-muted-foreground line-through">
+                                    {schedule.currency} {schedule.actualPrice}
+                                  </div>
+                                  <div className="text-lg font-bold text-success">
+                                    {schedule.currency} {schedule.netPrice}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pickup & Dropoff */}
+                {(tour.pickupLocation || tour.city || tour.hotel) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Pickup & Drop-off</h3>
+                    <div className="space-y-3">
+                      {tour.city && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <div>
+                            <strong>City:</strong> {tour.city}
+                          </div>
+                        </div>
+                      )}
+                      {tour.hotel && (
+                        <div className="flex items-start gap-2">
+                          <strong>Hotel:</strong> {tour.hotel}
+                        </div>
+                      )}
+                      {tour.pickupLocation && (
+                        <div className="flex items-start gap-2">
+                          <strong>Pickup:</strong> {tour.pickupLocation}
+                        </div>
+                      )}
+                      {tour.bestTime && (
+                        <div className="flex items-start gap-2">
+                          <strong>Best Time:</strong> {tour.bestTime}
+                        </div>
+                      )}
+                      {tour.locationDetails && (
+                        <p className="text-sm text-muted-foreground mt-2">{tour.locationDetails}</p>
+                      )}
+                      {!tour.sameDropOff && (tour.dropLocation || tour.dropArea) && (
+                        <div className="mt-4 pt-4 border-t">
+                          <strong className="block mb-2">Drop-off Location:</strong>
+                          {tour.dropArea && <p className="text-sm">Area: {tour.dropArea}</p>}
+                          {tour.dropLocation && <p className="text-sm">Location: {tour.dropLocation}</p>}
+                          {tour.dropPoint && <p className="text-sm">Point: {tour.dropPoint}</p>}
+                          {tour.dropDetails && <p className="text-sm text-muted-foreground mt-1">{tour.dropDetails}</p>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Languages */}
+                {tour.languages && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Languages</h3>
+                    <p className="text-muted-foreground">{tour.languages}</p>
+                  </div>
+                )}
+
+                {/* Insider Tips */}
+                {tour.nearbyAttractions && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Insider Tips</h3>
+                    <p className="text-muted-foreground">{tour.nearbyAttractions}</p>
+                  </div>
+                )}
+
+                {/* Cancellation Policy */}
+                {(tour.freeCancellation || tour.reserveNowPayLater || tour.cancellationNote) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Cancellation & Reservation</h3>
+                    <div className="space-y-3">
+                      {tour.freeCancellation && (
+                        <div className="flex items-center gap-2 text-success">
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="font-medium">Free Cancellation Available</span>
+                        </div>
+                      )}
+                      {tour.deadlineHours && (
+                        <p className="text-sm text-muted-foreground">
+                          Cancel up to {tour.deadlineHours} hours before the tour starts
+                        </p>
+                      )}
+                      {tour.cancellationNote && (
+                        <p className="text-sm text-muted-foreground">{tour.cancellationNote}</p>
+                      )}
+                      {tour.reserveNowPayLater && (
+                        <div className="flex items-center gap-2 text-primary">
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="font-medium">Reserve Now, Pay Later</span>
+                        </div>
+                      )}
+                      {tour.reserveNote && (
+                        <p className="text-sm text-muted-foreground">{tour.reserveNote}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Accessibility Updated */}
+                {(tour.wheelchairAccessible || tour.infantSeats || tour.strollerAccessible || tour.serviceAnimals || tour.accessibilityNotes) && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Accessibility</h3>
+                    <div className="space-y-2">
+                      {tour.wheelchairAccessible && (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-success" />
+                          <span>Wheelchair Accessible</span>
+                        </div>
+                      )}
+                      {tour.infantSeats && (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-success" />
+                          <span>Infant Seats Available</span>
+                        </div>
+                      )}
+                      {tour.strollerAccessible && (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-success" />
+                          <span>Stroller Accessible</span>
+                        </div>
+                      )}
+                      {tour.serviceAnimals && (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-success" />
+                          <span>Service Animals Allowed</span>
+                        </div>
+                      )}
+                      {tour.accessibilityNotes && (
+                        <p className="text-sm text-muted-foreground mt-2">{tour.accessibilityNotes}</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -1237,9 +1719,9 @@ const TourDetailPage = () => {
               </TabsContent>
               
               <TabsContent value="itinerary" className="space-y-4">
-                {tour.itinerary && tour.itinerary.length > 0 ? (
+                {(tour.itinerary && tour.itinerary.length > 0) || (tour.itineraryItems && tour.itineraryItems.length > 0) ? (
                   <div className="space-y-4">
-                    {tour.itinerary.map((item: any, index: number) => (
+                    {(tour.itineraryItems || tour.itinerary || []).map((item: any, index: number) => (
                       <Card key={index}>
                         <CardContent className="p-4">
                           <div className="flex gap-4">
@@ -1258,6 +1740,15 @@ const TourDetailPage = () => {
                                 <div className="flex items-center gap-1 mt-2">
                                   <MapPin className="h-3 w-3" />
                                   <span className="text-xs">{item.location}</span>
+                                </div>
+                              )}
+                              {item.included !== undefined && (
+                                <div className="mt-2">
+                                  {item.included ? (
+                                    <Badge variant="secondary" className="text-xs">Included in Package</Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-xs">Additional Cost: ${item.additionalCost}</Badge>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -1344,9 +1835,12 @@ const TourDetailPage = () => {
               
               <TabsContent value="includes" className="space-y-6">
                 {/* What's Included */}
-                {tour.includes && tour.includes.length > 0 && (
+                {tour.includes && (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">What's Included</h3>
+                    {typeof tour.includes === 'string' ? (
+                      <p className="text-muted-foreground whitespace-pre-wrap">{tour.includes}</p>
+                    ) : Array.isArray(tour.includes) ? (
                     <ul className="space-y-2">
                       {tour.includes.map((item: string, index: number) => (
                         <li key={index} className="flex items-start gap-2">
@@ -1355,13 +1849,17 @@ const TourDetailPage = () => {
                         </li>
                       ))}
                     </ul>
+                    ) : null}
                   </div>
                 )}
 
                 {/* What's Excluded */}
-                {tour.excludes && tour.excludes.length > 0 && (
+                {tour.excludes && (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">What's Not Included</h3>
+                    {typeof tour.excludes === 'string' ? (
+                      <p className="text-muted-foreground whitespace-pre-wrap">{tour.excludes}</p>
+                    ) : Array.isArray(tour.excludes) ? (
                     <ul className="space-y-2">
                       {tour.excludes.map((item: string, index: number) => (
                         <li key={index} className="flex items-start gap-2">
@@ -1370,6 +1868,47 @@ const TourDetailPage = () => {
                         </li>
                       ))}
                     </ul>
+                    ) : null}
+                  </div>
+                )}
+
+                {/* FAQs */}
+                {tour.faqs && tour.faqs.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
+                    <div className="space-y-3">
+                      {tour.faqs.map((faq: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <h4 className="font-semibold mb-2 text-primary">{faq.question}</h4>
+                            <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Included Destinations */}
+                {tour.includedDestinations && tour.includedDestinations.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Included Destinations</h3>
+                    <div className="space-y-3">
+                      {tour.includedDestinations.map((dest: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <h4 className="font-semibold mb-2">{dest.name}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">{dest.description}</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                              {dest.duration && <div><strong>Duration:</strong> {dest.duration}</div>}
+                              {dest.bestTimeToVisit && <div><strong>Best Time:</strong> {dest.bestTimeToVisit}</div>}
+                              {dest.entryFee && <div><strong>Entry Fee:</strong> {dest.entryFee}</div>}
+                              {dest.openingHours && <div><strong>Hours:</strong> {dest.openingHours}</div>}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
                 )}
                 
@@ -1626,7 +2165,7 @@ const TourDetailPage = () => {
                 )}
 
                 {/* Nearby Attractions */}
-                {tour.nearbyAttractions && tour.nearbyAttractions.length > 0 && (
+                {tour.nearbyAttractions && Array.isArray(tour.nearbyAttractions) && tour.nearbyAttractions.length > 0 && (
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Nearby Attractions</h3>
                     <ul className="space-y-2">
@@ -1878,17 +2417,68 @@ const TourDetailPage = () => {
             <Card className="sticky top-24 shadow-large">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="h-6 w-6 text-primary" />
-                      <span className="text-3xl font-bold text-primary">{price}</span>
-                      {tour.discount && tour.discount.percentage > 0 && (
-                        <span className="text-lg line-through text-muted-foreground ml-2">
-                          ${(tour.priceNumber / (1 - tour.discount.percentage / 100)).toFixed(0)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">per person</p>
+                  <div className="flex-1">
+                    {/* *** FIX: Enhanced Price Display with Discount *** */}
+                    {(() => {
+                      // Try pricingSchedule first for complete price display
+                      if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
+                        const schedule = tour.pricingSchedule[0];
+                        let actualPrice = parseFloat(String(schedule.actualPrice)) || 0;
+                        let netPrice = parseFloat(String(schedule.netPrice)) || actualPrice;
+                        
+                        // *** FIX: If actualPrice === netPrice but discount > 0, reverse calculate actualPrice ***
+                        if (actualPrice === netPrice && tour.discountPercentage > 0 && actualPrice > 0) {
+                          const discountDecimal = tour.discountPercentage / 100;
+                          actualPrice = Math.round(netPrice / (1 - discountDecimal));
+                          console.log('🔄 TourDetail - Reverse calculated actualPrice:', {
+                            netPrice,
+                            discountPercentage: tour.discountPercentage,
+                            calculatedActualPrice: actualPrice
+                          });
+                        }
+                        
+                        if (actualPrice > 0 && netPrice < actualPrice) {
+                          const discount = Math.round(((actualPrice - netPrice) / actualPrice) * 100);
+                          return (
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <DollarSign className="h-6 w-6 text-gray-400" />
+                                <span className="text-lg line-through text-muted-foreground">
+                                  ${actualPrice}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <DollarSign className="h-6 w-6 text-primary" />
+                                <span className="text-3xl font-bold text-green-600">${netPrice}</span>
+                                <Badge className="bg-red-500 text-white">{discount}% OFF</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">per person</p>
+                            </div>
+                          );
+                        } else if (actualPrice > 0) {
+                          return (
+                            <div>
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="h-6 w-6 text-primary" />
+                                <span className="text-3xl font-bold text-primary">${actualPrice}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">per person</p>
+                            </div>
+                          );
+                        }
+                      }
+                      
+                      // Fallback to priceNumber or price
+                      return (
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-6 w-6 text-primary" />
+                            <span className="text-3xl font-bold text-primary">{price}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">per person</p>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <Button variant="ghost" size="icon">
                     <Heart className="h-5 w-5" />
@@ -1931,7 +2521,7 @@ const TourDetailPage = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Languages:</span>
                     <span className="font-medium">
-                      {tour.languages?.join(', ') || 'English'}
+                      {Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages || 'English'}
                     </span>
                   </div>
                   {tour.difficulty && (

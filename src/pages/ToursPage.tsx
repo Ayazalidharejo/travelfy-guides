@@ -64,7 +64,40 @@ const ToursPage = () => {
         status: 'published'
       });
       
-      setTours(response.data || []);
+      // Convert backend mainImage to frontend imageUrl
+      const toursData = (response.data || []).map((tour: any) => ({
+        ...tour,
+        imageUrl: tour.mainImage 
+          ? (typeof tour.mainImage === 'string' ? tour.mainImage : tour.mainImage.url)
+          : tour.mainImageUrl || tour.imageUrl,
+        images: tour.additionalImages 
+          ? (Array.isArray(tour.additionalImages) 
+              ? tour.additionalImages.map((img: any) => typeof img === 'string' ? img : img.url)
+              : []
+            )
+          : (tour.additionalImageUrls || tour.images || []),
+        // *** FIX: Enhanced price mapping - prioritize priceNumber from backend ***
+        priceNumber: tour.priceNumber || 
+                     (tour.pricingSchedule?.[0]?.netPrice ? parseFloat(String(tour.pricingSchedule[0].netPrice)) : 0) ||
+                     (tour.pricingSchedule?.[0]?.actualPrice ? parseFloat(String(tour.pricingSchedule[0].actualPrice)) : 0) ||
+                     100,
+        // Keep price for display (construct from priceNumber)
+        price: tour.priceNumber 
+               ? `$${tour.priceNumber}` 
+               : (tour.pricingSchedule?.[0]?.netPrice ? `${tour.pricingSchedule[0].currency || 'USD'} ${tour.pricingSchedule[0].netPrice}` : '') ||
+                 (tour.pricingSchedule?.[0]?.actualPrice ? `${tour.pricingSchedule[0].currency || 'USD'} ${tour.pricingSchedule[0].actualPrice}` : '') ||
+                 'USD 100',
+        discountPercentage: tour.discountPercentage || tour.discount?.percentage || 0,
+        // *** FIX: Ensure pricingSchedule is properly formatted with numbers ***
+        pricingSchedule: tour.pricingSchedule ? tour.pricingSchedule.map((schedule: any) => ({
+          ...schedule,
+          actualPrice: parseFloat(String(schedule.actualPrice)) || 0,
+          netPrice: parseFloat(String(schedule.netPrice)) || 0,
+          currency: schedule.currency || 'USD'
+        })) : []
+      }));
+      
+      setTours(toursData);
       setTotalPages(response.pages || 1);
     } catch (error) {
       console.error('Error fetching tours:', error);

@@ -293,7 +293,7 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
-        <AdminPostDashboard/>
+        <AdminPostDashboard onTourChange={fetchStats} />
       </div>
     </div>
   );
