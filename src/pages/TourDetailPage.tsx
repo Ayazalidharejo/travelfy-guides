@@ -1,32 +1,47 @@
+
+
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { postsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import RatingComponent from '@/components/RatingComponent';
 import {
   Clock,
   MapPin,
   Star,
-  Users,
-  DollarSign,
-  Calendar,
-  Shield,
-  Heart,
-  Camera,
   MessageSquare,
+  Heart,
   Share2,
-  BookOpen,
-  CheckCircle,
-  AlertCircle,
+  Map as MapIcon,
+  Check,
+  ArrowLeft,
+  Calendar,
+  Users,
+  CalendarClock,
+  Tag,
+  FileText,
+  Package,
+  Globe,
+  DollarSign,
+  
   Info,
-  ArrowLeft
+  Percent,
+  Map,
+  
+  Timer,
+  Clock as ClockIcon,
+  Slash,
+  CheckCircle,
+  XCircle,
+  User,
+ 
+  Languages,
+  Home,
+  
+  
 } from 'lucide-react';
 
 const TourDetailPage = () => {
@@ -34,41 +49,41 @@ const TourDetailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
-  const [tour, setTour] = useState<any>(null);
+  const [tour, setTour] = useState(null);
+  console.log('Tour ID:', tour);
+  
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [imageLoading, setImageLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (!id) return;
 
-  const fetchTour = async () => {
-    try {
-      setLoading(true);
+    const fetchTour = async () => {
+      try {
+        setLoading(true);
         const response = await postsAPI.getPost(id);
-      if (response.success) {
-        setTour(response.data);
-          setImageLoading(false);
-      } else {
+        if (response.success) {
+          setTour(response.data);
+          console.log('Tour data:', response.data);
+        } else {
+          navigate('/tours');
+          toast({
+            title: "Tour not found",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
         navigate('/tours');
         toast({
-          title: "Tour not found",
-          description: "The tour you're looking for doesn't exist.",
+          title: "Error",
           variant: "destructive",
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching tour:', error);
-      navigate('/tours');
-      toast({
-        title: "Error",
-        description: "Failed to load tour details.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
     
     fetchTour();
   }, [id]);
@@ -83,50 +98,11 @@ const TourDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-card">
-        {/* Back Button Skeleton */}
-        <div className="container px-4 py-4">
-          <div className="h-10 w-32 bg-muted rounded animate-pulse" />
-              </div>
-        
-        {/* Image Gallery Skeleton */}
-        <div className="container px-4 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            <div className="lg:col-span-3">
-              <div className="aspect-video bg-muted rounded-lg animate-pulse" />
-            </div>
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Content Skeleton */}
-        <div className="container px-4 pb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="lg:col-span-2 space-y-8">
-              {/* Header Skeleton */}
-              <div className="space-y-4">
-                <div className="h-8 bg-muted rounded w-3/4 animate-pulse" />
-                <div className="h-12 bg-muted rounded w-1/2 animate-pulse" />
-                <div className="flex gap-6">
-                  <div className="h-4 bg-muted rounded w-24 animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-32 animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-28 animate-pulse" />
-                </div>
-              </div>
-              
-              {/* Tabs Skeleton */}
-              <div className="space-y-4">
-                <div className="h-10 bg-muted rounded animate-pulse" />
-                <div className="h-64 bg-muted rounded animate-pulse" />
-              </div>
-            </div>
-            
-            {/* Sidebar Skeleton */}
-            <div className="h-96 bg-muted rounded-lg animate-pulse" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-8">
+            <div className="h-10 w-32 bg-gray-200 rounded" />
+            <div className="h-96 bg-gray-200 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -135,567 +111,1013 @@ const TourDetailPage = () => {
 
   if (!tour) return null;
 
-  const images = tour.images?.length > 0 ? tour.images : [tour.imageUrl || '/placeholder.svg'];
-  const price = tour.priceNumber ? `$${tour.priceNumber}` : tour.price;
+  // Images
+  const allImages = [
+    tour.mainImageUrl,
+    tour.mainImage?.url,
+    ...(tour.additionalImageUrls || []),
+    ...(tour.additionalImages?.map(img => img.url) || []),
+  ].filter(Boolean);
+
+  const mainImage = allImages[activeImageIndex] || tour.mainImageUrl;
+  const thumbnailImages = allImages.slice(0, 3);
+
+  // Price
+  const originalPrice = tour.priceNumber || 0;
+  const discountPercent = tour.discount?.percentage || tour.discountPercentage || 0;
+  const discountedPrice = originalPrice - (originalPrice * discountPercent / 100);
+
+  // Parse arrays
+  const includesArray = tour.includes 
+    ? (Array.isArray(tour.includes) ? tour.includes : tour.includes.split('\n').filter(item => item.trim()))
+    : [];
+    
+  const excludesArray = tour.excludes 
+    ? (Array.isArray(tour.excludes) ? tour.excludes : tour.excludes.split('\n').filter(item => item.trim()))
+    : [];
+
+  const highlightsArray = tour.highlightsList || tour.highlights || tour.selectedSellingPoints || [];
 
   return (
-    <div className="min-h-screen bg-gradient-card">
-      {/* Back Button */}
-      <div className="container px-4 py-4">
-        <Button variant="ghost" onClick={() => navigate('/tours')} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Tours
-        </Button>
-      </div>
-  <h1 className="text-3xl md:text-4xl font-bold">{tour.title}</h1>
-   <div className="flex items-center gap-2">
-                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">4.7</span>
-                  <span className="text-muted-foreground">(127 reviews)</span>
+    <div className="min-h-screen bg-gray-50">
+      {/* HEADER */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-4">
+          <Button variant="ghost" className="gap-2" onClick={() => navigate('/tours')}>
+            <ArrowLeft className="h-4 w-4" />
+            Back to Tours
+          </Button>
+        </div>
       </div>
 
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* TOP SECTION - Image + Info Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-8 mb-8">
+          {/* LEFT - IMAGE GALLERY */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <div className="relative aspect-video rounded-2xl overflow-hidden bg-gray-200">
+              <img 
+                src={mainImage}
+                alt={tour.title}
+                className="w-full h-full object-cover"
+                onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x450?text=No+Image'}
+              />
+              {tour.featured && (
+                <Badge className="absolute top-4 left-4 bg-red-500 text-white border-0">
+                  Best Seller
+                </Badge>
+              )}
+            </div>
+
+            {/* Thumbnail Images - HORIZONTAL */}
+            {thumbnailImages.length > 0 && (
+              <div className="grid grid-cols-3 gap-4">
+                {thumbnailImages.map((img, idx) => (
+                  <div 
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative aspect-video rounded-xl overflow-hidden cursor-pointer transition-all ${
+                      activeImageIndex === idx ? 'ring-2 ring-green-500' : 'opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img 
+                      src={img}
+                      alt={`${tour.title} ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=No+Image'}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT - TOUR INFO */}
+          <div className="space-y-4">
+            {/* Product ID & Badge */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Product ID: {tour._id?.slice(-6)}</span>
+              {tour.featured && (
+                <Badge className="bg-red-500 text-white">Best Seller</Badge>
+              )}
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+              {tour.title}
+            </h1>
+
+            {/* Tagline */}
+            {tour.tagline && (
+              <p className="text-gray-600 text-lg">{tour.tagline}</p>
+            )}
+
+            {/* Rating */}
+            {/* <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4].map((star) => (
+                  <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                ))}
+                <Star className="h-5 w-5 text-yellow-400" />
+              </div>
+              <span className="font-semibold">4.8</span>
+              <span className="text-gray-500">(342 reviews)</span>
+            </div> */}
+
+            {/* Details with Icons */}
+            <div className="space-y-3">
+              {tour.languages && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <MessageSquare className="h-5 w-5 text-gray-500" />
+                  <span className="font-medium">Languages:</span>
+                  <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
+                </div>
+              )}
+              {tour.pickupLocation && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <MapPin className="h-5 w-5 text-gray-500" />
+                  <span className="font-medium">Pickup:</span>
+                  <span>{tour.pickupLocation}</span>
+                </div>
+              )}
+              {(tour.duration || tour.durationHours || tour.pricingSchedule?.[0]?.duration) && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <Clock className="h-5 w-5 text-gray-500" />
+                  <span className="font-medium">Duration:</span>
                   <span>
                     {tour.pricingSchedule?.[0]?.duration || 
                      (tour.duration && tour.duration.trim()) || 
-                     (tour.durationHours ? `${tour.durationHours} hours` : null) || 
-                     'Duration not specified'}
+                     `${tour.durationHours} hours`}
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  <span>
-                    {(tour.minGroup && tour.maxGroup) 
-                      ? `${tour.minGroup}-${tour.maxGroup} people`
-                      : (tour.groupSize?.min && tour.groupSize?.max)
-                        ? `${tour.groupSize.min}-${tour.groupSize.max} people`
-                        : (tour.groupSize && typeof tour.groupSize === 'number')
-                          ? `${tour.groupSize} people`
-                          : tour.groupSize || tour.groupType || 'Small group'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Shield className="h-4 w-4 text-success" />
-                  <span>Free cancellation</span>
-                </div>
-                {(tour.pricingSchedule?.[0]?.transportType || tour.transportType) && (
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4 text-blue-500" />
-                    <span>
-                      {tour.pricingSchedule?.[0]?.transportType || tour.transportType}
-                      {tour.pricingSchedule?.[0]?.transportModal && ` (${tour.pricingSchedule[0].transportModal})`}
-                      {tour.pricingSchedule?.[0]?.makeVariant && ` - ${tour.pricingSchedule[0].makeVariant}`}
-                    </span>
-                  </div>
-                )}
-              </div>
-      {/* Image Gallery */}
-      <div className="container px-4 mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-          <div className="lg:col-span-3">
-            <div className="relative aspect-video rounded-lg overflow-hidden">
-              {imageLoading && (
-                <div className="absolute inset-0 bg-muted animate-pulse rounded-lg" />
               )}
-              <img
-                src={images[activeImageIndex]}
-                alt={tour.title}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${
-                  imageLoading ? 'opacity-0' : 'opacity-100'
-                }`}
-                onLoad={() => setImageLoading(false)}
-                onError={() => setImageLoading(false)}
-              />
-              {tour.featured && (
-          <Badge className="absolute top-4 left-4 bg-gradient-sunset text-white">
-            Featured
-          </Badge>
-        )}
-          <Badge className="absolute top-4 right-4 bg-gradient-primary text-white">
-            {tour.category}
-          </Badge>
-      </div>
-  </div>
+              {tour.city && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <MapPin className="h-5 w-5 text-gray-500" />
+                  <span className="font-medium">Drop-Off:</span>
+                  <span>Return to {tour.city}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-3 text-gray-700">
+                <Calendar className="h-5 w-5 text-gray-500" />
+                <span className="font-medium">Availability:</span>
+                <span>Daily</span>
+              </div>
+            </div>
 
-          {images.length > 1 && (
-            <div className="space-y-2">
-              {images.slice(0, 4).map((image: string, index: number) => (
-          <div
-            key={index}
-            className={`aspect-square rounded-lg overflow-hidden cursor-pointer border-2 ${
-              activeImageIndex === index ? 'border-primary' : 'border-transparent'
-                  }`}
-            onClick={() => setActiveImageIndex(index)}
-          >
-            <img
-              src={image}
-              alt={`${tour.title} ${index + 1}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-smooth"
-            />
+            {/* See all visiting places */}
+            <div className="pt-4">
+              <p className="text-sm text-gray-600">See all the visiting places in {tour.city || 'Tokyo'}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`rounded-lg ${isFavorite ? 'text-red-500 border-red-500' : ''}`}
+              >
+                <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+              </Button>
+              <Button variant="outline" size="icon" className="rounded-lg">
+                <Share2 className="h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="icon" className="rounded-lg">
+                <MapIcon className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
-        ))}
         </div>
-      )}
-</div>
-      </div>
 
-      <div className="container px-4 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Main Content */}
+        {/* BOTTOM SECTION - Content + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LEFT - Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Header */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 flex-wrap">
-               
-                {tour.prefecture && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">{tour.prefecture}</span>
+            
+            {/* About Section */}
+            {(tour.description || tour.content) && (
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">About this Experience</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {tour.description || tour.content}
+                </p>
+              </div>
+            )}
+
+            {/* What's Included/Excluded - BORDERED BOX */}
+            {(includesArray.length > 0 || excludesArray.length > 0) && (
+              <div className="border-2 border-gray-200 rounded-2xl p-6">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* What's Exclude */}
+                  {excludesArray.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's exclude</h3>
+                      <ul className="space-y-3">
+                        {excludesArray.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* What's Included */}
+                  {includesArray.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's Included</h3>
+                      <ul className="space-y-3">
+                        {includesArray.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Trip Highlights - BORDERED BOX */}
+            {highlightsArray.length > 0 && (
+              <div className="border-2 border-gray-200 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Trip Highlights</h3>
+                <ul className="space-y-3">
+                  {highlightsArray.map((highlight, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Things to Bring */}
+            {tour.thingsToBring && tour.thingsToBring.length > 0 && (
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">What to Bring</h3>
+                <ul className="space-y-2">
+                  {tour.thingsToBring.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <Check className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Interactive FAQs */}
+            {tour.faqs && tour.faqs.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-lg border">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <span className="text-blue-600">❓</span>
+                  Frequently Asked Questions
+                </h3>
+                <div className="space-y-3">
+                  {tour.faqs.map((faq, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden">
+                      <button
+                        className="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between group"
+                        onClick={() => {
+                          const element = document.getElementById(`faq-${idx}`);
+                          if (element) {
+                            element.classList.toggle('hidden');
+                            const icon = document.getElementById(`faq-icon-${idx}`);
+                            if (icon) {
+                              icon.classList.toggle('rotate-180');
+                            }
+                          }
+                        }}
+                      >
+                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {faq.question}
+                        </h4>
+                        <svg 
+                          id={`faq-icon-${idx}`}
+                          className="w-5 h-5 text-gray-500 transition-transform duration-200" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <div id={`faq-${idx}`} className="hidden px-6 py-4 bg-white border-t border-gray-100">
+                        <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            {/* Tour Details Section - Organized and Styled */}
+            <div className="space-y-4 bg-gray-50 p-6 rounded-lg">
+              
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tour.bestTime && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                      <span className="font-semibold text-gray-800">Best Time:</span>
+                      <p className="text-gray-600">{tour.bestTime}</p>
+                    </div>
                   </div>
+                )}
+
+                {tour.bookingType && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+      <div>
+                      <span className="font-semibold text-gray-800">Booking Type:</span>
+                      <p className="text-gray-600">{tour.bookingType}</p>
+                    </div>
+                  </div>
+                )}
+
+                {tour.category && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-gray-800">Category:</span>
+                      <p className="text-gray-600">{tour.category}</p>
+                    </div>
+                </div>
+              )}
+
+                {tour.city && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-gray-800">City:</span>
+                      <p className="text-gray-600">{tour.city}</p>
+              </div>
+                  </div>
+                )}
+
+                {tour.duration && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                      <span className="font-semibold text-gray-800">Duration:</span>
+                      <p className="text-gray-600">{tour.duration}</p>
+                    </div>
+                  </div>
+                )}
+
+                {tour.languages && (
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-gray-800">Languages:</span>
+                      <p className="text-gray-600">{tour.languages}</p>
+                    </div>
+                </div>
+              )}
+              </div>
+
+              {/* Pricing Information */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Pricing Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tour.currency && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Currency:</span>
+                      <span className="ml-2 text-gray-600">{tour.currency}</span>
+                </div>
+              )}
+                  {tour.priceNumber && (
+                <div>
+                      <span className="font-semibold text-gray-700">Price:</span>
+                      <span className="ml-2 text-gray-600">{tour.priceNumber}</span>
+                </div>
+              )}
+                  {tour.discountPercentage && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Discount:</span>
+                      <span className="ml-2 text-green-600 font-semibold">{tour.discountPercentage}% OFF</span>
+              </div>
+                  )}
+                  {tour.discount && (
+                <div>
+                      <span className="font-semibold text-gray-700">Discount Percentage:</span>
+                      <span className="ml-2 text-green-600">{tour.discount.percentage}%</span>
+                </div>
+              )}
+              </div>
+              </div>
+
+              {/* Pricing Schedule */}
+              {tour.pricingSchedule && tour.pricingSchedule.length > 0 && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-blue-600" />
+                    Pricing Schedule
+                  </h3>
+                  <div className="space-y-4">
+                    {tour.pricingSchedule.map((item: any, index: number) => (
+                      <div key={index} className="border-l-4 border-blue-500 pl-4 py-2 bg-gray-50 rounded">
+                        <p className="mb-1">
+                          <span className="font-semibold text-gray-700">Duration:</span>
+                          <span className="ml-2 text-gray-600">{item.duration}</span>
+                        </p>
+                        <p className="mb-1">
+                          <span className="font-semibold text-gray-700">Actual Price:</span>
+                          <span className="ml-2 text-gray-600">${item.actualPrice}</span>
+                        </p>
+                        <p className="mb-2">
+                          <span className="font-semibold text-gray-700">Net Price:</span>
+                          <span className="ml-2 text-green-600 font-semibold">${item.netPrice}</span>
+                        </p>
+                        
+                        {item.days && item.days.length > 0 && (
+                          <div className="mb-2">
+                            <p className="font-semibold text-gray-700 mb-1">Days:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {item.days.map((day: string, i: number) => (
+                                <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                                  {day}
+                                </span>
+                              ))}
+                </div>
+              </div>
+                        )}
+
+                        {item.timeSlots && item.timeSlots.length > 0 && (
+                <div>
+                            <p className="font-semibold text-gray-700 mb-1">Time Slots:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {item.timeSlots.map((slot: string, i: number) => (
+                                <span key={i} className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-sm">
+                                  {slot}
+                                </span>
+                              ))}
+                            </div>
+                </div>
+              )}
+              </div>
+                    ))}
+                </div>
+              </div>
+              )}
+
+              {/* Location Details */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Location Details</h3>
+                <div className="space-y-3">
+                  {tour.pickupLocation && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-green-600 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-gray-700">Pickup Location:</span>
+                        <p className="text-gray-600">{tour.pickupLocation}</p>
+                      </div>
+                </div>
+              )}
+                  {tour.dropLocation && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-gray-700">Drop Location:</span>
+                        <p className="text-gray-600">{tour.dropLocation}</p>
+              </div>
+                    </div>
+                  )}
+                  {tour.dropArea && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                        <span className="font-semibold text-gray-700">Drop Area:</span>
+                        <p className="text-gray-600">{tour.dropArea}</p>
+                      </div>
+                </div>
+              )}
+                  {tour.dropPoint && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-gray-700">Drop Point:</span>
+                        <p className="text-gray-600">{tour.dropPoint}</p>
+              </div>
+                    </div>
+                  )}
+                  {tour.dropDetails && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                        <span className="font-semibold text-gray-700">Drop Details:</span>
+                        <p className="text-gray-600">{tour.dropDetails}</p>
+                      </div>
+                </div>
+              )}
+                  {tour.locationDetails && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-gray-700">Location Details:</span>
+                        <p className="text-gray-600">{tour.locationDetails}</p>
+              </div>
+                    </div>
+                  )}
+                  {tour.nearbyAttractions && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-purple-600 mt-0.5" />
+                <div>
+                        <span className="font-semibold text-gray-700">Nearby Attractions:</span>
+                        <p className="text-gray-600">{tour.nearbyAttractions}</p>
+                      </div>
+                </div>
+              )}
+                  {tour.sameDropOff !== undefined && (
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-blue-600" />
+                      <span className="font-semibold text-gray-700">Same Drop Off:</span>
+                      <span className="text-gray-600">{tour.sameDropOff ? "✅ Yes" : "❌ No"}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Time Details */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Time Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tour.startTime && (
+                <div>
+                      <span className="font-semibold text-gray-700">Start Time:</span>
+                      <span className="ml-2 text-gray-600">{tour.startTime}</span>
+                </div>
+              )}
+                  {tour.endTime && (
+                    <div>
+                      <span className="font-semibold text-gray-700">End Time:</span>
+                      <span className="ml-2 text-gray-600">{tour.endTime}</span>
+              </div>
+                  )}
+                  {tour.deadlineHours && (
+                <div>
+                      <span className="font-semibold text-gray-700">Deadline Hours:</span>
+                      <span className="ml-2 text-gray-600">{tour.deadlineHours}</span>
+                </div>
+              )}
+              </div>
+              </div>
+
+              {/* Highlights */}
+              {tour.highlightsList && tour.highlightsList.length > 0 && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-yellow-600" />
+                    Highlights
+                  </h3>
+                  <ul className="space-y-2">
+                    {tour.highlightsList.map((highlight: any, index: number) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-yellow-600 mt-1">★</span>
+                        <p className="text-gray-600">{highlight}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Selected Selling Points */}
+              {tour.selectedSellingPoints && tour.selectedSellingPoints.length > 0 && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-green-600" />
+                    Selected Selling Points
+                  </h3>
+                  <ul className="space-y-2">
+                    {tour.selectedSellingPoints.map((point: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-green-600 mt-1">✓</span>
+                        <p className="text-gray-600">{point}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Inclusions & Exclusions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tour.includes && (
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h4 className="font-bold text-green-800 mb-2">✓ Includes</h4>
+                    <p className="text-gray-700">{tour.includes}</p>
+                </div>
+              )}
+                {tour.excludes && (
+                  <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h4 className="font-bold text-red-800 mb-2">✗ Excludes</h4>
+                    <p className="text-gray-700">{tour.excludes}</p>
+              </div>
                 )}
               </div>
-              
-            
-              
-      
-                    </div>
 
-            {/* Tabs */}
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
-                <TabsTrigger value="includes">What's Included</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="overview" className="space-y-6">
+              {/* Cancellation Policy */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Cancellation Policy</h3>
+                <div className="space-y-2">
+                  {tour.freeCancellation !== undefined && (
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-gray-700">Free Cancellation:</span>
+                      <span className={`${tour.freeCancellation ? 'text-green-600' : 'text-red-600'} font-semibold`}>
+                        {tour.freeCancellation ? "✅ Yes" : "❌ No"}
+                      </span>
+                </div>
+              )}
+                  {tour.cancellationNote && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-3">About This Tour</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {tour.description || tour.content}
-                  </p>
+                      <span className="font-semibold text-gray-700">Cancellation Note:</span>
+                      <p className="text-gray-600 mt-1">{tour.cancellationNote}</p>
                 </div>
-
-                {/* Highlights */}
-                {(tour.highlightsList?.length > 0 || tour.highlights?.length > 0 || tour.selectedSellingPoints?.length > 0) && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Highlights</h3>
-                    <ul className="space-y-2">
-                      {(tour.highlightsList || tour.highlights || tour.selectedSellingPoints || []).map((highlight: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-success mt-0.5 shrink-0" />
-                          <span>{highlight}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {/* Taglines */}
-                {tour.taglinesList && tour.taglinesList.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Why Choose This Tour</h3>
-                    <ul className="space-y-2">
-                      {tour.taglinesList.map((tagline: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <Star className="h-5 w-5 text-yellow-500 mt-0.5 shrink-0" />
-                          <span>{tagline}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Things to Bring */}
-                {tour.thingsToBring && tour.thingsToBring.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">What to Bring</h3>
-                    <ul className="space-y-2">
-                      {tour.thingsToBring.map((item: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Cancellation & Reserve Info */}
-                {(tour.cancellationNote || tour.reserveNote) && (
-                    <div>
-                    <h3 className="text-xl font-semibold mb-3">Know Before You Go</h3>
-                    <div className="space-y-3">
-                      {tour.cancellationNote && (
-                        <div className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium">Cancellation Policy</p>
-                            <p className="text-sm text-muted-foreground">{tour.cancellationNote}</p>
-                          </div>
-                    </div>
+              )}
+                  {tour.reserveNowPayLater !== undefined && (
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-gray-700">Reserve Now, Pay Later:</span>
+                      <span className={`${tour.reserveNowPayLater ? 'text-green-600' : 'text-gray-600'} font-semibold`}>
+                        {tour.reserveNowPayLater ? "✅ Yes" : "❌ No"}
+                      </span>
+              </div>
                   )}
-                      {tour.reserveNote && (
-                        <div className="flex items-start gap-2">
-                          <Info className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                    <div>
-                            <p className="font-medium">Booking Information</p>
-                            <p className="text-sm text-muted-foreground">{tour.reserveNote}</p>
-                          </div>
-                    </div>
-                  )}
+                  {tour.reserveNote && (
+                <div>
+                      <span className="font-semibold text-gray-700">Reserve Note:</span>
+                      <p className="text-gray-600 mt-1">{tour.reserveNote}</p>
                 </div>
-                  </div>
-                )}
-
-                {/* Pickup & Drop-off Info */}
-                {(tour.pickupLocation || tour.dropLocation || tour.locationDetails) && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Meeting & Pickup</h3>
-                    <div className="space-y-3">
-                      {tour.pickupLocation && (
-                    <div className="flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium">Pickup Location</p>
-                            <p className="text-sm text-muted-foreground">{tour.pickupLocation}</p>
-                    </div>
-                  </div>
-                )}
-                      {tour.dropLocation && (
-                    <div className="flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+              )}
+                </div>
+              </div>
+  
+              {/* Group Information */}
+              {(tour.groupName || tour.groupLeaderName || tour.groupType || tour.groupSpecialRequests) && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">Group Information</h3>
+                  <div className="space-y-2">
+                    {tour.groupName && (
                       <div>
-                            <p className="font-medium">Drop-off Location</p>
-                            <p className="text-sm text-muted-foreground">{tour.dropLocation}</p>
-                            {tour.dropPoint && <p className="text-sm text-muted-foreground mt-1">{tour.dropPoint}</p>}
-                            {tour.dropDetails && <p className="text-sm text-muted-foreground mt-1">{tour.dropDetails}</p>}
-                    </div>
-                  </div>
-                )}
-                      {tour.locationDetails && (
-                        <div className="flex items-start gap-2">
-                          <Info className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium">Location Details</p>
-                            <p className="text-sm text-muted-foreground">{tour.locationDetails}</p>
-                          </div>
-                  </div>
-                )}
-                    </div>
-                  </div>
-                )}
+                        <span className="font-semibold text-gray-700">Group Name:</span>
+                        <span className="ml-2 text-gray-600">{tour.groupName}</span>
+                </div>
+              )}
+              {tour.groupLeaderName && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Group Leader Name:</span>
+                        <span className="ml-2 text-gray-600">{tour.groupLeaderName}</span>
+                </div>
+                    )}
+                    {tour.groupType && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Group Type:</span>
+                        <span className="ml-2 text-gray-600">{tour.groupType}</span>
+                </div>
+)}
+              {tour.groupSpecialRequests && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Special Requests:</span>
+                        <p className="text-gray-600 mt-1">{tour.groupSpecialRequests}</p>
+                </div>
+)}
+                </div>
+                </div>
+              )}
 
-                {/* Accessibility */}
-                {(tour.wheelchairAccessible || tour.strollerAccessible || tour.infantSeats || tour.serviceAnimals || tour.accessibilityNotes) && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Accessibility</h3>
-                    <div className="space-y-2">
-                      {tour.wheelchairAccessible && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span>Wheelchair accessible</span>
-                        </div>
-                      )}
-                      {tour.strollerAccessible && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span>Stroller accessible</span>
-                        </div>
-                      )}
-                      {tour.infantSeats && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span>Infant seats available</span>
-                        </div>
-                      )}
-                      {tour.serviceAnimals && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span>Service animals allowed</span>
-                        </div>
-                      )}
-                      {tour.accessibilityNotes && (
-                        <p className="text-sm text-muted-foreground mt-2">{tour.accessibilityNotes}</p>
-                      )}
+              {/* Additional Information */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Additional Information</h3>
+                <div className="space-y-3">
+                  {tour.description && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Description:</span>
+                      <p className="text-gray-600 mt-1">{tour.description}</p>
+  </div>
+)}
+ {tour.hotel && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Hotel:</span>
+                      <span className="ml-2 text-gray-600">{tour.hotel}</span>
+                </div>
+                  )}
+                  {tour.makeVariant && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Make Variant:</span>
+                      <span className="ml-2 text-gray-600">{tour.makeVariant}</span>
+                </div>
+                  )}
+                  {tour.transportType && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Transport Type:</span>
+                      <span className="ml-2 text-gray-600">{tour.transportType}</span>
+                </div>
+                  )}
+                  {tour.transportModal && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Transport Model:</span>
+                      <span className="ml-2 text-gray-600">{tour.transportModal}</span>
+                </div>
+)}
+                </div>
+                </div>
+
+              {/* Accessibility */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Accessibility</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {tour.wheelchairAccessible !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className={`${tour.wheelchairAccessible ? 'text-green-600' : 'text-gray-400'}`}>
+                        {tour.wheelchairAccessible ? "✅" : "❌"}
+                      </span>
+                      <span className="font-semibold text-gray-700">Wheelchair Accessible</span>
                     </div>
-                  </div>
-                )}
+                  )}
+                  {tour.strollerAccessible !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className={`${tour.strollerAccessible ? 'text-green-600' : 'text-gray-400'}`}>
+                        {tour.strollerAccessible ? "✅" : "❌"}
+                      </span>
+                      <span className="font-semibold text-gray-700">Stroller Accessible</span>
+                </div>
+                  )}
+                  {tour.serviceAnimals !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className={`${tour.serviceAnimals ? 'text-green-600' : 'text-gray-400'}`}>
+                        {tour.serviceAnimals ? "✅" : "❌"}
+                      </span>
+                      <span className="font-semibold text-gray-700">Service Animals</span>
+                </div>
+                  )}
+                </div>
+    </div>
 
-                {tour.importantInformation && tour.importantInformation.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Important Information</h3>
-                    <ul className="space-y-2">
-                      {tour.importantInformation.map((info: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                          <span>{info}</span>
-                        </li>
-                      ))}
-                    </ul>
+              {/* Single Person Details */}
+              {(tour.singlePersonName || tour.singlePersonAge || tour.singlePersonNationality || tour.singlePersonPreferences) && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">Single Person Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {tour.singlePersonName && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Name:</span>
+                        <span className="ml-2 text-gray-600">{tour.singlePersonName}</span>
+        </div>
+                    )}
+                    {tour.singlePersonAge && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Age:</span>
+                        <span className="ml-2 text-gray-600">{tour.singlePersonAge}</span>
+    </div>
+                    )}
+                    {tour.singlePersonNationality && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Nationality:</span>
+                        <span className="ml-2 text-gray-600">{tour.singlePersonNationality}</span>
+  </div>
+)}
+                    {tour.singlePersonPreferences && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Preferences:</span>
+                        <span className="ml-2 text-gray-600">{tour.singlePersonPreferences}</span>
+                </div>
+                    )}
                   </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="itinerary" className="space-y-4">
-                {(tour.itinerary && tour.itinerary.length > 0) || (tour.itineraryItems && tour.itineraryItems.length > 0) ? (
-                  <div className="space-y-4">
-                    {(tour.itineraryItems || tour.itinerary || []).map((item: any, index: number) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex gap-4">
-                            <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                              {index + 1}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-4 mb-2 flex-wrap">
-                                {item.time && (
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                    <span className="font-semibold">{item.time}</span>
-                                  </div>
-                                )}
-                                {item.duration && (
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4 text-blue-500" />
-                                    <span className="text-sm text-blue-600 font-medium">{item.duration}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <h4 className="font-semibold mb-1">{item.activity}</h4>
-                              <p className="text-muted-foreground text-sm">{item.description}</p>
-                              
-                              {/* Additional Cost & Included Status */}
-                              <div className="flex items-center gap-4 mt-2">
-                                {item.additionalCost && parseFloat(item.additionalCost) > 0 && (
-                                  <div className="flex items-center gap-1">
-                                    <DollarSign className="h-4 w-4 text-orange-500" />
-                                    <span className="text-sm text-orange-600 font-medium">
-                                      +${item.additionalCost} additional cost
-                                    </span>
-                                  </div>
-                                )}
-                                {item.included !== undefined && (
-                                  <div className="flex items-center gap-1">
-                                    {item.included ? (
-                                      <>
-                                        <CheckCircle className="h-4 w-4 text-green-500" />
-                                        <span className="text-sm text-green-600 font-medium">Included</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <AlertCircle className="h-4 w-4 text-red-500" />
-                                        <span className="text-sm text-red-600 font-medium">Not Included</span>
-                                      </>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                              {item.image && (
-                                <div className="mt-3 rounded-lg overflow-hidden">
-                                  <img 
-                                    src={item.image} 
-                                    alt={item.activity || 'Itinerary item'} 
-                                    className="w-full h-48 object-cover rounded-lg hover:scale-105 transition-smooth cursor-pointer"
-                                    onClick={() => window.open(item.image, '_blank')}
-                                  />
-                                </div>
-                              )}
-                              {item.location && (
-                                <div className="flex items-center gap-1 mt-2">
-                                  <MapPin className="h-3 w-3" />
-                                  <span className="text-xs">{item.location}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="p-6 text-center">
-                      <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">No itinerary available for this tour.</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="includes" className="space-y-6">
-                {tour.includes && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">What's Included</h3>
-                    <ul className="space-y-2">
-                      {(Array.isArray(tour.includes) 
-                        ? tour.includes 
-                        : typeof tour.includes === 'string' 
-                          ? tour.includes.split('\n').filter((item: string) => item.trim())
-                          : []
-                      ).map((item: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-success mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+  </div>
+)}
 
-                {tour.excludes && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">What's Not Included</h3>
-                    <ul className="space-y-2">
-                      {(Array.isArray(tour.excludes) 
-                        ? tour.excludes 
-                        : typeof tour.excludes === 'string' 
-                          ? tour.excludes.split('\n').filter((item: string) => item.trim())
-                          : []
-                      ).map((item: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {tour.notSuitableFor && Array.isArray(tour.notSuitableFor) && tour.notSuitableFor.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Not Suitable For</h3>
-                    <ul className="space-y-2">
-                      {tour.notSuitableFor.map((item: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="reviews" className="space-y-6">
-                <RatingComponent 
-                  tourId={tour._id} 
-                  tourTitle={tour.title}
-                />
-              </TabsContent>
-            </Tabs>
+              {/* Lists Information */}
+              {(tour.taglinesList || tour.themesList || tour.thingsToBring) && (
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">Additional Lists</h3>
+                  
+                  {tour.taglinesList && tour.taglinesList.length > 0 && (
+                    <div className="mb-4">
+                      <span className="font-semibold text-gray-700 block mb-2">Taglines:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {tour.taglinesList.map((tag: string, i: number) => (
+                          <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                            {tag}
+                          </span>
+                        ))}
+    </div>
+                    </div>
+                  )}
+
+                  {tour.themesList && tour.themesList.length > 0 && (
+                    <div className="mb-4">
+                      <span className="font-semibold text-gray-700 block mb-2">Themes:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {tour.themesList.map((theme: string, i: number) => (
+                          <span key={i} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                            {theme}
+                          </span>
+                        ))}
+    </div>
+  </div>
+)}
+
+                  {tour.thingsToBring && tour.thingsToBring.length > 0 && (
+                    <div>
+                      <span className="font-semibold text-gray-700 block mb-2">Things To Bring:</span>
+                      <ul className="list-disc ml-5 space-y-1">
+                        {tour.thingsToBring.map((item: string, i: number) => (
+                          <li key={i} className="text-gray-600">{item}</li>
+                        ))}
+                      </ul>
+    </div>
+                  )}
+  </div>
+)}
+
+              {/* Tour Metadata */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Tour Metadata</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tour.title && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Title:</span>
+                      <span className="ml-2 text-gray-600">{tour.title}</span>
+                    </div>
+                  )}
+                  {tour.slug && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Slug:</span>
+                      <span className="ml-2 text-gray-600">{tour.slug}</span>
+  </div>
+)}
+                  {tour.tourType && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Tour Type:</span>
+                      <span className="ml-2 text-gray-600">{tour.tourType}</span>
+                    </div>
+                  )}
+  {tour.tagline && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Tagline:</span>
+                      <span className="ml-2 text-gray-600">{tour.tagline}</span>
+                    </div>
+                  )}
+                  {tour.totalDestinations && (
+    <div>
+                      <span className="font-semibold text-gray-700">Total Destinations:</span>
+                      <span className="ml-2 text-gray-600">{tour.totalDestinations}</span>
+    </div>
+  )}
+                  {tour.totalItineraryItems && (
+    <div>
+                      <span className="font-semibold text-gray-700">Total Itinerary Items:</span>
+                      <span className="ml-2 text-gray-600">{tour.totalItineraryItems}</span>
+    </div>
+  )}
+                  {tour.status && (
+    <div>
+                      <span className="font-semibold text-gray-700">Status:</span>
+                      <span className="ml-2">
+                        <span className={`px-2 py-1 rounded text-sm ${
+                          tour.status === 'active' ? 'bg-green-100 text-green-700' : 
+                          tour.status === 'inactive' ? 'bg-red-100 text-red-700' : 
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {tour.status}
+                        </span>
+                      </span>
+    </div>
+  )}
+                  {tour.views !== undefined && (
+  <div>
+                      <span className="font-semibold text-gray-700">Views:</span>
+                      <span className="ml-2 text-gray-600">{tour.views}</span>
+  </div>
+                  )}
+                  {tour.validUntil && (
+  <div>
+                      <span className="font-semibold text-gray-700">Valid Until:</span>
+                      <span className="ml-2 text-gray-600">{new Date(tour.validUntil).toLocaleDateString()}</span>
+  </div>
+                  )}
+                  {tour.updatedAt && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Last Updated:</span>
+                      <span className="ml-2 text-gray-600">{new Date(tour.updatedAt).toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+          
+        </div>
+
+
+
+        
           </div>
 
-          {/* Booking Sidebar */}
+          {/* RIGHT - Booking Card */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24 shadow-large">
-              <CardHeader>
-                <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border sticky top-24">
+              {/* Price */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
                   <div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="h-6 w-6 text-primary" />
-                      <span className="text-3xl font-bold text-primary">{price}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">per person</p>
-                  </div>
-                  <Button variant="ghost" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Duration:</span>
-                    <span className="font-medium">
-                      {tour.pricingSchedule?.[0]?.duration || 
-                       (tour.duration && tour.duration.trim()) || 
-                       (tour.durationHours ? `${tour.durationHours} hours` : null) || 
-                       'Not specified'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Group Size:</span>
-                    <span className="font-medium">
-                      {(tour.minGroup && tour.maxGroup) 
-                        ? `${tour.minGroup}-${tour.maxGroup} people`
-                        : (tour.groupSize?.min && tour.groupSize?.max)
-                          ? `${tour.groupSize.min}-${tour.groupSize.max} people`
-                          : (tour.groupSize && typeof tour.groupSize === 'number')
-                            ? `${tour.groupSize} people`
-                            : tour.groupSize || tour.groupType || 'Small group'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Languages:</span>
-                    <span className="font-medium">
-                      {tour.languages 
-                        ? (Array.isArray(tour.languages) 
-                            ? tour.languages.join(', ') 
-                            : tour.languages
-                          )
-                        : 'English'}
-                    </span>
-                  </div>
-                  
-                  {/* Transport Details from Pricing Schedule */}
-                  {tour.pricingSchedule?.[0]?.transportType && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Transport:</span>
-                      <span className="font-medium">
-                        {tour.pricingSchedule[0].transportType}
-                        {tour.pricingSchedule[0].transportModal && ` (${tour.pricingSchedule[0].transportModal})`}
-                        {tour.pricingSchedule[0].makeVariant && ` - ${tour.pricingSchedule[0].makeVariant}`}
+                    <span className="text-lg text-gray-600">Total</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold text-green-600">
+                        ${discountedPrice.toFixed(0)}
                       </span>
+                      <span className="text-sm text-gray-500">Per Person</span>
                     </div>
-                  )}
-                  
-                  {/* Fallback to main transport fields */}
-                  {!tour.pricingSchedule?.[0]?.transportType && (tour.transportType || tour.transportModal || tour.makeVariant) && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Transport:</span>
-                      <span className="font-medium">
-                        {tour.transportType}
-                        {tour.transportModal && ` (${tour.transportModal})`}
-                        {tour.makeVariant && ` - ${tour.makeVariant}`}
-                      </span>
-                    </div>
-                  )}
+                  </div>
                 </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="space-y-3 mb-6">
+                <Button 
+                  className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg rounded-xl font-semibold"
+                  onClick={handleBookNow}
+                >
+                  Check Availability
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full py-6 text-lg rounded-xl font-semibold border-2"
+                  onClick={handleBookNow}
+                >
+                  Add to Cart
+                </Button>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Quick Detail */}
+              <div>
+                <h4 className="font-bold text-gray-900 mb-4">Quick Detail</h4>
+                <ul className="space-y-3">
+                  {tour.freeCancellation && (
+                    <li className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">Free cancellation up to {tour.deadlineHours || 24} hours</span>
+                    </li>
+                  )}
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Instant confirmation</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Mobile ticket accepted</span>
+                  </li>
+                </ul>
                 
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Button onClick={handleBookNow} className="w-full" variant="hero" size="lg">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Book Now
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share Tour
-                  </Button>
-                </div>
-                
-                <div className="pt-2 space-y-2 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-success" />
-                    <span>Free cancellation up to 24 hours</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-success" />
-                      <span>Instant confirmation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Camera className="h-4 w-4 text-primary" />
-                      <span>Photos included</span>
-                    </div>
-                    </div>
-              </CardContent>
-            </Card>
+<div>
+
+
+</div>
+      
+              </div>
+
+
+
+            </div>
           </div>
         </div>
       </div>
