@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { postsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import ShareModal from '@/components/ShareModal';
 import {
   Clock,
   MapPin,
@@ -55,6 +56,7 @@ const TourDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -122,10 +124,14 @@ const TourDetailPage = () => {
   const mainImage = allImages[activeImageIndex] || tour.mainImageUrl;
   const thumbnailImages = allImages.slice(0, 3);
 
-  // Price
-  const originalPrice = tour.priceNumber || 0;
+  // Price - Use backend pricing schedule if available
+  const actualPrice = tour.pricingSchedule?.[0]?.actualPrice || tour.priceNumber || 0;
+  const netPrice = tour.pricingSchedule?.[0]?.netPrice || tour.priceNumber || 0;
   const discountPercent = tour.discount?.percentage || tour.discountPercentage || 0;
-  const discountedPrice = originalPrice - (originalPrice * discountPercent / 100);
+  
+  // Use backend prices if available, otherwise calculate
+  const originalPrice = actualPrice || tour.priceNumber || 0;
+  const discountedPrice = netPrice || (originalPrice - (originalPrice * discountPercent / 100));
 
   // Parse arrays
   const includesArray = tour.includes 
@@ -143,7 +149,7 @@ const TourDetailPage = () => {
       {/* HEADER */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" className="gap-2" onClick={() => navigate('/tours')}>
+          <Button variant="ghost" className="gap-2" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
             Back to Tours
           </Button>
@@ -197,7 +203,10 @@ const TourDetailPage = () => {
           <div className="space-y-4">
             {/* Product ID & Badge */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Product ID: {tour._id?.slice(-6)}</span>
+             <div className="text-sm text-gray-600">
+  Product ID: <span className="bg-red-600 text-white px-1 rounded">{tour._id?.slice(-10)}</span>
+</div>
+
               {tour.featured && (
                 <Badge className="bg-red-500 text-white">Best Seller</Badge>
               )}
@@ -265,10 +274,22 @@ const TourDetailPage = () => {
                 <span>Daily</span>
               </div>
             </div>
+            
+             {tour.bookingType && (
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <MapPin className=" text-gray-500 mt-0.5" />
+      
+                      <span className="font-medium">Booking Type:</span>
+                      <p className="text-gray-600">{tour.bookingType}</p>
+                    
+                  </div>
+                )}
 
             {/* See all visiting places */}
             <div className="pt-4">
-              <p className="text-sm text-gray-600">See all the visiting places in {tour.city || 'Tokyo'}</p>
+<p className="text-sm text-gray-600">
+  See all the visiting places in <strong className="font-semibold text-gray-800">{tour.city || 'Tokyo'}</strong>
+</p>
             </div>
 
             {/* Action Buttons */}
@@ -281,12 +302,17 @@ const TourDetailPage = () => {
               >
                 <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
               </Button>
-              <Button variant="outline" size="icon" className="rounded-lg">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-lg"
+                onClick={() => setShowShareModal(true)}
+              >
                 <Share2 className="h-5 w-5" />
               </Button>
-              <Button variant="outline" size="icon" className="rounded-lg">
+              {/* <Button variant="outline" size="icon" className="rounded-lg">
                 <MapIcon className="h-5 w-5" />
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -305,45 +331,7 @@ const TourDetailPage = () => {
                 </p>
               </div>
             )}
-
-            {/* What's Included/Excluded - BORDERED BOX */}
-            {(includesArray.length > 0 || excludesArray.length > 0) && (
-              <div className="border-2 border-gray-200 rounded-2xl p-6">
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* What's Exclude */}
-                  {excludesArray.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's exclude</h3>
-                      <ul className="space-y-3">
-                        {excludesArray.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* What's Included */}
-                  {includesArray.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's Included</h3>
-                      <ul className="space-y-3">
-                        {includesArray.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Trip Highlights - BORDERED BOX */}
+   {/* Trip Highlights - BORDERED BOX */}
             {highlightsArray.length > 0 && (
               <div className="border-2 border-gray-200 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Trip Highlights</h3>
@@ -358,6 +346,45 @@ const TourDetailPage = () => {
               </div>
             )}
 
+            {/* What's Included/Excluded - BORDERED BOX */}
+            {(includesArray.length > 0 || excludesArray.length > 0) && (
+              <div className="border-2 border-gray-200 rounded-2xl p-6">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* What's Exclude */}
+                  {excludesArray.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's exclude</h3>
+                      <ul className="space-y-3 list-un">
+                        {excludesArray.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            {/* <Check className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" /> */}
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+
+                  {/* What's Included */}
+                  {includesArray.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's Included</h3>
+                      <ul className="space-y-3">
+                        {includesArray.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            {/* <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /> */}
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+         
             {/* Things to Bring */}
             {tour.thingsToBring && tour.thingsToBring.length > 0 && (
               <div>
@@ -455,7 +482,7 @@ const TourDetailPage = () => {
               
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tour.bestTime && (
+                {/* {tour.bestTime && (
                   <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
                     <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
               <div>
@@ -463,18 +490,10 @@ const TourDetailPage = () => {
                       <p className="text-gray-600">{tour.bestTime}</p>
                     </div>
                   </div>
-                )}
+                )} */}
 
-                {tour.bookingType && (
-                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
-                    <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
-      <div>
-                      <span className="font-semibold text-gray-800">Booking Type:</span>
-                      <p className="text-gray-600">{tour.bookingType}</p>
-                    </div>
-                  </div>
-                )}
-
+               
+{/* 
                 {tour.category && (
                   <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
                     <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
@@ -483,9 +502,9 @@ const TourDetailPage = () => {
                       <p className="text-gray-600">{tour.category}</p>
                     </div>
                 </div>
-              )}
+              )} */}
 
-                {tour.city && (
+                {/* {tour.city && (
                   <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
                     <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
@@ -493,9 +512,9 @@ const TourDetailPage = () => {
                       <p className="text-gray-600">{tour.city}</p>
               </div>
                   </div>
-                )}
+                )} */}
 
-                {tour.duration && (
+                {/* {tour.duration && (
                   <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
                     <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
@@ -503,8 +522,8 @@ const TourDetailPage = () => {
                       <p className="text-gray-600">{tour.duration}</p>
                     </div>
                   </div>
-                )}
-
+                )} */}
+{/* 
                 {tour.languages && (
                   <div className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
                     <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
@@ -513,11 +532,11 @@ const TourDetailPage = () => {
                       <p className="text-gray-600">{tour.languages}</p>
                     </div>
                 </div>
-              )}
+              )} */}
               </div>
 
               {/* Pricing Information */}
-              <div className="bg-white p-4 rounded-lg shadow-sm">
+              {/* <div className="bg-white p-4 rounded-lg shadow-sm">
                 <h3 className="text-lg font-bold text-gray-800 mb-3">Pricing Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {tour.currency && (
@@ -545,7 +564,7 @@ const TourDetailPage = () => {
                 </div>
               )}
               </div>
-              </div>
+              </div> */}
 
               {/* Pricing Schedule */}
               {tour.pricingSchedule && tour.pricingSchedule.length > 0 && (
@@ -679,7 +698,7 @@ const TourDetailPage = () => {
               </div>
 
               {/* Time Details */}
-              <div className="bg-white p-4 rounded-lg shadow-sm">
+              {/* <div className="bg-white p-4 rounded-lg shadow-sm">
                 <h3 className="text-lg font-bold text-gray-800 mb-3">Time Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {tour.startTime && (
@@ -687,7 +706,7 @@ const TourDetailPage = () => {
                       <span className="font-semibold text-gray-700">Start Time:</span>
                       <span className="ml-2 text-gray-600">{tour.startTime}</span>
                 </div>
-              )}
+                 )}
                   {tour.endTime && (
                     <div>
                       <span className="font-semibold text-gray-700">End Time:</span>
@@ -701,10 +720,10 @@ const TourDetailPage = () => {
                 </div>
               )}
               </div>
-              </div>
+              </div> */}
 
               {/* Highlights */}
-              {tour.highlightsList && tour.highlightsList.length > 0 && (
+              {/* {tour.highlightsList && tour.highlightsList.length > 0 && (
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-yellow-600" />
@@ -719,7 +738,7 @@ const TourDetailPage = () => {
                     ))}
                   </ul>
                 </div>
-              )}
+              )} */}
 
               {/* Selected Selling Points */}
               {tour.selectedSellingPoints && tour.selectedSellingPoints.length > 0 && (
@@ -740,20 +759,20 @@ const TourDetailPage = () => {
               )}
 
               {/* Inclusions & Exclusions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {tour.includes && (
                   <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                     <h4 className="font-bold text-green-800 mb-2">✓ Includes</h4>
                     <p className="text-gray-700">{tour.includes}</p>
                 </div>
-              )}
+                 )}
                 {tour.excludes && (
                   <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                     <h4 className="font-bold text-red-800 mb-2">✗ Excludes</h4>
                     <p className="text-gray-700">{tour.excludes}</p>
               </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Cancellation Policy */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -791,7 +810,7 @@ const TourDetailPage = () => {
               </div>
   
               {/* Group Information */}
-              {(tour.groupName || tour.groupLeaderName || tour.groupType || tour.groupSpecialRequests) && (
+              {/* {(tour.groupName || tour.groupLeaderName || tour.groupType || tour.groupSpecialRequests) && (
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <h3 className="text-lg font-bold text-gray-800 mb-3">Group Information</h3>
                   <div className="space-y-2">
@@ -821,7 +840,7 @@ const TourDetailPage = () => {
 )}
                 </div>
                 </div>
-              )}
+              )} */}
 
               {/* Additional Information */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -892,7 +911,7 @@ const TourDetailPage = () => {
     </div>
 
               {/* Single Person Details */}
-              {(tour.singlePersonName || tour.singlePersonAge || tour.singlePersonNationality || tour.singlePersonPreferences) && (
+              {/* {(tour.singlePersonName || tour.singlePersonAge || tour.singlePersonNationality || tour.singlePersonPreferences) && (
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <h3 className="text-lg font-bold text-gray-800 mb-3">Single Person Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -922,7 +941,7 @@ const TourDetailPage = () => {
                     )}
                   </div>
   </div>
-)}
+)} */}
 
               {/* Lists Information */}
               {(tour.taglinesList || tour.themesList || tour.thingsToBring) && (
@@ -955,7 +974,7 @@ const TourDetailPage = () => {
   </div>
 )}
 
-                  {tour.thingsToBring && tour.thingsToBring.length > 0 && (
+                  {/* {tour.thingsToBring && tour.thingsToBring.length > 0 && (
                     <div>
                       <span className="font-semibold text-gray-700 block mb-2">Things To Bring:</span>
                       <ul className="list-disc ml-5 space-y-1">
@@ -964,84 +983,11 @@ const TourDetailPage = () => {
                         ))}
                       </ul>
     </div>
-                  )}
+                  )} */}
   </div>
 )}
 
-              {/* Tour Metadata */}
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg font-bold text-gray-800 mb-3">Tour Metadata</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {tour.title && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Title:</span>
-                      <span className="ml-2 text-gray-600">{tour.title}</span>
-                    </div>
-                  )}
-                  {tour.slug && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Slug:</span>
-                      <span className="ml-2 text-gray-600">{tour.slug}</span>
-  </div>
-)}
-                  {tour.tourType && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Tour Type:</span>
-                      <span className="ml-2 text-gray-600">{tour.tourType}</span>
-                    </div>
-                  )}
-  {tour.tagline && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Tagline:</span>
-                      <span className="ml-2 text-gray-600">{tour.tagline}</span>
-                    </div>
-                  )}
-                  {tour.totalDestinations && (
-    <div>
-                      <span className="font-semibold text-gray-700">Total Destinations:</span>
-                      <span className="ml-2 text-gray-600">{tour.totalDestinations}</span>
-    </div>
-  )}
-                  {tour.totalItineraryItems && (
-    <div>
-                      <span className="font-semibold text-gray-700">Total Itinerary Items:</span>
-                      <span className="ml-2 text-gray-600">{tour.totalItineraryItems}</span>
-    </div>
-  )}
-                  {tour.status && (
-    <div>
-                      <span className="font-semibold text-gray-700">Status:</span>
-                      <span className="ml-2">
-                        <span className={`px-2 py-1 rounded text-sm ${
-                          tour.status === 'active' ? 'bg-green-100 text-green-700' : 
-                          tour.status === 'inactive' ? 'bg-red-100 text-red-700' : 
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {tour.status}
-                        </span>
-                      </span>
-    </div>
-  )}
-                  {tour.views !== undefined && (
-  <div>
-                      <span className="font-semibold text-gray-700">Views:</span>
-                      <span className="ml-2 text-gray-600">{tour.views}</span>
-  </div>
-                  )}
-                  {tour.validUntil && (
-  <div>
-                      <span className="font-semibold text-gray-700">Valid Until:</span>
-                      <span className="ml-2 text-gray-600">{new Date(tour.validUntil).toLocaleDateString()}</span>
-  </div>
-                  )}
-                  {tour.updatedAt && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Last Updated:</span>
-                      <span className="ml-2 text-gray-600">{new Date(tour.updatedAt).toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+             
 
           
         </div>
@@ -1056,14 +1002,27 @@ const TourDetailPage = () => {
             <div className="bg-white rounded-2xl p-6 shadow-lg border sticky top-24">
               {/* Price */}
               <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
+                <div className="space-y-2">
+                  {/* Actual Price */}
+                  {discountPercent > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg text-gray-500 line-through">
+                        Actual Price: ${originalPrice.toFixed(0)}
+                      </span>
+                      <Badge className="bg-red-500 text-white">
+                        {discountPercent}% OFF
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {/* Net Price */}
                   <div>
-                    <span className="text-lg text-gray-600">Total</span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-bold text-green-600">
+                    <span className="text-sm text-gray-600 block mb-1">Total</span>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-5xl font-bold text-green-600">
                         ${discountedPrice.toFixed(0)}
                       </span>
-                      <span className="text-sm text-gray-500">Per Person</span>
+                      <span className="text-lg text-gray-500">Per Person</span>
                     </div>
                   </div>
                 </div>
@@ -1121,6 +1080,14 @@ const TourDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Modal Component */}
+      <ShareModal 
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        tourTitle={tour?.title}
+        tourDescription={tour?.tagline || tour?.description}
+      />
     </div>
   );
 };

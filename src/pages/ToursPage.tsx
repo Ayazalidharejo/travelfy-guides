@@ -54,6 +54,15 @@ const ToursPage = () => {
     filterTours();
   }, [tours, searchTerm, selectedCategory]);
 
+  // Auto-filter when search term changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      filterTours();
+    }, 300); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
   const fetchTours = async () => {
     try {
       setLoading(true);
@@ -115,16 +124,20 @@ const ToursPage = () => {
     let filtered = [...tours];
 
     // Search filter
-    if (searchTerm) {
+    if (searchTerm && searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(tour => 
-        tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tour.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tour.prefecture?.toLowerCase().includes(searchTerm.toLowerCase())
+        (tour.title && tour.title.toLowerCase().includes(searchLower)) ||
+        (tour.description && tour.description.toLowerCase().includes(searchLower)) ||
+        (tour.prefecture && tour.prefecture.toLowerCase().includes(searchLower)) ||
+        (tour.city && tour.city.toLowerCase().includes(searchLower)) ||
+        (tour.category && tour.category.toLowerCase().includes(searchLower)) ||
+        (tour.tourType && tour.tourType.toLowerCase().includes(searchLower))
       );
     }
 
-    // Category filter
-    if (selectedCategory) {
+    // Category filter - handle "all" case
+    if (selectedCategory && selectedCategory !== 'all' && selectedCategory !== '') {
       filtered = filtered.filter(tour => tour.category === selectedCategory);
     }
 
@@ -138,34 +151,42 @@ const ToursPage = () => {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
+    setSelectedCategory('all');
     setSortBy('-createdAt');
     setCurrentPage(1);
+    // Reset filtered tours to show all tours
+    setFilteredTours(tours);
   };
 
   const Filters = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Search */}
-      {/* <div>
-        <label className="text-sm font-medium mb-2 block">Search Tours</label>
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+          <Search className="h-4 w-4" />
+          Search Tours
+        </label>
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
             placeholder="Search destinations, activities..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1"
+            className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
-          <Button type="submit" size="icon" variant="outline">
+          <Button type="submit" size="icon" variant="outline" className="border-gray-300 hover:bg-blue-50">
             <Search className="h-4 w-4" />
           </Button>
         </form>
-      </div> */}
+      </div>
 
       {/* Category Filter */}
       <div>
-        <label className="text-sm font-medium mb-2 block">Category</label>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger>
+        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+          <Filter className="h-4 w-4" />
+          Category
+        </label>
+        <Select value={selectedCategory || 'all'} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -181,9 +202,12 @@ const ToursPage = () => {
 
       {/* Sort */}
       <div>
-        <label className="text-sm font-medium mb-2 block">Sort By</label>
+        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4" />
+          Sort By
+        </label>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger>
+          <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -196,54 +220,116 @@ const ToursPage = () => {
         </Select>
       </div>
 
-      <Button onClick={clearFilters} variant="outline" className="w-full">
-        Clear Filters
-      </Button>
+      <div className="pt-4 border-t border-gray-200">
+        <Button 
+          onClick={clearFilters} 
+          variant="outline" 
+          className="w-full border-gray-300 hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+        >
+          Clear All Filters
+        </Button>
+      </div>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-gradient-card">
-      {/* Hero Section */}
-      <section className="bg-gradient-hero py-16">
-        <div className="container px-4">
-          <div className="text-center max-w-3xl mx-auto">
-            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm mb-4">
-              🌍 Explore Destinations
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Discover Amazing Tours
+      {/* Enhanced Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 py-20 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}></div>
+        </div>
+        
+        {/* Floating Elements */}
+        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-32 right-20 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-400/20 rounded-full blur-lg animate-pulse"></div>
+        
+        <div className="container px-4 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-6 py-3 mb-8 hover:bg-white/30 transition-all duration-300">
+              <span className="text-2xl">🌍</span>
+              <span className="text-white font-semibold">Explore Amazing Destinations</span>
+            </div>
+            
+            {/* Main Heading */}
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              Discover Your Next
+              <span className="block bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                Adventure
+              </span>
             </h1>
-            <p className="text-xl text-white/90 mb-8">
-              Choose from our carefully curated collection of unforgettable travel experiences
+            
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Choose from our carefully curated collection of unforgettable travel experiences, 
+              handpicked by local experts and adventure enthusiasts.
             </p>
             
-            {/* Quick Search */}
-            <div className="max-w-md mx-auto">
-              <form onSubmit={handleSearch} className="flex gap-2">
-                <Input
-                  placeholder="Search destinations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-white/90 backdrop-blur-sm border-white/30"
-                />
-                <Button type="submit" variant="hero" className="bg-white text-primary hover:bg-white/90">
-                  <Search className="h-4 w-4" />
-                </Button>
-              </form>
+            {/* Enhanced Search */}
+            <div className="max-w-2xl mx-auto mb-12">
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl border border-white/20">
+                <form onSubmit={handleSearch} className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      placeholder="Search destinations, tours, activities, cities..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-12 pr-4 py-4 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-500"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <Search className="h-5 w-5 mr-2" />
+                    Search
+                  </Button>
+                </form>
+              </div>
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">500+</div>
+                <div className="text-white/80">Amazing Tours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">50+</div>
+                <div className="text-white/80">Destinations</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">10K+</div>
+                <div className="text-white/80">Happy Travelers</div>
+              </div>
             </div>
           </div>
+        </div>
+        
+        {/* Bottom Wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-20 text-white" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="currentColor"></path>
+          </svg>
         </div>
       </section>
 
       <div className="container px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Filters Sidebar */}
-          <div className="hidden lg:block w-64 shrink-0">
-            <Card className="p-6 sticky top-24">
-              <div className="flex items-center gap-2 mb-4">
-                <Filter className="h-5 w-5" />
-                <h3 className="font-semibold">Filters</h3>
+          <div className="hidden lg:block w-72 shrink-0">
+            <Card className="p-6 sticky top-24 shadow-lg border-0 bg-white">
+              <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Filter className="h-5 w-5 text-blue-600" />
+                </div>
+                <h3 className="font-bold text-lg text-gray-800">Filters</h3>
               </div>
               <Filters />
             </Card>
@@ -252,26 +338,38 @@ const ToursPage = () => {
           {/* Main Content */}
           <div className="flex-1">
             {/* Mobile Filters & Results Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold">
-                  {filteredTours.length} Tours Found
-                </h2>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <MapPin className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      {filteredTours.length} Tours Found
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {searchTerm || selectedCategory !== 'all' ? 'Filtered results' : 'All available tours'}
+                    </p>
+                  </div>
+                </div>
                 
                 {/* Active Filters */}
-                <div className="flex gap-2">
-                  {selectedCategory && (
-                    <Badge variant="secondary" className="gap-1">
+                <div className="flex gap-2 flex-wrap">
+                  {selectedCategory && selectedCategory !== 'all' && (
+                    <Badge variant="secondary" className="gap-1 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200">
+                      <Filter className="h-3 w-3" />
                       {selectedCategory}
-                      <button onClick={() => setSelectedCategory('')} className="ml-1 hover:text-destructive">
+                      <button onClick={() => setSelectedCategory('all')} className="ml-1 hover:text-red-600">
                         ×
                       </button>
                     </Badge>
                   )}
                   {searchTerm && (
-                    <Badge variant="secondary" className="gap-1">
+                    <Badge variant="secondary" className="gap-1 bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200">
+                      <Search className="h-3 w-3" />
                       "{searchTerm}"
-                      <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-destructive">
+                      <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-red-600">
                         ×
                       </button>
                     </Badge>
@@ -282,15 +380,20 @@ const ToursPage = () => {
               {/* Mobile Filter Button */}
               <Sheet>
                 <SheetTrigger asChild className="lg:hidden">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-blue-50 hover:border-blue-300">
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     Filters
+                    {(searchTerm || (selectedCategory && selectedCategory !== 'all')) && (
+                      <Badge className="ml-2 bg-blue-500 text-white text-xs">Active</Badge>
+                    )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                      <Filter className="h-5 w-5" />
+                <SheetContent side="right" className="w-80 bg-gray-50">
+                  <SheetHeader className="pb-4 border-b border-gray-200">
+                    <SheetTitle className="flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Filter className="h-5 w-5 text-blue-600" />
+                      </div>
                       Filters
                     </SheetTitle>
                   </SheetHeader>
@@ -322,15 +425,25 @@ const ToursPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No tours found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Try adjusting your search criteria or browse all tours
+              <div className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+                <div className="p-4 bg-red-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <MapPin className="h-10 w-10 text-red-500" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-3">No tours found</h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  {searchTerm || selectedCategory !== 'all' 
+                    ? 'No tours match your current filters. Try adjusting your search criteria.'
+                    : 'No tours are currently available. Please check back later.'
+                  }
                 </p>
-                <Button onClick={clearFilters} variant="hero">
-                  Clear Filters
-                </Button>
+                <div className="flex gap-3 justify-center">
+                  <Button onClick={clearFilters} variant="hero" className="bg-blue-600 hover:bg-blue-700">
+                    Clear Filters
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline" className="border-gray-300">
+                    Refresh Page
+                  </Button>
+                </div>
               </div>
             )}
 
