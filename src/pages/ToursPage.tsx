@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,17 +13,36 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 
 
 const ToursPage = () => {
+  const [searchParams] = useSearchParams();
+  
+  // Initialize state from URL parameters FIRST
+  const urlSearch = searchParams.get('search') || '';
+  const urlCategory = searchParams.get('category') || '';
+  const urlDate = searchParams.get('date') || '';
+  
+  console.log('🌐 ToursPage URL Params:', {
+    urlSearch,
+    urlCategory,
+    urlDate,
+    fullURL: window.location.href
+  });
+  
   const [tours, setTours] = useState([]);
-  
-  
   const [filteredTours, setFilteredTours] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState(urlSearch);
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
+  const [selectedDate, setSelectedDate] = useState(urlDate);
   const [sortBy, setSortBy] = useState('-createdAt');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
+  
+  console.log('🔧 State Initialized:', {
+    searchTerm,
+    selectedCategory,
+    selectedDate
+  });
   
   const categories = [
     'adventure',
@@ -50,14 +70,18 @@ const ToursPage = () => {
     fetchTours();
   }, [currentPage, sortBy]);
 
+  // Filter tours whenever tours data changes or search/category/date changes
   useEffect(() => {
-    filterTours();
-  }, [tours, searchTerm, selectedCategory]);
+    if (tours.length > 0) {
+      console.log('⚡ Running filterTours because tours/search/category/date changed');
+      filterTours();
+    }
+  }, [tours, searchTerm, selectedCategory, selectedDate]);
 
   // Auto-filter when search term changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      filterTours();
+    filterTours();
     }, 300); // Debounce search
 
     return () => clearTimeout(timeoutId);
@@ -66,12 +90,16 @@ const ToursPage = () => {
   const fetchTours = async () => {
     try {
       setLoading(true);
+      console.log('📥 Fetching tours from API...');
+      
       const response = await postsAPI.getPosts({
         page: currentPage,
         limit: 12,
         sort: sortBy,
         status: 'published'
       });
+      
+      console.log('✅ Fetched tours:', response.data?.length || 0);
       
       // Convert backend mainImage to frontend imageUrl
       const toursData = (response.data || []).map((tour: any) => ({
@@ -108,8 +136,11 @@ const ToursPage = () => {
       
       setTours(toursData);
       setTotalPages(response.pages || 1);
+      
+      console.log('💾 Tours saved to state:', toursData.length);
+      console.log('🎯 Will apply filters if any exist...');
     } catch (error) {
-      console.error('Error fetching tours:', error);
+      console.error('❌ Error fetching tours:', error);
       toast({
         title: "Error",
         description: "Failed to load tours. Please try again later.",
@@ -121,26 +152,70 @@ const ToursPage = () => {
   };
 
   const filterTours = () => {
+    console.log('🔍 Filtering tours...', {
+      totalTours: tours.length,
+      searchTerm,
+      selectedCategory,
+      selectedDate
+    });
+    
     let filtered = [...tours];
 
-    // Search filter
+    // ✅ Title Search Filter (Primary Search)
     if (searchTerm && searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(tour => 
-        (tour.title && tour.title.toLowerCase().includes(searchLower)) ||
-        (tour.description && tour.description.toLowerCase().includes(searchLower)) ||
-        (tour.prefecture && tour.prefecture.toLowerCase().includes(searchLower)) ||
-        (tour.city && tour.city.toLowerCase().includes(searchLower)) ||
-        (tour.category && tour.category.toLowerCase().includes(searchLower)) ||
-        (tour.tourType && tour.tourType.toLowerCase().includes(searchLower))
-      );
+      console.log('🔎 Searching for:', searchLower);
+      
+      filtered = filtered.filter(tour => {
+        // Priority 1: Search in TITLE first (most important)
+        const titleMatch = tour.title && tour.title.toLowerCase().includes(searchLower);
+        
+        // Priority 2: Search in other fields
+        const descriptionMatch = tour.description && tour.description.toLowerCase().includes(searchLower);
+        const locationMatch = (tour.prefecture && tour.prefecture.toLowerCase().includes(searchLower)) ||
+                             (tour.city && tour.city.toLowerCase().includes(searchLower));
+        const categoryMatch = tour.category && tour.category.toLowerCase().includes(searchLower);
+        const typeMatch = tour.tourType && tour.tourType.toLowerCase().includes(searchLower);
+        
+        return titleMatch || descriptionMatch || locationMatch || categoryMatch || typeMatch;
+      });
+      
+      console.log('✅ Search filtered results:', filtered.length);
     }
 
-    // Category filter - handle "all" case
+    // ✅ Category Filter
     if (selectedCategory && selectedCategory !== 'all' && selectedCategory !== '') {
+      console.log('📁 Filtering by category:', selectedCategory);
       filtered = filtered.filter(tour => tour.category === selectedCategory);
+      console.log('✅ Category filtered results:', filtered.length);
     }
 
+    // ✅ Date Filter (NEW)
+    if (selectedDate && selectedDate.trim()) {
+      console.log('📅 Filtering by date:', selectedDate);
+      
+      filtered = filtered.filter(tour => {
+        // Check if tour has available dates in pricingSchedule
+        if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
+          return tour.pricingSchedule.some((schedule: any) => {
+            if (schedule.days && Array.isArray(schedule.days)) {
+              // Check if selected date matches any available days
+              return schedule.days.some((day: string) => {
+                const tourDate = new Date(day);
+                const selectedDateObj = new Date(selectedDate);
+                return tourDate.toDateString() === selectedDateObj.toDateString();
+              });
+            }
+            return true; // If no specific days, show all tours
+          });
+        }
+        return true; // If no pricing schedule, show tour
+      });
+      
+      console.log('✅ Date filtered results:', filtered.length);
+    }
+
+    console.log('🎯 Final filtered count:', filtered.length);
     setFilteredTours(filtered);
   };
 
@@ -150,8 +225,10 @@ const ToursPage = () => {
   };
 
   const clearFilters = () => {
+    console.log('🧹 Clearing all filters...');
     setSearchTerm('');
     setSelectedCategory('all');
+    setSelectedDate('');
     setSortBy('-createdAt');
     setCurrentPage(1);
     // Reset filtered tours to show all tours
@@ -177,6 +254,27 @@ const ToursPage = () => {
             <Search className="h-4 w-4" />
           </Button>
         </form>
+      </div>
+
+      {/* Date Filter */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Filter by Date
+        </label>
+        <Input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+        />
+        {selectedDate && (
+          <p className="text-xs text-gray-500 mt-2">
+            Showing tours available on {new Date(selectedDate).toLocaleDateString()}
+          </p>
+        )}
       </div>
 
       {/* Category Filter */}
@@ -227,7 +325,7 @@ const ToursPage = () => {
           className="w-full border-gray-300 hover:bg-red-50 hover:border-red-300 hover:text-red-600"
         >
           Clear All Filters
-        </Button>
+      </Button>
       </div>
     </div>
   );
@@ -273,13 +371,13 @@ const ToursPage = () => {
             {/* Enhanced Search */}
             <div className="max-w-2xl mx-auto mb-12">
               <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl border border-white/20">
-                <form onSubmit={handleSearch} className="flex gap-2">
+              <form onSubmit={handleSearch} className="flex gap-2">
                   <div className="flex-1 relative">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
+                <Input
                       placeholder="Search destinations, tours, activities, cities..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-12 pr-4 py-4 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-500"
                     />
                   </div>
@@ -289,8 +387,8 @@ const ToursPage = () => {
                   >
                     <Search className="h-5 w-5 mr-2" />
                     Search
-                  </Button>
-                </form>
+                </Button>
+              </form>
               </div>
             </div>
             
@@ -337,6 +435,55 @@ const ToursPage = () => {
 
           {/* Main Content */}
           <div className="flex-1">
+            {/* Filter Applied Banner */}
+            {(searchTerm || selectedCategory !== 'all' || selectedDate) && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Filter className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold text-blue-900">Filters Applied</h3>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {searchTerm && (
+                    <Badge className="gap-1 bg-blue-600 text-white hover:bg-blue-700">
+                      <Search className="h-3 w-3" />
+                      Search: "{searchTerm}"
+                      <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-red-300">
+                        ×
+                      </button>
+                    </Badge>
+                  )}
+                  {selectedCategory && selectedCategory !== 'all' && (
+                    <Badge className="gap-1 bg-purple-600 text-white hover:bg-purple-700">
+                      <Filter className="h-3 w-3" />
+                      Category: {selectedCategory}
+                      <button onClick={() => setSelectedCategory('all')} className="ml-1 hover:text-red-300">
+                        ×
+                      </button>
+                    </Badge>
+                  )}
+                  {selectedDate && (
+                    <Badge className="gap-1 bg-green-600 text-white hover:bg-green-700">
+                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Date: {new Date(selectedDate).toLocaleDateString()}
+                      <button onClick={() => setSelectedDate('')} className="ml-1 hover:text-red-300">
+                        ×
+                      </button>
+                    </Badge>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearFilters}
+                    className="text-blue-700 hover:text-blue-900 hover:bg-blue-100"
+                  >
+                    Clear All
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Mobile Filters & Results Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
@@ -346,16 +493,16 @@ const ToursPage = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">
-                      {filteredTours.length} Tours Found
-                    </h2>
+                  {filteredTours.length} Tours Found
+                </h2>
                     <p className="text-sm text-gray-600">
-                      {searchTerm || selectedCategory !== 'all' ? 'Filtered results' : 'All available tours'}
+                      {searchTerm || selectedCategory !== 'all' || selectedDate ? '✅ Showing filtered results' : 'All available tours'}
                     </p>
                   </div>
                 </div>
                 
-                {/* Active Filters */}
-                <div className="flex gap-2 flex-wrap">
+                {/* Active Filters - Smaller badges */}
+                <div className="hidden md:flex gap-2 flex-wrap">
                   {selectedCategory && selectedCategory !== 'all' && (
                     <Badge variant="secondary" className="gap-1 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200">
                       <Filter className="h-3 w-3" />
@@ -374,6 +521,17 @@ const ToursPage = () => {
                       </button>
                     </Badge>
                   )}
+                  {selectedDate && (
+                    <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 border-green-200 hover:bg-green-200">
+                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {new Date(selectedDate).toLocaleDateString()}
+                      <button onClick={() => setSelectedDate('')} className="ml-1 hover:text-red-600">
+                        ×
+                      </button>
+                    </Badge>
+                  )}
                 </div>
               </div>
               
@@ -383,7 +541,7 @@ const ToursPage = () => {
                   <Button variant="outline" size="sm" className="border-gray-300 hover:bg-blue-50 hover:border-blue-300">
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     Filters
-                    {(searchTerm || (selectedCategory && selectedCategory !== 'all')) && (
+                    {(searchTerm || (selectedCategory && selectedCategory !== 'all') || selectedDate) && (
                       <Badge className="ml-2 bg-blue-500 text-white text-xs">Active</Badge>
                     )}
                   </Button>
@@ -438,8 +596,8 @@ const ToursPage = () => {
                 </p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={clearFilters} variant="hero" className="bg-blue-600 hover:bg-blue-700">
-                    Clear Filters
-                  </Button>
+                  Clear Filters
+                </Button>
                   <Button onClick={() => window.location.reload()} variant="outline" className="border-gray-300">
                     Refresh Page
                   </Button>

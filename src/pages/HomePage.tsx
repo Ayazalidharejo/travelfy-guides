@@ -1,16 +1,18 @@
 
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import TourCard from '@/components/tour/TourCard';
+import React, { useEffect, useState } from 'react';
 import { postsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-import RatingComponent from '@/components/RatingComponent';
-import { TrendingUp } from 'lucide-react';
 
-import Hero from './HeroSection';
+// Exact Design Components
+import HeroFinal from '@/components/home/HeroFinal';
+import ToursSectionExact from '@/components/home/ToursSectionExact';
+import StatsSectionExact from '@/components/home/StatsSectionExact';
+import ConsultationSection from '@/components/home/ConsultationSection';
+import NewsletterSection from '@/components/home/NewsletterSection';
+import FooterSection from '@/components/home/FooterSection';
+
+// Existing Components
 import IntroductionSection from '@/components/IntroductionSection';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import Testimonials from '@/components/Testimonials';
@@ -18,6 +20,7 @@ import FAQ from '@/components/FAQ';
 import Gallery from '@/components/Gallery';
 import VerticalItinerary from '@/components/VerticalItinerary';
 import HappyTravelers from '@/components/HappyTravelers';
+import RatingComponent from '@/components/RatingComponent';
 
 const HomePage = () => {
   const [featuredTours, setFeaturedTours] = useState<any[]>([]);
@@ -150,99 +153,78 @@ const HomePage = () => {
     fetchTours();
   }, [toast]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
-      <Hero/>
-      <IntroductionSection/>
-      <HappyTravelers/>
+      {/* Hero Section - EXACT Design */}
+      <HeroFinal />
 
-      {/* Featured Tours */}
+      {/* Explore Our Tours - EXACT Design */}
       {featuredTours.length > 0 && (
-        <section className="py-20">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <Badge className="bg-gradient-sunset text-white mb-4">
-                ⭐ Featured Tours
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Handpicked Adventures
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Discover our most popular and carefully curated travel experiences 
-                that promise unforgettable memories.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredTours.map((tour: any) => {
-                console.log('Featured Tour Data:', tour);
-                return (
-                <Link to={`/tours/${tour._id}`} key={tour._id} className="block">
-                  <TourCard tour={tour} />
-                </Link>
-                );
-              })}
-            </div>
-            
-            <div className="text-center mt-12">
-              <Link to="/tours">
-                <Button variant="hero" size="lg">
-                  View All Tours
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+        <ToursSectionExact 
+          title="Explore our tours"
+          tours={featuredTours}
+        />
       )}
 
-      {/* Popular Tours */}
+      {/* Recently Viewed - EXACT Design */}
       {popularTours.length > 0 && (
-        <section className="py-20 bg-gradient-card">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <Badge className="bg-gradient-primary text-white mb-4 flex items-center justify-center gap-1 w-fit mx-auto">
-                <TrendingUp className="h-4 w-4" />
-                Popular Tours
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Trending Destinations
+        <ToursSectionExact 
+          title="Recently Viewed"
+          tours={popularTours}
+        />
+      )}
+
+      {/* Stats Section - EXACT Design */}
+      <StatsSectionExact />
+
+      {/* Consultation Section */}
+      <ConsultationSection />
+
+      {/* Introduction */}
+      <IntroductionSection />
+
+      {/* Happy Travelers */}
+      <HappyTravelers />
+
+      {/* Why Choose Us */}
+      <WhyChooseUs />
+
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* Gallery */}
+      <Gallery />
+
+      {/* Itinerary */}
+      <VerticalItinerary />
+
+      {/* FAQ */}
+      <FAQ />
+
+      {/* Reviews */}
+      {featuredTours.length > 0 && (
+        <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                What Our Travelers Say
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Explore the most sought-after destinations chosen by fellow travelers.
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Real experiences from our amazing community of travelers
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {popularTours.slice(0, 4).map((tour: any) => (
-                <Link to={`/tours/${tour._id}`} key={tour._id} className="block">
-                  <TourCard tour={tour} />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <WhyChooseUs/>
-      <Testimonials/>
-      <Gallery/>
-      <VerticalItinerary/>
-      <FAQ/>
-
-      {/* Recent Reviews Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What Our Travelers Say
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Real experiences from our amazing community of travelers around the world
-            </p>
-          </div>
-          
-          {/* Featured Tour for Reviews */}
-          {featuredTours.length > 0 && (
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -258,9 +240,15 @@ const HomePage = () => {
                 tourTitle={featuredTours[0].title}
               />
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
+
+      {/* Newsletter */}
+      <NewsletterSection />
+
+      {/* Footer */}
+      <FooterSection />
     </div>
   );
 };
