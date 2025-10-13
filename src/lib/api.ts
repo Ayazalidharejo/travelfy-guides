@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_BASE_URL = 'http://localhost:5000/api';
-const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
+const API_BASE_URL = 'http://localhost:5000/api';
+// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -229,6 +229,7 @@ export const postsAPI = {
     userName: string; 
     userEmail: string;
     tourId: string;
+    reviewImage?: string;
   }) => {
     try {
       const response = await api.post(`/posts/${tourId}/ratings`, ratingData);
@@ -246,6 +247,7 @@ export const postsAPI = {
   updateRating: async (tourId: string, ratingId: string, updateData: { 
     rating: number; 
     comment: string;
+    reviewImage?: string;
   }) => {
     try {
       const response = await api.put(`/posts/${tourId}/ratings/${ratingId}`, updateData);
@@ -290,6 +292,7 @@ export const postsAPI = {
     }
   },
 };
+
 
 // Bookings API calls
 export const bookingsAPI = {
@@ -366,6 +369,26 @@ export const uploadAPI = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
+  },
+  
+  uploadReviewImage: async (file: File): Promise<{ success: boolean; data?: { url: string; public_id: string }; message?: string }> => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await api.post('/upload/review', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Upload Error:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to upload image',
+      };
+    }
   },
 };
 

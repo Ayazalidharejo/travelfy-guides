@@ -1,58 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, MapPin, Star, Users, DollarSign, Car, MessageSquare } from 'lucide-react';
 
-interface TourCardProps {
-  tour: {
-    _id: string;
-    title: string;
-    imageUrl?: string;
-    images?: string[];
-    price?: string;
-    priceNumber?: number;
-    duration?: string;
-    durationHours?: number;
-    category: string;
-    rating?: {
-      average?: number;
-      count?: number;
-    };
-    prefecture?: string;
-    city?: string;
-    featured?: boolean;
-    description?: string;
-    groupSize?: {
-      min: number;
-      max: number;
-    };
-    capacity?: number;
-    maxGroup?: number;
-    minGroup?: number;
-    taglinesList?: string[];
-    themesList?: string[];
-    selectedSellingPoints?: string[];
-    pricingSchedule?: Array<{
-      actualPrice: string | number;
-      netPrice: string | number;
-      currency?: string;
-      days?: string[];
-      timeSlots?: string[];
-      duration?: string;
-    }>;
-    discountPercentage?: number;
-    discount?: {
-      percentage?: number;
-      validUntil?: string;
-    };
-    [key: string]: any;
-  };
-}
-
-const TourCard: React.FC<TourCardProps> = ({ tour }) => {
+const TourCard = ({ tour }: { tour: any }) => {
+  const navigate = useNavigate();
   const imageUrl = tour.imageUrl || tour.images?.[0] || '/placeholder.svg';
+
+  const handleCardClick = () => {
+    navigate(`/tours/${tour._id}`);
+  };
 
   const categoryColors = {
     adventure: 'bg-gradient-sunset',
@@ -68,7 +27,12 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
   const ratingCount = tour.rating?.count ?? 0;
 
   return (
-    <Card className="group overflow-hidden hover:shadow-large transition-smooth border-0 bg-gradient-card">
+    <Card
+      className="group overflow-hidden hover:shadow-large transition-smooth border-0 bg-gradient-card cursor-pointer"
+      onClick={handleCardClick}
+      tabIndex={0}
+      role="button"
+    >
       <div className="relative overflow-hidden">
         <img
           src={imageUrl}
@@ -282,11 +246,17 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             })()}
           </div>
 
-          <Link to={`/tours/${tour._id}`}>
-            <Button variant="hero" size="sm" className="shadow-medium">
-              View Details
-            </Button>
-          </Link>
+          <Button
+            variant="hero"
+            size="sm"
+            className="shadow-medium"
+            onClick={e => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
+          >
+            View Details
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { postsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +19,7 @@ import Gallery from '@/components/Gallery';
 import VerticalItinerary from '@/components/VerticalItinerary';
 import HappyTravelers from '@/components/HappyTravelers';
 import RatingComponent from '@/components/RatingComponent';
+import TourCard from '@/components/tour/TourCard';
 
 const HomePage = () => {
   const [featuredTours, setFeaturedTours] = useState<any[]>([]);
@@ -168,48 +167,57 @@ const HomePage = () => {
     <div className="min-h-screen">
       {/* Hero Section - EXACT Design */}
       <HeroFinal />
-
-      {/* Explore Our Tours - EXACT Design */}
+      <IntroductionSection/>
+<WhyChooseUs />
+      {/* Explore Our Tours - Cards Design like ToursPage */}
       {featuredTours.length > 0 && (
-        <ToursSectionExact 
-          title="Explore our tours"
-          tours={featuredTours}
-        />
+        <section className="container mx-auto px-4 py-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Explore our tours
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {featuredTours.map((tour: any) => (
+              <TourCard key={tour._id} tour={tour} />
+            ))}
+          </div>
+        </section>
       )}
 
-      {/* Recently Viewed - EXACT Design */}
+      {/* Recently Viewed - Cards Design like ToursPage */}
       {popularTours.length > 0 && (
-        <ToursSectionExact 
-          title="Recently Viewed"
-          tours={popularTours}
-        />
+        <section className="container mx-auto px-4 py-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Recently Viewed
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {popularTours.map((tour: any) => (
+              <TourCard key={tour._id} tour={tour} />
+            ))}
+          </div>
+        </section>
       )}
-
+   
       {/* Stats Section - EXACT Design */}
-      <StatsSectionExact />
+      
 
       {/* Consultation Section */}
       <ConsultationSection />
 
-      {/* Introduction */}
-      {/* <IntroductionSection /> */}
-
-      {/* Happy Travelers */}
-      {/* <HappyTravelers /> */}
-
       {/* Why Choose Us */}
-      <WhyChooseUs />
+   
 
       {/* Testimonials */}
-      <Testimonials />
+     
 
       {/* Gallery */}
       <Gallery />
 
       {/* Itinerary */}
       <VerticalItinerary />
-
+      
+<StatsSectionExact />
       {/* FAQ */}
+       <Testimonials />
       <FAQ />
 
       {/* Reviews */}
@@ -245,7 +253,7 @@ const HomePage = () => {
       )}
 
       {/* Newsletter */}
-      <NewsletterSection />
+      {/* <NewsletterSection /> */}
 
       {/* Footer */}
       {/* <FooterSection /> */}

@@ -12,13 +12,13 @@ import {
 const features = [
   {
     icon: <MapPin className="text-red-600 w-8 h-8 mb-3" />,
-    title: "Expert Local Guides",
+    title: "Expert Guides & Best Drivers ",
     description:
       "Our experienced guides bring Japan's culture and history to life with every tour.",
   },
   {
     icon: <UserCheck className="text-red-600 w-8 h-8 mb-3" />,
-    title: "Best Drivers",
+    title: "Customized & Private Tours",
     description:
       "Our drivers know every corner of Japan to ensure you have a smooth, safe journey.",
   },

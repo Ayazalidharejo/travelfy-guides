@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { postsAPI } from '@/lib/api';
+import { postsAPI, uploadAPI } from '@/lib/api';
 import { 
   Star, 
   MessageSquare, 
@@ -16,7 +16,9 @@ import {
   Send,
   User,
   Calendar,
-  ThumbsUp
+  ThumbsUp,
+  Upload,
+  X
 } from 'lucide-react';
 
 interface Rating {
@@ -24,9 +26,11 @@ interface Rating {
   userId: string;
   userName: string;
   userEmail: string;
+  userAvatar?: string;
   tourId: string;
   rating: number;
   comment: string;
+  reviewImage?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,10 +61,15 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
   // New rating form
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState('');
+  const [newReviewImage, setNewReviewImage] = useState<File | null>(null);
+  const [newReviewImagePreview, setNewReviewImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   // Edit rating form
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
+  const [editReviewImage, setEditReviewImage] = useState<File | null>(null);
+  const [editReviewImagePreview, setEditReviewImagePreview] = useState('');
 
   const fetchRatings = useCallback(async () => {
     if (!tourId) {
@@ -70,19 +79,15 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     
     try {
       setLoading(true);
-      console.log('Fetching ratings for tour:', tourId);
       const response = await postsAPI.getRatings(tourId);
-      console.log('Ratings response:', response);
       
       if (response.success) {
         setRatings(response.data || []);
       } else {
-        console.warn('Failed to fetch ratings:', response.message);
-        // Don't show error toast for failed fetch, just log it
+        // Don't show error toast for failed fetch, just set empty ratings
         setRatings([]);
       }
     } catch (error) {
-      console.error('Error fetching ratings:', error);
       // Don't show error toast, just set empty ratings
       setRatings([]);
     } finally {
@@ -94,7 +99,9 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     if (tourId) {
       fetchRatings();
     }
-  }, [tourId, fetchRatings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tourId]);
+
 
   const handleSubmitRating = async () => {
     if (!isAuthenticated) {
@@ -126,12 +133,37 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
 
     try {
       setSubmitting(true);
+      
+      // Upload image if file is selected
+      let uploadedImageUrl = '';
+      if (newReviewImage) {
+        setUploadingImage(true);
+        toast({
+          title: "Uploading Image...",
+          description: "Please wait while we upload your image.",
+        });
+        
+        const uploadResponse = await uploadAPI.uploadReviewImage(newReviewImage);
+        setUploadingImage(false);
+        
+        if (uploadResponse.success && uploadResponse.data) {
+          uploadedImageUrl = uploadResponse.data.url;
+        } else {
+          toast({
+            title: "Image Upload Failed",
+            description: uploadResponse.message || "Failed to upload image. Continuing without image.",
+            variant: "destructive",
+          });
+        }
+      }
+      
       const ratingData = {
         tourId,
         rating: newRating,
         comment: newComment.trim(),
         userName: user?.name || user?.email || 'Anonymous',
-        userEmail: user?.email || ''
+        userEmail: user?.email || '',
+        reviewImage: uploadedImageUrl
       };
 
       const response = await postsAPI.addRating(tourId, ratingData);
@@ -141,6 +173,8 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
         setRatings(prev => [newRatingData, ...prev]);
         setNewRating(0);
         setNewComment('');
+        setNewReviewImage(null);
+        setNewReviewImagePreview('');
         
         toast({
           title: "Rating Submitted",
@@ -166,6 +200,7 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
       });
     } finally {
       setSubmitting(false);
+      setUploadingImage(false);
     }
   };
 
@@ -192,29 +227,58 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
 
     try {
       setSubmitting(true);
+      
+      // Upload image if new file is selected
+      let uploadedImageUrl = editingRating.reviewImage || ''; // Keep existing image by default
+      if (editReviewImage) {
+        setUploadingImage(true);
+        toast({
+          title: "Uploading Image...",
+          description: "Please wait while we upload your image.",
+        });
+        
+        const uploadResponse = await uploadAPI.uploadReviewImage(editReviewImage);
+        setUploadingImage(false);
+        
+        if (uploadResponse.success && uploadResponse.data) {
+          uploadedImageUrl = uploadResponse.data.url;
+        } else {
+          toast({
+            title: "Image Upload Failed",
+            description: uploadResponse.message || "Failed to upload image. Keeping existing image.",
+            variant: "destructive",
+          });
+        }
+      }
+      
       const updateData = {
         rating: editRating,
-        comment: editComment.trim()
+        comment: editComment.trim(),
+        reviewImage: uploadedImageUrl
       };
 
+      console.log('✏️ Updating rating:', editingRating._id);
       const response = await postsAPI.updateRating(tourId, editingRating._id, updateData);
+      console.log('Update response:', response);
       
       if (response.success) {
-        const updatedRating = response.data;
-        setRatings(prev => prev.map(rating => 
-          rating._id === editingRating._id ? updatedRating : rating
-        ));
         setEditingRating(null);
         setEditRating(0);
         setEditComment('');
+        setEditReviewImage(null);
+        setEditReviewImagePreview('');
         
         toast({
           title: "Rating Updated",
-          description: "Your rating has been updated successfully!",
+          description: "Rating has been updated successfully!",
         });
         
+        // Refetch ratings from database to get fresh data
+        await fetchRatings();
+        console.log('✅ Ratings refetched after update');
+        
         if (onRatingUpdated) {
-          onRatingUpdated(updatedRating);
+          onRatingUpdated(response.data);
         }
       } else {
         toast({
@@ -232,6 +296,59 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
       });
     } finally {
       setSubmitting(false);
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, isEdit: boolean = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select an image file (JPG, PNG, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Image size must be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    
+    if (isEdit) {
+      setEditReviewImage(file);
+      setEditReviewImagePreview(previewUrl);
+    } else {
+      setNewReviewImage(file);
+      setNewReviewImagePreview(previewUrl);
+    }
+  };
+  
+  const removeImage = (isEdit: boolean = false) => {
+    if (isEdit) {
+      setEditReviewImage(null);
+      if (editReviewImagePreview) {
+        URL.revokeObjectURL(editReviewImagePreview);
+      }
+      setEditReviewImagePreview('');
+    } else {
+      setNewReviewImage(null);
+      if (newReviewImagePreview) {
+        URL.revokeObjectURL(newReviewImagePreview);
+      }
+      setNewReviewImagePreview('');
     }
   };
 
@@ -241,15 +358,19 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     }
 
     try {
+      console.log('🗑️ Deleting rating:', ratingId);
       const response = await postsAPI.deleteRating(tourId, ratingId);
+      console.log('Delete response:', response);
       
       if (response.success) {
-        setRatings(prev => prev.filter(rating => rating._id !== ratingId));
-        
         toast({
           title: "Rating Deleted",
-          description: "Your rating has been deleted successfully.",
+          description: "Rating has been deleted successfully.",
         });
+        
+        // Refetch ratings from database to get fresh data
+        await fetchRatings();
+        console.log('✅ Ratings refetched after delete');
         
         if (onRatingDeleted) {
           onRatingDeleted(ratingId);
@@ -275,12 +396,15 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     setEditingRating(rating);
     setEditRating(rating.rating);
     setEditComment(rating.comment);
+    setEditReviewImage(null);
+    setEditReviewImagePreview(rating.reviewImage || '');
   };
 
   const cancelEdit = () => {
     setEditingRating(null);
     setEditRating(0);
     setEditComment('');
+    removeImage(true);
   };
 
   const renderStars = (rating: number, interactive: boolean = false, onRatingChange?: (rating: number) => void) => {
@@ -321,9 +445,11 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     return distribution;
   }, [ratings]);
 
-  const userRating = useMemo(() => {
-    return ratings.find(rating => rating.userId === user?.id);
-  }, [ratings, user?.id]);
+  // Allow multiple reviews - removed single userRating
+  // const userRating = useMemo(() => {
+  //   return ratings.find(rating => rating.userId === user?.id);
+  // }, [ratings, user?.id]);
+  const userRating = null; // Always null to allow multiple reviews
 
   if (loading) {
     return (
@@ -415,12 +541,58 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
               />
             </div>
             
+            <div>
+              <Label htmlFor="reviewImage">Review Image (Optional)</Label>
+              <div className="mt-2">
+                <label htmlFor="reviewImageInput" className="cursor-pointer">
+                  <div className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                    <div className="text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      <p className="mt-2 text-sm text-gray-600">
+                        <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                    </div>
+                  </div>
+                  <input
+                    id="reviewImageInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(e, false)}
+                    className="hidden"
+                  />
+                </label>
+                
+                {(newReviewImagePreview || newReviewImage) && (
+                  <div className="mt-3 relative inline-block">
+                    <img 
+                      src={newReviewImagePreview} 
+                      alt="Preview" 
+                      className="rounded-lg max-w-xs h-32 object-cover border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(false)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <Button 
               onClick={handleSubmitRating} 
-              disabled={submitting || newRating === 0 || !newComment.trim()}
+              disabled={submitting || uploadingImage || newRating === 0 || !newComment.trim()}
               className="w-full"
             >
-              {submitting ? (
+              {uploadingImage ? (
+                <>
+                  <Upload className="mr-2 h-4 w-4 animate-pulse" />
+                  Uploading Image...
+                </>
+              ) : submitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Submitting...
@@ -442,75 +614,41 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Your Review</span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => startEditRating(userRating)}
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDeleteRating(userRating._id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </div>
+              {/* Only admin can edit/delete reviews - removed user buttons */}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {editingRating && editingRating._id === userRating._id ? (
-              <div className="space-y-4">
+            <div className="flex gap-4">
+              <Avatar>
+                {userRating.userAvatar && <AvatarImage src={userRating.userAvatar} alt={userRating.userName} />}
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {userRating.userName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex-1 space-y-3">
                 <div>
-                  <Label>Your Rating *</Label>
-                  <div className="mt-2">
-                    {renderStars(editRating, true, setEditRating)}
+                  <p className="font-semibold">{userRating.userName}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {renderStars(userRating.rating)}
+                    <Badge variant="secondary" className="text-xs">
+                      {new Date(userRating.createdAt).toLocaleDateString()}
+                    </Badge>
                   </div>
                 </div>
-                
-                <div>
-                  <Label>Your Review *</Label>
-                  <Textarea
-                    value={editComment}
-                    onChange={(e) => setEditComment(e.target.value)}
-                    className="mt-2"
-                    rows={4}
-                  />
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleUpdateRating} 
-                    disabled={submitting}
-                    size="sm"
-                  >
-                    {submitting ? 'Updating...' : 'Update Review'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={cancelEdit}
-                    size="sm"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  {renderStars(userRating.rating)}
-                  <Badge variant="secondary">
-                    {new Date(userRating.createdAt).toLocaleDateString()}
-                  </Badge>
-                </div>
                 <p className="text-muted-foreground">{userRating.comment}</p>
+                {userRating.reviewImage && (
+                  <div className="mt-3">
+                    <img 
+                      src={userRating.reviewImage} 
+                      alt="Your review" 
+                      className="rounded-lg max-w-md w-full h-auto object-cover border"
+                      onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -549,6 +687,7 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
                 <CardContent className="p-4">
                   <div className="flex gap-4">
                     <Avatar>
+                      {rating.userAvatar && <AvatarImage src={rating.userAvatar} alt={rating.userName} />}
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {rating.userName.charAt(0).toUpperCase()}
                       </AvatarFallback>
@@ -567,33 +706,149 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
                           </div>
                         </div>
                         
-                        {user?.id === rating.userId && (
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => startEditRating(rating)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteRating(rating._id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                        {/* Admin can edit/delete any review */}
+                        {user?.role === 'admin' && (
+                          <div className="flex gap-2">
+                            {editingRating?._id === rating._id ? (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={cancelEdit}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={handleUpdateRating}
+                                  disabled={submitting}
+                                >
+                                  {submitting ? 'Saving...' : 'Save'}
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => startEditRating(rating)}
+                                >
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteRating(rating._id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Delete
+                                </Button>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
                       
-                      <p className="text-muted-foreground">{rating.comment}</p>
-                      
-                      {rating.updatedAt !== rating.createdAt && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Edited on {new Date(rating.updatedAt).toLocaleDateString()}
-                        </p>
+                      {/* Show edit form if admin is editing this rating */}
+                      {editingRating?._id === rating._id ? (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="edit-rating">Rating</Label>
+                            <div className="flex gap-2 mt-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setEditRating(star)}
+                                  className="focus:outline-none"
+                                >
+                                  <Star
+                                    className={`h-8 w-8 ${
+                                      star <= editRating
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="edit-comment">Your Review</Label>
+                            <Textarea
+                              id="edit-comment"
+                              value={editComment}
+                              onChange={(e) => setEditComment(e.target.value)}
+                              placeholder="Share your experience..."
+                              rows={4}
+                              className="mt-2"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="editReviewImage">Review Image (Optional)</Label>
+                            <div className="mt-2">
+                              <label htmlFor="editReviewImageInput" className="cursor-pointer">
+                                <div className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                                  <div className="text-center">
+                                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                    <p className="mt-2 text-sm text-gray-600">
+                                      <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                                  </div>
+                                </div>
+                                <input
+                                  id="editReviewImageInput"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleImageChange(e, true)}
+                                  className="hidden"
+                                />
+                              </label>
+
+                              {(editReviewImagePreview || editReviewImage || rating.reviewImage) && (
+                                <div className="mt-3 relative inline-block">
+                                  <img
+                                    src={editReviewImagePreview || rating.reviewImage}
+                                    alt="Preview"
+                                    className="rounded-lg max-w-xs h-32 object-cover border"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImage(true)}
+                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-muted-foreground">{rating.comment}</p>
+                          
+                          {rating.reviewImage && (
+                            <div className="mt-3">
+                              <img 
+                                src={rating.reviewImage} 
+                                alt="Review" 
+                                className="rounded-lg max-w-md w-full h-auto object-cover border"
+                                onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                              />
+                            </div>
+                          )}
+                          
+                          {rating.updatedAt !== rating.createdAt && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Edited on {new Date(rating.updatedAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -607,4 +862,9 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
   );
 };
 
-export default React.memo(RatingComponent);
+// Memoization with custom comparison
+export default React.memo(RatingComponent, (prevProps, nextProps) => {
+  // Only re-render if tourId or tourTitle changes
+  return prevProps.tourId === nextProps.tourId && 
+         prevProps.tourTitle === nextProps.tourTitle;
+});

@@ -229,12 +229,17 @@ const Header = React.memo(() => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Memoized avatar URL
+  // Memoized avatar URL - handles both Cloudinary and local URLs
   const avatarUrl = useMemo(() => {
     if (!user?.avatar) return null;
-    return user.avatar.startsWith('http') 
-      ? user.avatar 
-      : `http://localhost:5000${user.avatar}`;
+    
+    // If already a full URL (Cloudinary, data URI, etc.), return as is
+    if (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) {
+      return user.avatar;
+    }
+    
+    // For relative paths, use local backend URL
+    return `http://localhost:5000${user.avatar}`;
   }, [user?.avatar]);
 
   // Optimized logout handler

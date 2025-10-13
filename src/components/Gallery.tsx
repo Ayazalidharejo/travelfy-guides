@@ -1,421 +1,1117 @@
-
-
-// "use client";
-// import React from "react";
-
-// const galleryCards = [
-//   {
-//     src: "https://images.unsplash.com/photo-1554797589-7241bb691973?auto=format&fit=crop&w=800&q=80",
-//     title: "Tokyo",
-//     subtitle: "Tradition Meets Tomorrow",
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=800&q=80",
-//     title: "Kyoto",
-//     subtitle: "Where Culture Blooms",
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1504788363733-507549153474?auto=format&fit=crop&w=800&q=80",
-//     title: "Osaka",
-//     subtitle: "Vibrant Nights, Delicious Bites",
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1584422022290-06639d5f1877?auto=format&fit=crop&w=800&q=80",
-//     title: "Mount Fuji",
-//     subtitle: "Nature’s Majestic Wonder",
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1619022983184-e6c263346a61?auto=format&fit=crop&w=800&q=80",
-//     title: "Hokkaido",
-//     subtitle: "Snowy Peaks & Serenity",
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1607082349250-f5ef37602f72?auto=format&fit=crop&w=800&q=80",
-//     title: "Okinawa",
-//     subtitle: "Island of Eternal Summer",
-//   },
-// ];
-
-// const Gallery: React.FC = () => {
-//   return (
-//     <section className="bg-white py-20 px-6 md:px-20">
-//       <div className="max-w-6xl mx-auto text-center">
-//         {/* Section Heading */}
-//         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-//           Moments from{" "}
-//           <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">
-//             Karvaan Tours
-//           </span>
-//         </h2>
-
-//         <p className="text-gray-700 text-lg md:text-xl mb-12">
-//           Experience the beauty of Japan through the lens of our past travelers.
-//         </p>
-
-//         {/* Gallery Grid */}
-//         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//           {galleryCards.map((card, index) => (
-//             <div
-//               key={index}
-//               className="relative group h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
-//             >
-//               {/* Background Image */}
-//               <img
-//                 src={card.src}
-//                 alt={card.title}
-//                 className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
-//               />
-
-//               {/* Overlay Content */}
-//               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
-//                 <h3 className="text-2xl font-bold text-white">{card.title}</h3>
-//                 <p className="text-white mt-2 italic">{card.subtitle}</p>
-//                 <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-//                   View More
-//                 </button>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default Gallery;
-
-
-
 "use client";
 import React, { useState } from "react";
-import { X, MapPin, Clock, Calendar, Star, Users, Compass, Camera, Utensils, Hotel, Train } from "lucide-react";
+import { 
+  X, MapPin, Clock, Calendar, Star, Users, Compass, Camera, Utensils, Hotel, Train,
+  ChevronDown, ChevronUp, Navigation, PlayCircle, Building, Mountain, Church, 
+  ShoppingCart, Waves, Cable, Trees, Store, Gamepad2, Target, Info
+} from "lucide-react";
 
 const japanPlaces = [
   {
     id: 1,
-    name: "Tokyo",
-    subtitle: "Tradition Meets Tomorrow",
-    mainImage: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
-    description: "Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples. From the neon lights of Shibuya to the serene Meiji Shrine, this megacity offers endless discoveries. Experience cutting-edge technology, world-class cuisine, and vibrant pop culture.",
-    longDescription: "Tokyo is a city of contrasts where ancient temples stand beside futuristic skyscrapers. As the world's most populous metropolitan area, it offers an incredible array of experiences. Start your day at the historic Senso-ji Temple in Asakusa, then dive into the electric atmosphere of Shibuya Crossing. Explore the trendy neighborhoods of Harajuku and Shibuya, visit the peaceful Meiji Shrine, and end your evening in the neon-lit streets of Shinjuku. Tokyo's food scene is unparalleled, from Michelin-starred restaurants to tiny ramen shops. The city's efficient public transportation makes it easy to explore, and there's always something new to discover around every corner.",
-    highlights: [
-      "Shibuya Crossing - World's busiest intersection with thousands crossing simultaneously",
-      "Senso-ji Temple - Tokyo's oldest temple dating back to 628 AD",
-      "Tokyo Skytree - 634m tall observation tower with panoramic city views",
-      "Tsukiji Outer Market - Fresh seafood paradise and street food haven",
-      "Harajuku - Fashion and youth culture hub with unique street style",
-      "Meiji Shrine - Peaceful Shinto shrine in the heart of the city",
-      "Akihabara - Electronic and anime culture district",
-      "Tokyo Tower - Iconic red and white landmark"
-    ],
-    bestTime: "March-May (Cherry Blossoms) & September-November (Mild Weather)",
-    duration: "4-6 days",
-    rating: 4.9,
-    activities: ["City Tours", "Temple Visits", "Shopping", "Food Tours", "Photography", "Nightlife"],
-    cuisine: ["Sushi", "Ramen", "Tempura", "Yakitori", "Street Food"],
-    transportation: "Extensive subway and train network, extremely efficient and punctual",
-    accommodation: "From capsule hotels to luxury ryokans, wide range of options available",
-    tips: [
-      "Get a Suica or Pasmo card for easy transportation",
-      "Visit early morning to avoid crowds at popular temples",
-      "Try standing sushi bars for authentic experience",
-      "Respect local customs and etiquette",
-      "Download offline maps and translation apps"
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1566140967404-b8b3932483f5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551641506-ee5bf4cb45f1?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1590829536736-bf151c83d5c0?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1532236204992-f5e85c024202?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551633450-b5f3c644e648?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1554797589-7241bb691973?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1533873984035-25970ab07461?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1522424427542-68a475ceed6d?auto=format&fit=crop&w=800&q=80"
-    ]
-  },
-  {
-    id: 2,
-    name: "Kyoto",
-    subtitle: "Ancient Capital of Culture",
-    mainImage: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80",
-    description: "Kyoto, the cultural heart of Japan, preserves over 2,000 temples and shrines. This ancient capital enchants visitors with traditional geisha districts, zen gardens, and bamboo groves. Experience authentic tea ceremonies, explore historic palaces, and witness timeless Japanese traditions.",
-    longDescription: "Kyoto served as Japan's capital for over 1,000 years and remains the cultural soul of the nation. With 17 UNESCO World Heritage Sites, this city is a living museum of Japanese history and tradition. Walk through the iconic red torii gates of Fushimi Inari, marvel at the golden splendor of Kinkaku-ji, and lose yourself in the mystical Arashiyama Bamboo Grove. The Gion district offers glimpses of geishas hurrying to appointments, while traditional machiya townhouses line quiet streets. Kyoto's kaiseki cuisine represents the pinnacle of Japanese culinary art, and participating in a tea ceremony here connects you to centuries of tradition. Every season brings new beauty, from cherry blossoms in spring to vibrant maple leaves in autumn.",
-    highlights: [
-      "Fushimi Inari Shrine - Thousands of vermilion torii gates creating tunnels up the mountain",
-      "Kinkaku-ji (Golden Pavilion) - Stunning Zen temple covered in gold leaf",
-      "Arashiyama Bamboo Grove - Towering bamboo forest creating an otherworldly atmosphere",
-      "Gion District - Traditional geisha quarter with wooden machiya houses",
-      "Kiyomizu-dera - UNESCO temple with wooden stage offering city views",
-      "Nijo Castle - Former residence of Tokugawa shoguns",
-      "Philosopher's Path - Cherry blossom-lined canal walk",
-      "Nishiki Market - Kyoto's 400-year-old food market"
-    ],
-    bestTime: "March-April (Cherry Blossoms) & November (Autumn Colors)",
-    duration: "3-5 days",
-    rating: 4.9,
-    activities: ["Temple Hopping", "Tea Ceremony", "Kimono Wearing", "Garden Tours", "Geisha Spotting", "Bamboo Forest Walk"],
-    cuisine: ["Kaiseki", "Yudofu", "Matcha Desserts", "Obanzai", "Kyoto Wagashi"],
-    transportation: "Buses are main transport, also subway lines and trains available",
-    accommodation: "Traditional ryokans highly recommended for authentic experience",
-    tips: [
-      "Visit Fushimi Inari early morning to avoid crowds",
-      "Purchase a bus day pass for unlimited travel",
-      "Book tea ceremonies and kimono rentals in advance",
-      "Respect temple etiquette and photography rules",
-      "Explore small side streets for hidden gems"
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1578469550956-0e16b69c6a3d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1484804959297-65e7c19d7c9f?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1624253321806-cff86f6e1b2b?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1504109586057-7a2ae83d1338?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1518820755499-666aa6d5c4b2?auto=format&fit=crop&w=800&q=80"
-    ]
-  },
-  {
-    id: 3,
     name: "Mount Fuji",
     subtitle: "Japan's Sacred Peak",
-    mainImage: "https://images.unsplash.com/photo-1576675466848-be8cca8c0f58?auto=format&fit=crop&w=1200&q=80",
-    description: "Mount Fuji, standing at 3,776 meters, is Japan's highest and most iconic mountain. This perfectly symmetrical volcanic cone has inspired artists for centuries. Surrounded by five lakes and beautiful landscapes, it offers breathtaking views, hiking trails, and spiritual significance.",
-    longDescription: "Mount Fuji is more than just Japan's tallest peak - it's a sacred symbol deeply embedded in Japanese culture and spirituality. This active stratovolcano last erupted in 1707 and is now a UNESCO World Heritage Site. The climbing season runs from July to September when thousands attempt the challenging ascent to watch sunrise from the summit. The Fuji Five Lakes region at the mountain's base offers year-round beauty with stunning reflections of the peak on clear days. Lake Kawaguchi is particularly popular for photographers. The nearby Hakone region provides hot spring resorts with views of Fuji, while Chureito Pagoda offers the most iconic photo opportunity with the five-story pagoda framing the mountain. Whether climbing to the summit or admiring from afar, Fuji-san captivates all who see it.",
+    mainImage: "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1200&h=800&fit=crop",
+    description: "Mount Fuji, standing at 3,776 meters, is Japan's highest and most iconic mountain. This perfectly symmetrical volcanic cone has inspired artists for centuries.",
+    longDescription: "Mount Fuji is more than just Japan's tallest peak - it's a sacred symbol deeply embedded in Japanese culture and spirituality. This active stratovolcano last erupted in 1707 and is now a UNESCO World Heritage Site.",
     highlights: [
       "Summit Climb - Challenging 6-8 hour trek to watch sunrise from 3,776m peak",
       "Lake Kawaguchi - Most accessible of Five Lakes with perfect Fuji reflections",
       "Chureito Pagoda - Iconic five-story pagoda with cherry blossoms and Fuji view",
-      "Fuji Five Lakes - Kawaguchi, Yamanaka, Sai, Shoji, and Motosu lakes",
-      "Hakone - Hot spring resort town with Fuji views and art museums",
-      "Aokigahara Forest - Dense forest at Fuji's base (also called Sea of Trees)",
-      "Oshino Hakkai - Eight sacred ponds with crystal clear spring water",
-      "Fuji-Q Highland - Amusement park with thrilling roller coasters"
+      "Fuji Five Lakes - Kawaguchi, Yamanaka, Sai, Shoji, and Motosu lakes"
     ],
     bestTime: "July-September (Climbing) & October-February (Clear Views)",
     duration: "2-3 days",
-    rating: 4.8,
-    activities: ["Mountain Climbing", "Lake Cruises", "Photography", "Hot Springs", "Hiking Trails", "Cable Car Rides"],
-    cuisine: ["Hoto Noodles", "Fujinomiya Yakisoba", "Lake Fish", "Mountain Vegetables"],
-    transportation: "Train to Kawaguchiko, then buses; car rental recommended for flexibility",
-    accommodation: "Lakeside hotels, traditional ryokans with onsen, mountain huts for climbers",
+    rating: 4.9,
+    activities: ["Mountain Climbing", "Lake Cruises", "Photography", "Hiking Trails", "Shrine Visits", "Cable Car Rides"],
+    cuisine: ["Hoto Noodles", "Fujinomiya Yakisoba", "Lake Fish", "Mountain Vegetables", "Fuji Tofu"],
+    transportation: "Train to Kawaguchiko Station, then buses; express buses from Tokyo available",
+    accommodation: "Lakeside hotels, mountain huts for climbers, traditional ryokans with Fuji views",
     tips: [
       "Book mountain huts months in advance for overnight climbing",
-      "Start climb in afternoon, rest at 7th/8th station, summit for sunrise",
-      "Bring warm clothes even in summer - summit is cold",
-      "Visit on weekdays to avoid crowds",
-      "Check weather forecasts - Fuji creates its own weather"
+      "Start climb in afternoon, rest at station, summit for sunrise",
+      "Bring warm clothes even in summer - summit temperature near freezing"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1570145820259-a25a6a5d6f41?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1578271887552-5ac3a72752bc?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1568849676085-51415703900f?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1583319414569-a8f88a7f35e6?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1576670159805-381d4d3a6b17?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1617134135682-3e1f0f2ed9c6?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1584422022290-06639d5f1877?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1606918801925-e2c914c4b503?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1626433499373-20baa892e994?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?auto=format&fit=crop&w=800&q=80"
-    ]
+      "https://images.unsplash.com/photo-1570145820259-a25a6a5d6f41?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1578271887552-5ac3a72752bc?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1568849676085-51415703900f?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Tokyo to Mount Fuji Adventure",
+      tripDuration: "2 Days • 11 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Theatre1010", 
+          icon: PlayCircle, 
+          color: "text-purple-600", 
+          location: "Theatre1010, Tokyo",
+          time: "09:00 AM",
+          duration: "1 hour",
+          description: "Start your journey from Tokyo's Theatre1010. This modern cultural hub in Kita-Senju offers a glimpse into Tokyo's vibrant arts scene.",
+          activities: ["Cultural exploration", "Morning coffee", "Travel preparation"],
+          cost: "Free to ¥500"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Chureito Pagoda", 
+          icon: Building, 
+          color: "text-red-500", 
+          location: "Chureito Pagoda, Fujiyoshida",
+          time: "12:00 PM",
+          duration: "2 hours",
+          description: "The iconic five-story pagoda with Mt. Fuji backdrop. Climb 400 steps for breathtaking views. Best during cherry blossom season!",
+          activities: ["Photography", "Hiking 400 steps", "Scenic views"],
+          cost: "Free entry"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Oshino Hakkai", 
+          icon: Mountain, 
+          color: "text-blue-600", 
+          location: "Oshino Hakkai, Yamanashi",
+          time: "02:30 PM",
+          duration: "1.5 hours",
+          description: "Eight sacred ponds with crystal-clear spring water fed by Mt. Fuji's snowmelt. Traditional thatched-roof houses surround the ponds.",
+          activities: ["Pond viewing", "Traditional village walk", "Local snacks"],
+          cost: "¥300 pond area entry"
+        },
+        { 
+          id: 4, 
+          day: 1,
+          name: "Arakura Fuji Sengen Shrine", 
+          icon: Church, 
+          color: "text-orange-600", 
+          location: "Arakura Fuji Sengen Shrine, Fujiyoshida",
+          time: "04:30 PM",
+          duration: "1 hour",
+          description: "Ancient shrine at the base of Chureito Pagoda. Peaceful atmosphere with Mt. Fuji views and traditional architecture.",
+          activities: ["Shrine visit", "Prayer", "Omikuji fortune"],
+          cost: "Free"
+        },
+        { 
+          id: 5, 
+          day: 1,
+          name: "Kawaguchiko Lawson", 
+          icon: ShoppingCart, 
+          color: "text-blue-500", 
+          location: "Lawson Kawaguchiko Station",
+          time: "06:00 PM",
+          duration: "30 minutes",
+          description: "Famous convenience store with perfect Mt. Fuji framing! A must-visit Instagram spot. Stock up on snacks and drinks.",
+          activities: ["Photo opportunity", "Snack shopping", "Convenience items"],
+          cost: "¥500-1000"
+        },
+        { 
+          id: 6, 
+          day: 1,
+          name: "Lake Kawaguchiko", 
+          icon: Waves, 
+          color: "text-cyan-500", 
+          location: "Lake Kawaguchiko, Yamanashi",
+          time: "07:00 PM",
+          duration: "Evening stroll",
+          description: "Most accessible of the Fuji Five Lakes. Enjoy sunset reflections of Mt. Fuji on the calm lake waters. Perfect end to Day 1!",
+          activities: ["Lake walk", "Sunset photography", "Dinner by lake"],
+          cost: "Free"
+        },
+        { 
+          id: 7, 
+          day: 2,
+          name: "Kachi-Kachi Ropeway", 
+          icon: Cable, 
+          color: "text-gray-600", 
+          location: "Kachi Kachi Ropeway, Fujikawaguchiko",
+          time: "09:00 AM",
+          duration: "1.5 hours",
+          description: "Cable car ride to Mt. Tenjo observation deck. Panoramic views of Mt. Fuji, Lake Kawaguchiko, and surrounding mountains.",
+          activities: ["Ropeway ride", "Observation deck", "Morning views"],
+          cost: "¥900 round trip"
+        },
+        { 
+          id: 8, 
+          day: 2,
+          name: "Oishi Park", 
+          icon: Trees, 
+          color: "text-green-500", 
+          location: "Oishi Park, Fujikawaguchiko",
+          time: "11:00 AM",
+          duration: "1 hour",
+          description: "Flower gardens with Mt. Fuji views. Lavender in summer, cosmos in autumn. Beautiful seasonal flowers year-round.",
+          activities: ["Flower viewing", "Photography", "Park picnic"],
+          cost: "Free"
+        },
+        { 
+          id: 9, 
+          day: 2,
+          name: "Fuji Honchodori", 
+          icon: MapPin, 
+          color: "text-slate-600", 
+          location: "Fuji Honchodori, Fujiyoshida",
+          time: "01:00 PM",
+          duration: "1.5 hours",
+          description: "Traditional shopping street near Fuji-Q Highland. Local restaurants, souvenir shops, and authentic Fujiyoshida experience.",
+          activities: ["Shopping", "Local lunch", "Street exploration"],
+          cost: "¥1500-2500"
+        },
+        { 
+          id: 10, 
+          day: 2,
+          name: "Gotemba Premium Outlets", 
+          icon: Store, 
+          color: "text-amber-600", 
+          location: "Gotemba Premium Outlets",
+          time: "03:00 PM",
+          duration: "2-3 hours",
+          description: "Japan's largest outlet mall with 200+ stores. Mt. Fuji views while shopping for international and Japanese brands at discounted prices.",
+          activities: ["Shopping", "Brand outlets", "Food court"],
+          cost: "Varies"
+        },
+        { 
+          id: 11, 
+          day: 2,
+          name: "Yamanakako Lake Side Bowl", 
+          icon: Gamepad2, 
+          color: "text-emerald-500", 
+          location: "Yamanakako Lake Side Bowl",
+          time: "06:00 PM",
+          duration: "1-2 hours",
+          description: "Fun bowling alley near Lake Yamanaka. Perfect way to end your Mt. Fuji adventure with entertainment and relaxation.",
+          activities: ["Bowling", "Arcade games", "Dinner nearby"],
+          cost: "¥500-800 per game"
+        }
+      ]
+    }
+  },
+  {
+    id: 2,
+    name: "Hakone",
+    subtitle: "Hot Spring Paradise with Fuji Views",
+    mainImage: "https://images.unsplash.com/photo-1528164344705-47542687000d?w=1200&h=800&fit=crop",
+    description: "Hakone is a mountainous hot spring resort town famous for its stunning views of Mount Fuji, volcanic valleys, and art museums.",
+    longDescription: "Hakone has been a popular hot spring destination for centuries, offering respite from urban life with its therapeutic waters and mountain scenery.",
+    highlights: [
+      "Lake Ashi Cruise - Pirate ship cruise with stunning Mt. Fuji views",
+      "Hakone Ropeway - Cable car over volcanic valley with panoramic vistas",
+      "Owakudani Valley - Active volcanic valley with sulfur vents and black eggs",
+      "Hakone Open-Air Museum - World-class outdoor sculpture museum"
+    ],
+    bestTime: "March-May & September-November (Clear Fuji Views)",
+    duration: "1-2 days",
+    rating: 4.8,
+    activities: ["Hot Springs", "Lake Cruises", "Museum Visits", "Hiking", "Cable Car Rides", "Photography"],
+    cuisine: ["Onsen Tamago", "Hakone Soba", "Black Eggs", "Kaiseki Ryori", "Local Tofu"],
+    transportation: "Hakone Freepass covers all transport; Romance Car from Shinjuku Station",
+    accommodation: "Traditional ryokans with onsen, modern hotels, many with Mt. Fuji views",
+    tips: [
+      "Purchase Hakone Freepass for unlimited transport and discounts",
+      "Stay overnight in ryokan for authentic onsen experience",
+      "Visit Owakudani early to avoid crowds and tour groups"
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1578469550956-0e16b69c6a3d?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Hakone Onsen & Art Tour",
+      tripDuration: "1 Day • 8 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Hakone-Yumoto Station", 
+          icon: Train, 
+          color: "text-blue-600", 
+          location: "Hakone-Yumoto Station",
+          time: "09:00 AM",
+          duration: "30 minutes",
+          description: "Starting point in Hakone. Purchase Hakone Freepass here. Explore onsen town atmosphere and local shops.",
+          activities: ["Station arrival", "Freepass purchase", "Town exploration"],
+          cost: "¥6100 Freepass"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Hakone Open-Air Museum", 
+          icon: Building, 
+          color: "text-purple-600", 
+          location: "Hakone Open-Air Museum",
+          time: "10:00 AM",
+          duration: "2 hours",
+          description: "World-class sculpture museum in beautiful mountain setting. Features Picasso Pavilion and outdoor installations.",
+          activities: ["Sculpture viewing", "Picasso collection", "Foot bath"],
+          cost: "¥1600"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Owakudani Valley", 
+          icon: Mountain, 
+          color: "text-orange-600", 
+          location: "Owakudani, Hakone",
+          time: "01:00 PM",
+          duration: "1.5 hours",
+          description: "Active volcanic valley with steaming vents. Try famous black eggs boiled in sulfur springs (said to add 7 years to life!).",
+          activities: ["Valley walk", "Black egg tasting", "Sulfur observation"],
+          cost: "¥500"
+        },
+        { 
+          id: 4, 
+          day: 1,
+          name: "Lake Ashi Cruise", 
+          icon: Waves, 
+          color: "text-cyan-500", 
+          location: "Lake Ashi, Hakone",
+          time: "03:00 PM",
+          duration: "1 hour",
+          description: "Pirate ship cruise across Lake Ashi with Mt. Fuji backdrop. Beautiful photo opportunities on clear days.",
+          activities: ["Boat cruise", "Mt. Fuji views", "Lake photography"],
+          cost: "¥1200"
+        },
+        { 
+          id: 5, 
+          day: 1,
+          name: "Hakone Shrine", 
+          icon: Church, 
+          color: "text-red-500", 
+          location: "Hakone Shrine, Moto-Hakone",
+          time: "04:30 PM",
+          duration: "1 hour",
+          description: "Historic lakeside shrine with iconic red torii gate in water. Peaceful cedar forest setting.",
+          activities: ["Shrine visit", "Torii photography", "Forest walk"],
+          cost: "Free"
+        }
+      ]
+    }
+  },
+  {
+    id: 3,
+    name: "Gotemba",
+    subtitle: "Shopping Paradise at Mount Fuji's Base",
+    mainImage: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1200&h=800&fit=crop",
+    description: "Gotemba, located at the eastern base of Mount Fuji, is famous for its massive premium outlets and spectacular mountain views.",
+    longDescription: "Gotemba sits at 450 meters elevation on the southeastern slope of Mount Fuji, providing some of the best views of the mountain from its shopping complexes.",
+    highlights: [
+      "Gotemba Premium Outlets - Japan's largest outlet mall with 200+ stores",
+      "Peace Park - Beautiful park with Mt. Fuji views and walking paths",
+      "Gotemba Kogen Brewing - Local craft brewery using Mt. Fuji spring water",
+      "Mt. Fuji Subashiri Trail - Hiking access to Mount Fuji climbing routes"
+    ],
+    bestTime: "October-February (Clearest Mt. Fuji Views) & Year-round Shopping",
+    duration: "1 day",
+    rating: 4.6,
+    activities: ["Shopping", "Photography", "Hiking", "Brewery Tours", "Racing Events", "Nature Walks"],
+    cuisine: ["Gotemba Koshihikari Rice", "Local Sake", "Craft Beer", "Mishima Croquettes", "Wasabi Dishes"],
+    transportation: "JR Gotemba Line from Tokyo; highway buses available; car rental recommended",
+    accommodation: "Business hotels, resort hotels with onsen, budget accommodation near outlets",
+    tips: [
+      "Visit outlets on weekdays to avoid weekend crowds",
+      "Best Mt. Fuji views in winter mornings when air is clear",
+      "Combine with Hakone visit for hot springs experience"
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1583319414569-a8f88a7f35e6?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1568849676085-51415703900f?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Gotemba Shopping & Brewery Tour",
+      tripDuration: "1 Day • 5 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Gotemba Premium Outlets", 
+          icon: Store, 
+          color: "text-amber-600", 
+          location: "Gotemba Premium Outlets",
+          time: "10:00 AM",
+          duration: "3-4 hours",
+          description: "Japan's largest outlet mall with Mt. Fuji views. 200+ international and Japanese brands at discounted prices.",
+          activities: ["Brand shopping", "Food court lunch", "Mt. Fuji photography"],
+          cost: "Varies by shopping"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Peace Park", 
+          icon: Trees, 
+          color: "text-green-500", 
+          location: "Peace Park, Gotemba",
+          time: "02:30 PM",
+          duration: "1 hour",
+          description: "Beautiful park with excellent Mt. Fuji viewpoints. Walking paths, monuments, and peaceful atmosphere.",
+          activities: ["Park walk", "Photography", "Relaxation"],
+          cost: "Free"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Gotemba Kogen Brewing", 
+          icon: ShoppingCart, 
+          color: "text-blue-500", 
+          location: "Gotemba Kogen Brewery",
+          time: "04:00 PM",
+          duration: "1.5 hours",
+          description: "Local craft brewery using Mt. Fuji spring water. Tours available with tasting sessions of various beer styles.",
+          activities: ["Brewery tour", "Beer tasting", "Souvenir shopping"],
+          cost: "¥1000-1500"
+        }
+      ]
+    }
   },
   {
     id: 4,
-    name: "Osaka",
-    subtitle: "Kitchen of Japan",
-    mainImage: "https://images.unsplash.com/photo-1590253230532-a67f2dc7e55e?auto=format&fit=crop&w=1200&q=80",
-    description: "Osaka, Japan's third-largest city, is famous for its delicious street food and vibrant nightlife. Known as the 'Nation's Kitchen,' this energetic metropolis offers incredible culinary experiences, historic castles, and friendly locals. Experience the true taste of Japanese urban culture.",
-    longDescription: "Osaka is Japan's kitchen and comedy capital, known for its food-obsessed culture and outgoing people. The city's merchant heritage created a unique atmosphere where locals pride themselves on hospitality and humor. Dotonbori's neon-lit streets showcase the famous running Glico Man sign and offer endless street food options - takoyaki, okonomiyaki, kushikatsu, and more. Osaka Castle, one of Japan's most famous landmarks, tells stories of samurai and shoguns. The Shinsekai district preserves retro Showa-era charm with its Tsutenkaku Tower. Universal Studios Japan offers world-class entertainment, while the Kuromon Market provides authentic local food experiences. Osaka serves as an excellent base for exploring nearby Kyoto, Nara, and Kobe, all within easy reach.",
+    name: "Tokyo",
+    subtitle: "Where Tradition Meets Tomorrow",
+    mainImage: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=800&fit=crop",
+    description: "Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples.",
+    longDescription: "Tokyo is a city of contrasts where ancient temples stand beside futuristic skyscrapers. As the world's most populous metropolitan area, it offers endless experiences.",
     highlights: [
-      "Osaka Castle - Magnificent 16th-century fortress with museum and beautiful grounds",
-      "Dotonbori - Neon-lit entertainment district famous for street food and nightlife",
-      "Universal Studios Japan - World-class theme park with unique Japanese attractions",
-      "Kuromon Market - 'Osaka's Kitchen' with 150+ shops selling fresh seafood",
-      "Shinsekai - Retro entertainment district with Tsutenkaku Tower",
-      "Osaka Aquarium Kaiyukan - One of world's largest aquariums",
-      "Umeda Sky Building - Futuristic building with floating garden observatory",
-      "Shitennoji Temple - Japan's oldest officially-administered temple"
+      "Shibuya Crossing - World's busiest intersection with organized chaos",
+      "Senso-ji Temple - Tokyo's oldest temple dating back to 628 AD",
+      "Tokyo Skytree - 634m tall tower with breathtaking city panoramas",
+      "Harajuku & Takeshita Street - Youth culture and fashion epicenter"
     ],
-    bestTime: "March-May & September-November (Mild Weather)",
-    duration: "2-4 days",
-    rating: 4.7,
-    activities: ["Food Tours", "Castle Visits", "Shopping", "Theme Parks", "River Cruises", "Comedy Shows"],
-    cuisine: ["Takoyaki", "Okonomiyaki", "Kushikatsu", "Fugu", "Osaka Sushi"],
-    transportation: "Extensive subway and JR lines, very affordable and efficient",
-    accommodation: "Budget-friendly options, business hotels, and luxury stays available",
+    bestTime: "March-May (Cherry Blossoms) & September-November (Mild Weather)",
+    duration: "4-7 days",
+    rating: 4.9,
+    activities: ["City Tours", "Temple Visits", "Shopping", "Food Tours", "Photography", "Nightlife"],
+    cuisine: ["Sushi", "Ramen", "Tempura", "Yakitori", "Tonkatsu", "Street Food"],
+    transportation: "Extensive subway and JR train network, extremely efficient and punctual",
+    accommodation: "From capsule hotels to luxury ryokans, every budget and style available",
     tips: [
-      "Say 'Ookini' instead of 'Arigato' like locals do",
-      "Never double-dip kushikatsu in communal sauce",
-      "Visit Dotonbori at night for best atmosphere",
-      "Get Osaka Amazing Pass for free attractions and transport",
-      "Try standing bars for cheap drinks and local interaction"
+      "Get Suica or Pasmo card for seamless public transport",
+      "Visit temples early morning to avoid crowds",
+      "Try standing sushi bars for authentic experience"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1589452271712-64b8a66c7b71?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1534274867514-d5b47f750f1a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1591619593541-ce65e5d1793f?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1548048026-5a1a941d93d3?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1624356381799-b6d52e81a1d5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1628745239842-d0d03b2e33d2?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1601823984263-b55d490ee1fe?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1598199877908-a9366c5d1eda?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1628744876497-eb30460be9f6?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1504788230298-b0750fe7608a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=800&q=80"
-    ]
+      "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Tokyo City Highlights",
+      tripDuration: "2 Days • 10 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Senso-ji Temple", 
+          icon: Church, 
+          color: "text-red-500", 
+          location: "Senso-ji Temple, Asakusa",
+          time: "08:00 AM",
+          duration: "2 hours",
+          description: "Tokyo's oldest temple. Walk through Kaminarimon Gate, shop at Nakamise Street, and explore the main temple.",
+          activities: ["Temple visit", "Nakamise shopping", "Fortune drawing"],
+          cost: "Free"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Tokyo Skytree", 
+          icon: Building, 
+          color: "text-blue-600", 
+          location: "Tokyo Skytree, Sumida",
+          time: "10:30 AM",
+          duration: "2 hours",
+          description: "634m tall broadcasting tower with two observation decks. Panoramic views of Tokyo and Mt. Fuji on clear days.",
+          activities: ["Observation deck", "Shopping", "Sky Restaurant"],
+          cost: "¥2100-3400"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Shibuya Crossing", 
+          icon: MapPin, 
+          color: "text-purple-600", 
+          location: "Shibuya Crossing, Shibuya",
+          time: "02:00 PM",
+          duration: "1.5 hours",
+          description: "World's busiest intersection. Cross with thousands of people, visit Hachiko statue, explore Shibuya 109.",
+          activities: ["Crossing experience", "Hachiko photo", "Shopping"],
+          cost: "Free"
+        },
+        { 
+          id: 4, 
+          day: 1,
+          name: "Harajuku & Takeshita Street", 
+          icon: ShoppingCart, 
+          color: "text-pink-500", 
+          location: "Harajuku, Tokyo",
+          time: "04:00 PM",
+          duration: "2 hours",
+          description: "Youth fashion capital. Colorful street fashion, trendy shops, crepes, and unique boutiques.",
+          activities: ["Street fashion", "Shopping", "Crepe tasting"],
+          cost: "¥1000-3000"
+        },
+        { 
+          id: 5, 
+          day: 1,
+          name: "Meiji Shrine", 
+          icon: Trees, 
+          color: "text-green-600", 
+          location: "Meiji Shrine, Harajuku",
+          time: "06:00 PM",
+          duration: "1 hour",
+          description: "Peaceful Shinto shrine in forested grounds. Traditional weddings often visible. Beautiful at sunset.",
+          activities: ["Shrine visit", "Forest walk", "Traditional ceremony viewing"],
+          cost: "Free"
+        },
+        { 
+          id: 6, 
+          day: 1,
+          name: "Ueno Park",
+          time: "07:30 PM",
+          duration: "1 hour",
+          icon: "🌳",
+        },
+        { 
+          id: 7, 
+          day: 1,
+          name: "Akihabara",
+          time: "08:45 PM",
+          duration: "1 hour",
+          icon: "🎮",
+        },
+        { 
+          id: 8, 
+          day: 1,
+          name: "Tokyo Dome",
+          time: "10:00 PM",
+          duration: "1 hour",
+          icon: "🏟️",
+        },
+        { 
+          id: 9, 
+          day: 1,
+          name: "Roppongi Hills",
+          time: "11:15 PM",
+          duration: "1 hour",
+          icon: "🏙️",
+        },
+        { 
+          id: 10, 
+          day: 1,
+          name: "Tsukiji Outer Market",
+          time: "12:30 AM",
+          duration: "1 hour",
+          icon: "🍣",
+        }
+      ]
+    }
   },
   {
     id: 5,
-    name: "Hokkaido",
-    subtitle: "Northern Wilderness",
-    mainImage: "https://images.unsplash.com/photo-1560252556-e98b9cd46569?auto=format&fit=crop&w=1200&q=80",
-    description: "Hokkaido, Japan's northernmost island, offers pristine natural beauty and world-class skiing. Experience stunning national parks, hot springs, fresh seafood, and the famous Sapporo Snow Festival. This winter wonderland transforms into a colorful paradise during summer with lavender fields and flower gardens.",
-    longDescription: "Hokkaido is Japan's wild frontier, offering vast wilderness, powder snow skiing, and unique cultural experiences. Sapporo, the capital, hosts the world-famous Snow Festival every February, attracting millions to see massive ice sculptures. Niseko has become an international ski resort destination with incredibly light powder snow. In summer, Furano and Biei transform into rainbow landscapes with endless flower fields, particularly the purple lavender. Hokkaido's food scene is exceptional - fresh seafood from cold waters, Sapporo beer, Genghis Khan lamb BBQ, and rich dairy products. The indigenous Ainu culture adds another dimension to the island's heritage. Shiretoko National Park, a UNESCO World Heritage Site, offers pristine wilderness with brown bears, while the remote Akan and Daisetsuzan national parks provide true backcountry experiences.",
+    name: "Nikko",
+    subtitle: "Sacred Mountains & UNESCO Treasures",
+    mainImage: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&h=800&fit=crop",
+    description: "Nikko, a mountain town north of Tokyo, is home to UNESCO World Heritage shrines and temples set among stunning natural scenery.",
+    longDescription: "Nikko has been a center of Shinto and Buddhist mountain worship for over 1,200 years. Famous for ornate Toshogu Shrine and beautiful waterfalls.",
     highlights: [
-      "Sapporo Snow Festival - Massive ice sculptures festival every February",
-      "Niseko - World-renowned powder snow skiing and snowboarding",
-      "Furano Lavender Fields - Endless purple fields bloom in July",
-      "Biei Blue Pond - Stunning artificial pond with supernatural blue color",
-      "Shiretoko National Park - UNESCO wilderness with bears and wildlife",
-      "Otaru Canal - Historic port town with glassware and music boxes",
-      "Hakodate - Historic port city with night views and morning market",
-      "Jigokudani (Hell Valley) - Volcanic valley with hot springs"
+      "Toshogu Shrine - Ornate UNESCO shrine with famous monkey and cat carvings",
+      "Kegon Falls - Spectacular 97-meter waterfall near Lake Chuzenji",
+      "Lake Chuzenji - Beautiful mountain lake formed by volcanic eruption",
+      "Shinkyo Bridge - Sacred vermillion bridge over Daiya River"
     ],
-    bestTime: "February (Snow Festival & Skiing) & July-August (Lavender)",
-    duration: "5-7 days",
+    bestTime: "May-June (Fresh Green) & October-November (Autumn Colors)",
+    duration: "1-2 days",
     rating: 4.8,
-    activities: ["Skiing/Snowboarding", "Hot Springs", "Wildlife Watching", "Flower Viewing", "Seafood Tours", "Hiking"],
-    cuisine: ["Fresh Seafood", "Soup Curry", "Jingisukan", "Sapporo Ramen", "Dairy Products"],
-    transportation: "Car rental recommended for flexibility, trains connect major cities",
-    accommodation: "Ski resorts, onsen ryokans, city hotels in Sapporo",
+    activities: ["Temple Visits", "Hiking", "Waterfall Viewing", "Hot Springs", "Photography", "Nature Walks"],
+    cuisine: ["Yuba (Tofu Skin)", "Nikko Soba", "Rainbow Trout", "Wild Vegetables", "Sake"],
+    transportation: "Limited Express train from Tokyo (Asakusa) takes 2 hours",
+    accommodation: "Traditional ryokans, onsen hotels, budget guesthouses available",
     tips: [
-      "Rent a car to explore rural areas and flower fields",
-      "Book ski accommodations well in advance",
-      "Try uni (sea urchin) and ikura (salmon roe) donburi",
-      "Winter requires serious cold weather gear",
-      "Visit multiple onsen towns for varied experiences"
+      "Purchase combo ticket for shrines to save money",
+      "Visit shrines before 9am to avoid tour groups",
+      "Autumn colors peak late October to early November"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1583725094311-ee8f5c85d63b?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1578469645742-46cae010e5d4?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1612556975381-cd3ac98f7098?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1611348524140-53c9a25263d6?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1553531087-32e45f922b43?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1583498602475-76067f4a6bed?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1619022983184-e6c263346a61?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80"
-    ]
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Nikko UNESCO Heritage Tour",
+      tripDuration: "1 Day • 6 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Shinkyo Bridge", 
+          icon: Building, 
+          color: "text-red-500", 
+          location: "Shinkyo Bridge, Nikko",
+          time: "09:00 AM",
+          duration: "30 minutes",
+          description: "Sacred vermillion bridge entrance to Nikko. One of Japan's three most beautiful bridges.",
+          activities: ["Bridge viewing", "Photography", "River walk"],
+          cost: "¥300 to cross"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Toshogu Shrine", 
+          icon: Church, 
+          color: "text-orange-600", 
+          location: "Toshogu Shrine, Nikko",
+          time: "10:00 AM",
+          duration: "2.5 hours",
+          description: "Ornate UNESCO shrine with Three Wise Monkeys and Sleeping Cat carvings. Tokugawa Ieyasu's mausoleum.",
+          activities: ["Shrine exploration", "Carving viewing", "Five-story pagoda"],
+          cost: "¥1300"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Lake Chuzenji", 
+          icon: Waves, 
+          color: "text-blue-500", 
+          location: "Lake Chuzenji, Nikko",
+          time: "02:00 PM",
+          duration: "1.5 hours",
+          description: "Beautiful mountain lake at 1269m elevation. Cruise available, stunning autumn colors.",
+          activities: ["Lake cruise", "Lakeside walk", "Scenic photography"],
+          cost: "¥1250 cruise"
+        },
+        { 
+          id: 4, 
+          day: 1,
+          name: "Kegon Falls", 
+          icon: Mountain, 
+          color: "text-cyan-500", 
+          location: "Kegon Falls, Nikko",
+          time: "04:00 PM",
+          duration: "1 hour",
+          description: "Spectacular 97-meter waterfall. Elevator to base for close-up views. One of Japan's three most beautiful falls.",
+          activities: ["Waterfall viewing", "Elevator ride", "Nature photography"],
+          cost: "¥570"
+        }
+      ]
+    }
   },
   {
     id: 6,
-    name: "Okinawa",
-    subtitle: "Tropical Paradise",
-    mainImage: "https://images.unsplash.com/photo-1598024055266-e772a5f8c128?auto=format&fit=crop&w=1200&q=80",
-    description: "Okinawa, Japan's subtropical island paradise, features crystal-clear waters, white sandy beaches, and unique Ryukyuan culture. This chain of islands offers incredible diving, snorkeling, and a laid-back atmosphere. Experience a different side of Japan with its distinct traditions, cuisine, and natural beauty.",
-    longDescription: "Okinawa is Japan's tropical escape, a chain of 160 islands stretching toward Taiwan. The main island blends Japanese and distinct Ryukyuan culture, with influences from China and America. Naha, the capital, centers around Kokusai Street and the restored Shuri Castle, former seat of the Ryukyu Kingdom. The Churaumi Aquarium is world-class, featuring whale sharks and manta rays. Okinawa's beaches rival any tropical destination - Emerald Beach, Manza Beach, and the remote Kerama Islands offer pristine waters perfect for diving and snorkeling. The island's cuisine is unique - try goya champuru, Okinawa soba, and awamori spirit. The islands' residents are known for longevity, attributed to their healthy diet and lifestyle. Southern islands like Ishigaki and Miyakojima offer even more remote paradise experiences with incredible coral reefs.",
+    name: "Nagano",
+    subtitle: "Alpine Beauty & Snow Monkeys",
+    mainImage: "https://images.unsplash.com/photo-1560252556-e98b9cd46569?w=1200&h=800&fit=crop",
+    description: "Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs.",
+    longDescription: "Nagano Prefecture is Japan's roof, encompassing much of the Japanese Alps. Famous for 1998 Winter Olympics and snow monkeys.",
     highlights: [
-      "Churaumi Aquarium - One of world's largest aquariums with whale sharks",
-      "Shuri Castle - Restored UNESCO site of Ryukyu Kingdom (rebuilt after 2019 fire)",
-      "Kerama Islands - Pristine diving and snorkeling paradise",
-      "Cape Manzamo - Dramatic cliff formations with ocean views",
-      "Ishigaki Island - Remote paradise with coral reefs and beaches",
-      "American Village - Shopping and entertainment district",
-      "Okinawa World - Cultural theme park with massive cave system",
-      "Miyakojima - Beautiful island with stunning beaches"
+      "Zenko-ji Temple - Historic 7th-century temple",
+      "Jigokudani Monkey Park - Wild snow monkeys in hot springs",
+      "Hakuba Valley - World-class ski resort",
+      "Matsumoto Castle - Stunning original black castle"
     ],
-    bestTime: "April-June & September-October (Avoid Typhoon Season)",
-    duration: "4-6 days",
+    bestTime: "December-March (Skiing & Snow Monkeys) & June-October (Hiking)",
+    duration: "2-4 days",
     rating: 4.7,
-    activities: ["Scuba Diving", "Snorkeling", "Beach Activities", "Island Hopping", "Cultural Tours", "Marine Sports"],
-    cuisine: ["Goya Champuru", "Okinawa Soba", "Taco Rice", "Umibudo", "Awamori"],
-    transportation: "Car rental essential for main island, ferries between islands",
-    accommodation: "Beach resorts, guesthouses, traditional minshuku available",
+    activities: ["Skiing", "Temple Visits", "Wildlife Watching", "Hiking", "Hot Springs"],
+    cuisine: ["Soba Noodles", "Oyaki", "Shinshu Beef", "Wild Vegetables", "Chestnuts"],
+    transportation: "Shinkansen from Tokyo to Nagano (90 minutes)",
+    accommodation: "Ski resorts, onsen ryokans, city hotels, mountain lodges",
     tips: [
-      "Rent a car to explore hidden beaches and attractions",
-      "Book diving trips in advance during peak season",
-      "Try shisa lion statues hunting - they're everywhere",
-      "Respect local culture - pace is slower than mainland",
-      "Visit remote islands for fewer crowds and pristine nature"
+      "Visit snow monkeys early morning for best experience",
+      "Try authentic handmade soba at local restaurants",
+      "Book ski accommodations early for winter season"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1566054531654-af7c3462bdbf?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1590419690008-905895e8fe0d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1505142468610-359e7d316be0?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80"
-    ]
+      "https://images.unsplash.com/photo-1583725094311-ee8f5c85d63b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1578469645742-46cae010e5d4?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Nagano Snow Monkeys & Temple Tour",
+      tripDuration: "1 Day • 4 Destinations",
+      items: [
+        { 
+          id: 1, 
+          day: 1,
+          name: "Zenko-ji Temple", 
+          icon: Church, 
+          color: "text-red-500", 
+          location: "Zenko-ji Temple, Nagano",
+          time: "08:00 AM",
+          duration: "2 hours",
+          description: "One of Japan's most important Buddhist temples. Founded in 7th century, houses Japan's first Buddhist statue.",
+          activities: ["Temple visit", "Morning prayer", "Nakamise shopping"],
+          cost: "¥500"
+        },
+        { 
+          id: 2, 
+          day: 1,
+          name: "Jigokudani Monkey Park", 
+          icon: Mountain, 
+          color: "text-blue-600", 
+          location: "Jigokudani, Yamanouchi",
+          time: "11:00 AM",
+          duration: "2.5 hours",
+          description: "Famous wild snow monkeys bathing in natural hot springs. Only place in world where monkeys bathe in onsen!",
+          activities: ["Monkey watching", "Forest trail walk", "Photography"],
+          cost: "¥800"
+        },
+        { 
+          id: 3, 
+          day: 1,
+          name: "Shibu Onsen", 
+          icon: Waves, 
+          color: "text-orange-500", 
+          location: "Shibu Onsen, Yamanouchi",
+          time: "02:30 PM",
+          duration: "2 hours",
+          description: "Traditional hot spring town near monkey park. Nine public bathhouses, nostalgic atmosphere.",
+          activities: ["Onsen bathing", "Town walk", "Traditional architecture"],
+          cost: "¥500-1500"
+        }
+      ]
+    }
+  },
+  {
+    id: 7,
+    name: "Kyoto",
+    subtitle: "Ancient Temples & Geisha Districts",
+    mainImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=800&fit=crop",
+    description: "Kyoto, the heart of traditional Japan, is famous for its historic temples, shrines, and beautiful gardens.",
+    longDescription: "Kyoto was Japan's capital for over a thousand years. Its streets are lined with wooden houses, and the city is home to hundreds of temples and shrines.",
+    highlights: [
+      "Fushimi Inari Shrine - Thousands of iconic red torii gates",
+      "Kinkaku-ji (Golden Pavilion) - Zen temple covered in gold leaf",
+      "Gion District - Geisha culture and traditional tea houses",
+      "Arashiyama Bamboo Grove - Magical bamboo forest walk"
+    ],
+    bestTime: "March-April (Cherry Blossoms) & November (Autumn Leaves)",
+    duration: "2-4 days",
+    rating: 4.9,
+    activities: ["Temple Visits", "Tea Ceremonies", "Kimono Experience", "Garden Walks", "Bamboo Forest", "Cultural Tours"],
+    cuisine: ["Kaiseki", "Yudofu", "Matcha Sweets", "Kyo Wagashi", "Tofu Dishes"],
+    transportation: "JR Shinkansen from Tokyo (2.5 hours), local buses and subway",
+    accommodation: "Ryokans, machiya townhouses, luxury hotels",
+    tips: [
+      "Book tea ceremony in advance for authentic experience",
+      "Visit Fushimi Inari early morning to avoid crowds",
+      "Rent a kimono for a day to explore historic districts"
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101178521-c1a4c8a0f8d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop"
+    ],
+    itinerary: {
+      tripName: "Kyoto Heritage & Culture Tour",
+      tripDuration: "2 Days • 8 Destinations",
+      items: [
+        {
+          id: 1,
+          day: 1,
+          name: "Fushimi Inari Shrine",
+          icon: Church,
+          color: "text-red-500",
+          location: "Fushimi Inari Taisha, Kyoto",
+          time: "08:00 AM",
+          duration: "2 hours",
+          description: "Walk through thousands of red torii gates up the sacred Mount Inari.",
+          activities: ["Shrine visit", "Torii gate walk", "Photography"],
+          cost: "Free"
+        },
+        {
+          id: 2,
+          day: 1,
+          name: "Kinkaku-ji (Golden Pavilion)",
+          icon: Building,
+          color: "text-yellow-500",
+          location: "Kinkaku-ji, Kyoto",
+          time: "10:30 AM",
+          duration: "1 hour",
+          description: "Zen temple covered in gold leaf, surrounded by beautiful gardens.",
+          activities: ["Temple visit", "Garden walk", "Photography"],
+          cost: "¥400"
+        },
+        {
+          id: 3,
+          day: 1,
+          name: "Gion District",
+          icon: Store,
+          color: "text-pink-500",
+          location: "Gion, Kyoto",
+          time: "01:00 PM",
+          duration: "2 hours",
+          description: "Explore the historic geisha district, tea houses, and traditional streets.",
+          activities: ["Street walk", "Tea ceremony", "Kimono rental"],
+          cost: "Varies"
+        },
+        {
+          id: 4,
+          day: 1,
+          name: "Arashiyama Bamboo Grove",
+          icon: Trees,
+          color: "text-green-500",
+          location: "Arashiyama, Kyoto",
+          time: "04:00 PM",
+          duration: "1 hour",
+          description: "Magical walk through towering bamboo forest.",
+          activities: ["Bamboo walk", "Photography", "Nature experience"],
+          cost: "Free"
+        },
+        {
+          id: 5,
+          day: 2,
+          name: "Kiyomizu-dera Temple",
+          icon: Church,
+          color: "text-orange-500",
+          location: "Kiyomizu-dera, Kyoto",
+          time: "09:00 AM",
+          duration: "1.5 hours",
+          description: "Famous temple with panoramic views of Kyoto.",
+          activities: ["Temple visit", "Viewpoint", "Shopping"],
+          cost: "¥400"
+        },
+        {
+          id: 6,
+          day: 2,
+          name: "Nishiki Market",
+          icon: ShoppingCart,
+          color: "text-blue-500",
+          location: "Nishiki Market, Kyoto",
+          time: "11:00 AM",
+          duration: "1 hour",
+          description: "Traditional food market with local delicacies.",
+          activities: ["Food tasting", "Shopping", "Market walk"],
+          cost: "Varies"
+        },
+        {
+          id: 7,
+          day: 2,
+          name: "Philosopher's Path",
+          icon: Waves,
+          color: "text-cyan-500",
+          location: "Philosopher's Path, Kyoto",
+          time: "01:00 PM",
+          duration: "1 hour",
+          description: "Scenic canal-side walk lined with cherry trees.",
+          activities: ["Walking", "Photography", "Nature"],
+          cost: "Free"
+        },
+        {
+          id: 8,
+          day: 2,
+          name: "Toji Temple",
+          icon: Church,
+          color: "text-purple-600",
+          location: "Toji Temple, Kyoto",
+          time: "03:00 PM",
+          duration: "1 hour",
+          description: "Historic temple with Japan's tallest pagoda.",
+          activities: ["Temple visit", "Pagoda viewing", "Photography"],
+          cost: "¥500"
+        }
+      ]
+    }
   }
 ];
 
-const Gallery: React.FC = () => {
+const day1LeftLocations = [
+  {
+    id: 1,
+    name: "Senso-ji Temple",
+    images: [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop"
+    ],
+    description: "Tokyo's oldest temple. Walk through Kaminarimon Gate, shop at Nakamise Street, and explore the main temple."
+  },
+  {
+    id: 2,
+    name: "Tokyo Skytree",
+    images: [
+      "https://images.unsplash.com/photo-1465101178521-c1a4c8a0f8d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop"
+    ],
+    description: "634m tall broadcasting tower with two observation decks. Panoramic views of Tokyo and Mt. Fuji on clear days."
+  },
+  {
+    id: 3,
+    name: "Shibuya Crossing",
+    images: [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop"
+    ],
+    description: "World's busiest intersection. Cross with thousands of people, visit Hachiko statue, explore Shibuya 109."
+  },
+  {
+    id: 4,
+    name: "Harajuku & Takeshita Street",
+    images: [
+      "https://images.unsplash.com/photo-1465101178521-c1a4c8a0f8d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop"
+    ],
+    description: "Youth fashion capital. Colorful street fashion, trendy shops, crepes, and unique boutiques."
+  },
+  {
+    id: 5,
+    name: "Meiji Shrine",
+    images: [
+      "https://images.unsplash.com/photo-1465101178521-c1a4c8a0f8d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop"
+    ],
+    description: "Peaceful Shinto shrine in forested grounds. Traditional weddings often visible. Beautiful at sunset."
+  }
+];
+
+const day1RightLocations = [
+  {
+    id: 6,
+    name: "Ueno Park",
+    time: "07:30 PM",
+    duration: "1 hour",
+    icon: "🌳",
+  },
+  {
+    id: 7,
+    name: "Akihabara",
+    time: "08:45 PM",
+    duration: "1 hour",
+    icon: "🎮",
+  },
+  {
+    id: 8,
+    name: "Tokyo Dome",
+    time: "10:00 PM",
+    duration: "1 hour",
+    icon: "🏟️",
+  },
+  {
+    id: 9,
+    name: "Roppongi Hills",
+    time: "11:15 PM",
+    duration: "1 hour",
+    icon: "🏙️",
+  },
+  {
+    id: 10,
+    name: "Tsukiji Outer Market",
+    time: "12:30 AM",
+    duration: "1 hour",
+    icon: "🍣",
+  },
+];
+
+// Combine left and right locations for gallery section
+const day1Locations = [
+  ...day1LeftLocations,
+  ...day1RightLocations.map(loc => ({
+    ...loc,
+    images: [
+      "https://images.unsplash.com/photo-1465101178521-c1a4c8a0f8d9?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&h=800&fit=crop"
+    ],
+    description: loc.name + " description"
+  }))
+];
+
+
+
+const Gallery = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [expandedItems, setExpandedItems] = useState({});
+  const [selectedItineraryItem, setSelectedItineraryItem] = useState(null);
+  const [showGallery, setShowGallery] = useState<number | null>(null);
+
+  const toggleExpand = (id) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+    
+    // Track which itinerary item was clicked
+    if (selectedPlace && selectedPlace.itinerary) {
+      const item = selectedPlace.itinerary.items.find(item => item.id === id);
+      if (item) {
+        setSelectedItineraryItem(item);
+        console.log("Selected Itinerary Item:", {
+          id: item.id,
+          name: item.name,
+          location: item.location,
+          day: item.day,
+          time: item.time,
+          from: selectedPlace.name,
+          to: item.location
+        });
+      }
+    }
+  };
+
+  const openInGoogleMaps = (location) => {
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    window.open(mapsUrl, '_blank');
+  };
+
+  const renderItineraryColumn = (items) => (
+    <div className="relative">
+      {items.map((item, index) => (
+        <div key={item.id} className="relative">
+          {index < items.length - 1 && (
+            <div className="absolute left-8 top-20 w-px h-20 bg-gradient-to-b from-gray-300 to-gray-200 z-0"></div>
+          )}
+          
+          <div className="relative z-10 p-4 hover:bg-gray-50 transition-all rounded-lg mb-2">
+            <div 
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => toggleExpand(item.id)}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-full bg-gray-100 ${item.color} transition-transform hover:scale-110`}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-r from-[#307172] to-[#204f4f] text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                  {item.id}
+                </div>
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-base">{item.name}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{item.time} • {item.duration}</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openInGoogleMaps(item.location);
+                  }}
+                  className="p-2 hover:bg-pink-100 rounded-full transition-colors"
+                  title="Open in Google Maps"
+                >
+                  <Target className="w-4 h-4 text-pink-500" />
+                </button>
+                {expandedItems[item.id] ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </div>
+            </div>
+
+            {expandedItems[item.id] && (
+              <div className="mt-4 ml-14 p-5 bg-gradient-to-br from-gray-50 to-white rounded-xl border-l-4 border-pink-500 shadow-sm">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Info className="w-4 h-4 text-pink-500" />
+                    <h4 className="font-semibold text-gray-900">Description</h4>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{item.description}</p>
+                </div>
+
+                <div className="mb-3">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-2">Activities</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {item.activities.map((activity, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">
+                        {activity}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-gray-600">Cost:</span>
+                    <span className="text-sm font-bold text-[#307172]">{item.cost}</span>
+                  </div>
+                  <button
+                    onClick={() => openInGoogleMaps(item.location)}
+                    className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-700 font-medium hover:underline cursor-pointer"
+                  >
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>Get directions</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <section className="bg-white py-20 px-6 md:px-20">
-      <div className="max-w-6xl mx-auto text-center">
-        {/* Section Heading */}
+      {/* TOP: Photo Gallery */}
+      <section className="container mx-auto px-4 py-10">
+        <h2 className="text-2xl font-bold mb-6 text-center">Photo Gallery</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {japanPlaces[0].gallery.map((img, idx) => (
+            <div key={idx} className="aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <img
+                src={img}
+                alt={`Mount Fuji ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------- JAPAN DESTINATIONS CARDS ---------- */}
+      <div className="max-w-6xl mx-auto text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
           Explore Beautiful{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">
             Japan Destinations
           </span>
         </h2>
-
         <p className="text-gray-700 text-lg md:text-xl mb-12">
           Discover the most breathtaking places in Japan with Karvaan Tours
         </p>
-
-        {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {japanPlaces.map((place) => (
             <div
               key={place.id}
-              onClick={() => setSelectedPlace(place)}
+              onClick={() => {
+                setSelectedPlace(place);
+                setExpandedItems({});
+                setSelectedItineraryItem(null);
+              }}
               className="relative group h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
             >
-              {/* Background Image */}
               <img
                 src={place.mainImage}
                 alt={place.name}
                 className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
               />
-
-              {/* Overlay Content */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end pb-6">
                 <h3 className="text-2xl font-bold text-white">{place.name}</h3>
                 <p className="text-white mt-2 italic">{place.subtitle}</p>
@@ -428,20 +1124,22 @@ const Gallery: React.FC = () => {
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* ---------- MODAL FOR PLACE DETAILS ---------- */}
       {selectedPlace && (
         <div className="fixed inset-0 bg-black/90 z-50 overflow-y-auto">
           <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl relative">
-              {/* Close Button */}
+            <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-2xl relative">
               <button
-                onClick={() => setSelectedPlace(null)}
+                onClick={() => {
+                  setSelectedPlace(null);
+                  setExpandedItems({});
+                  setSelectedItineraryItem(null);
+                }}
                 className="sticky top-4 float-right mr-4 mt-4 bg-white rounded-full p-2 hover:bg-gray-100 transition z-10 shadow-lg"
               >
                 <X className="w-6 h-6" />
               </button>
 
-              {/* Hero Image */}
               <div className="relative h-96 rounded-t-2xl overflow-hidden">
                 <img
                   src={selectedPlace.mainImage}
@@ -456,36 +1154,33 @@ const Gallery: React.FC = () => {
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-8">
-                {/* Quick Info Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <Calendar className="w-6 h-6 text-blue-600" />
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Best Time to Visit</p>
+                      <p className="text-sm text-gray-600 font-medium">Best Time</p>
                       <p className="font-semibold text-sm text-gray-800">{selectedPlace.bestTime}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 bg-green-50 p-4 rounded-lg border border-green-100">
                     <Clock className="w-6 h-6 text-green-600" />
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Recommended Duration</p>
+                      <p className="text-sm text-gray-600 font-medium">Duration</p>
                       <p className="font-semibold text-gray-800">{selectedPlace.duration}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 bg-yellow-50 p-4 rounded-lg border border-yellow-100">
                     <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Traveler Rating</p>
+                      <p className="text-sm text-gray-600 font-medium">Rating</p>
                       <p className="font-semibold text-gray-800">{selectedPlace.rating}/5.0</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Description */}
                 <div className="mb-8">
-                  <h3 className="text-3xl font-bold mb-4 text-gray-900 flex items-center gap-2">
+                  <h3 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 flex items-center gap-2">
                     <Compass className="w-8 h-8 text-red-600" />
                     About {selectedPlace.name}
                   </h3>
@@ -493,11 +1188,51 @@ const Gallery: React.FC = () => {
                   <p className="text-gray-600 leading-relaxed">{selectedPlace.longDescription}</p>
                 </div>
 
-                {/* Highlights */}
+                {/* Itinerary Section */}
+                {selectedPlace.itinerary && (
+                  <div className="mb-8">
+                    <div className="bg-gradient-to-r from-[#307172] to-[#204f4f] p-6 rounded-t-xl text-white">
+                      <div className="flex items-center gap-3 mb-2">
+                        <MapPin className="w-6 h-6" />
+                        <h2 className="text-2xl font-bold">{selectedPlace.itinerary.tripName}</h2>
+                      </div>
+                      <p className="text-pink-100 ml-9">{selectedPlace.itinerary.tripDuration}</p>
+                    </div>
+
+                    <div className="bg-white border-2 border-[#307172] rounded-b-xl p-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Day 1 */}
+                        <div className="space-y-0">
+                          <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
+                            <Calendar className="w-5 h-5 text-pink-500" />
+                            <h3 className="text-lg font-semibold text-gray-800">
+                              Day 1 Locations ({selectedPlace.itinerary.items.filter(i => i.day === 1).length} stops)
+                            </h3>
+                          </div>
+                          {renderItineraryColumn(selectedPlace.itinerary.items.filter(i => i.day === 1))}
+                        </div>
+
+                        {/* Day 2 (if exists) */}
+                        {selectedPlace.itinerary.items.some(i => i.day === 2) && (
+                          <div className="space-y-0">
+                            <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
+                              <Calendar className="w-5 h-5 text-pink-500" />
+                              <h3 className="text-lg font-semibold text-gray-800">
+                                Day 2 Locations ({selectedPlace.itinerary.items.filter(i => i.day === 2).length} stops)
+                              </h3>
+                            </div>
+                            {renderItineraryColumn(selectedPlace.itinerary.items.filter(i => i.day === 2))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mb-8">
                   <h3 className="text-3xl font-bold mb-4 text-gray-900 flex items-center gap-2">
                     <Camera className="w-8 h-8 text-red-600" />
-                    Top Highlights & Attractions
+                    Top Highlights
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {selectedPlace.highlights.map((highlight, idx) => (
@@ -509,13 +1244,11 @@ const Gallery: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Activities & Cuisine Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  {/* Activities */}
                   <div>
                     <h3 className="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-2">
                       <Users className="w-7 h-7 text-blue-600" />
-                      Popular Activities
+                      Activities
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedPlace.activities.map((activity, idx) => (
@@ -526,11 +1259,10 @@ const Gallery: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Cuisine */}
                   <div>
                     <h3 className="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-2">
                       <Utensils className="w-7 h-7 text-orange-600" />
-                      Local Cuisine
+                      Cuisine
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedPlace.cuisine.map((food, idx) => (
@@ -542,7 +1274,6 @@ const Gallery: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Transportation & Accommodation */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="bg-purple-50 p-6 rounded-lg border border-purple-100">
                     <h3 className="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
@@ -560,9 +1291,8 @@ const Gallery: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Travel Tips */}
                 <div className="mb-8 bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-lg border border-indigo-100">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">💡 Insider Travel Tips</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-gray-900">💡 Travel Tips</h3>
                   <ul className="space-y-2">
                     {selectedPlace.tips.map((tip, idx) => (
                       <li key={idx} className="flex items-start gap-3">
@@ -573,11 +1303,10 @@ const Gallery: React.FC = () => {
                   </ul>
                 </div>
 
-                {/* Photo Gallery */}
                 <div>
                   <h3 className="text-3xl font-bold mb-6 text-gray-900 flex items-center gap-2">
                     <Camera className="w-8 h-8 text-red-600" />
-                    Photo Gallery ({selectedPlace.gallery.length}+ Images)
+                    Photo Gallery
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                     {selectedPlace.gallery.map((img, idx) => (
@@ -591,13 +1320,130 @@ const Gallery: React.FC = () => {
                     ))}
                   </div>
                 </div>
-
-               
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* ---------- DAY 1 LOCATIONS GALLERY ---------- */}
+      <section className="container mx-auto px-4 py-10">
+        <h2 className="text-2xl font-bold mb-6 text-center">Day 1 Locations (10 stops)</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {day1Locations.map((location) => (
+            <div key={location.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+              <img
+                src={location.images[0]}
+                alt={location.name}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="font-semibold text-lg mb-2">{location.name}</h3>
+                <p className="text-gray-600 text-sm mb-2">{location.description}</p>
+                <button
+                  className="text-blue-600 underline text-sm"
+                  onClick={() => setShowGallery(location.id)}
+                >
+                  View More Gallery
+                </button>
+              </div>
+              {/* Gallery Modal */}
+              {showGallery === location.id && (
+                <div className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center">
+                  <div className="bg-white rounded-lg p-6 max-w-2xl w-full relative">
+                    <button
+                      className="absolute top-2 right-2 text-gray-500 text-xl"
+                      onClick={() => setShowGallery(null)}
+                    >
+                      &times;
+                    </button>
+                    <h4 className="text-lg font-bold mb-4">{location.name} Gallery</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {location.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt={`${location.name} ${idx + 1}`}
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------- BOTTOM: TOKYO TO MOUNT FUJI ADVENTURE SECTION ---------- */}
+      <section className="container mx-auto px-4 py-10">
+        <div className="bg-gradient-to-r from-[#307172] to-[#204f4f] p-6 rounded-t-xl text-white mb-0">
+          <div className="flex items-center gap-3 mb-2">
+            <MapPin className="w-6 h-6" />
+            <h2 className="text-2xl font-bold">Tokyo to Mount Fuji Adventure</h2>
+          </div>
+          <p className="text-pink-100 ml-9">2 Days • 11 Destinations</p>
+        </div>
+        <div className="bg-white border-2 border-[#307172] rounded-b-xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Day 1 */}
+            <div className="space-y-0">
+              <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
+                <Calendar className="w-5 h-5 text-pink-500" />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Day 1 Locations ({japanPlaces[0].itinerary.items.filter(i => i.day === 1).length} stops)
+                </h3>
+              </div>
+              {japanPlaces[0].itinerary.items.filter(i => i.day === 1).map((item, index) => (
+                <div key={item.id} className="relative z-10 p-4 hover:bg-gray-50 transition-all rounded-lg mb-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 rounded-full bg-gray-100 ${item.color} transition-transform`}>
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-r from-[#307172] to-[#204f4f] text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        {item.id}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-base">{item.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{item.time} • {item.duration}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Day 2 */}
+            <div className="space-y-0">
+              <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
+                <Calendar className="w-5 h-5 text-pink-500" />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Day 2 Locations ({japanPlaces[0].itinerary.items.filter(i => i.day === 2).length} stops)
+                </h3>
+              </div>
+              {japanPlaces[0].itinerary.items.filter(i => i.day === 2).map((item, index) => (
+                <div key={item.id} className="relative z-10 p-4 hover:bg-gray-50 transition-all rounded-lg mb-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 rounded-full bg-gray-100 ${item.color} transition-transform`}>
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-r from-[#307172] to-[#204f4f] text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        {item.id}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-base">{item.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{item.time} • {item.duration}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
   );
 };

@@ -5,41 +5,41 @@ import { CheckCircle, Phone, Calendar, MessageCircle } from 'lucide-react';
 
 const ConsultationSection = () => {
   return (
-    <section className="py-12">
+    <section className="py-12 ">
       <div className="container mx-auto px-4">
         <div 
-          className="rounded-3xl overflow-hidden shadow-xl relative"
+          className="bg-gradient-to-r from-[#307172] to-[#204f4f] rounded-3xl overflow-hidden shadow-xl relative "
           style={{
-            background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+            background: ')',
             minHeight: '300px'
           }}
         >
-          <div className="grid md:grid-cols-[1fr,auto] gap-8 items-center p-8 md:p-12">
+          <div className=" grid md:grid-cols-[1fr,auto] gap-8 items-center p-8 md:p-12">
             {/* Left Content */}
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#000000' }}>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#fff' }}>
                 Get Free Travel Consultation
               </h2>
               
-              <p className="text-sm mb-6 leading-relaxed" style={{ color: '#000000' }}>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: '#fff' }}>
                 Our expert travel consultants are here to help you plan the perfect trip. From
                 destination selection to customized itineraries, we've got you covered.
               </p>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#000000' }} />
-                  <p className="text-sm" style={{ color: '#000000' }}>Personalized recommendations</p>
+                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#fff' }} />
+                  <p className="text-sm" style={{ color: '#fff' }}>Personalized recommendations</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#000000' }} />
-                  <p className="text-sm" style={{ color: '#000000' }}>Flexible scheduling</p>
+                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#fff' }} />
+                  <p className="text-sm" style={{ color: '#fff' }}>Flexible scheduling</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#000000' }} />
-                  <p className="text-sm" style={{ color: '#000000' }}>24/7 support available</p>
+                  <CheckCircle className="h-4 w-4 flex-shrink-0" style={{ color: '#fff' }} />
+                  <p className="text-sm" style={{ color: '#fff' }}>24/7 support available</p>
                 </div>
               </div>
 

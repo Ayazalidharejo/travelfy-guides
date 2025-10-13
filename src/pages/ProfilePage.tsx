@@ -24,13 +24,13 @@ const ProfilePage = () => {
   const getImageURL = useCallback((avatarPath?: string) => {
     if (!avatarPath) return '';
 
+    // If already a full URL (Cloudinary, data URI, etc.), return as is
     if (avatarPath.startsWith('data:') || avatarPath.startsWith('http')) {
       return avatarPath;
     }
 
-    // Adjust baseURL according to your backend
-    // const baseURL = 'http://localhost:5000';
-    const baseURL = 'https://tour-backend-eight.vercel.app';
+    // For relative paths, use local backend URL
+    const baseURL = 'http://localhost:5000';
     return `${baseURL}${avatarPath}`;
   }, []);
 
