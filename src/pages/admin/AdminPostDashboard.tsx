@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getDisplayPrice } from '../../lib/priceUtils';
 import { Plus, Trash2, ChevronDown, ChevronUp, X, Edit2, Eye, Search, Upload, Clock, MapPin } from 'lucide-react';
 import { postsAPI, uploadAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +31,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     transportType: '',
     transportModal: '',
     makeVariant: '',
+    vehiclePrice: '',
     mainImage: null,
     additionalImages: [],
     galleryImages: [],
@@ -135,6 +137,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     netPrice: '',
     currency: 'USD'
   });
+
+  // State for managing multiple transport vehicles
+  const [savedTransportVehicles, setSavedTransportVehicles] = useState([]);
+
+  // Debug savedTransportVehicles changes
+  useEffect(() => {
+    console.log('🚗 savedTransportVehicles changed:', savedTransportVehicles);
+    console.log('🚗 savedTransportVehicles length:', savedTransportVehicles.length);
+  }, [savedTransportVehicles]);
 
   const [expandedSections, setExpandedSections] = useState({
     basic: true,
@@ -252,7 +263,19 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             actualPrice: parseFloat(String(schedule.actualPrice)) || 0,
             netPrice: parseFloat(String(schedule.netPrice)) || 0,
             currency: schedule.currency || 'USD'
-          })) : []
+          })) : [],
+          // *** NEW: Add minimum vehicle price for quick access ***
+          minVehiclePrice: (() => {
+            if (!tour.transportVehicles || !Array.isArray(tour.transportVehicles) || tour.transportVehicles.length === 0) {
+              return null;
+            }
+            const prices = tour.transportVehicles
+              .map((vehicle: any) => parseFloat(vehicle.price))
+              .filter((price: number) => !isNaN(price));
+            return prices.length > 0 ? Math.min(...prices) : null;
+          })(),
+          // *** NEW: Include transportVehicles in tour data ***
+          transportVehicles: tour.transportVehicles || []
         }));
         
         console.log('✅ Tours loaded:', toursData.length);
@@ -263,6 +286,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
           console.log('💰 First Tour - price:', toursData[0]?.price);
           console.log('💰 First Tour - pricingSchedule:', toursData[0]?.pricingSchedule);
           console.log('🔥 First Tour - discountPercentage:', toursData[0]?.discountPercentage);
+          console.log('🚗 First Tour - transportVehicles:', toursData[0]?.transportVehicles);
+          console.log('🚗 First Tour - minVehiclePrice:', toursData[0]?.minVehiclePrice);
           
           if (toursData[0]?.pricingSchedule?.length > 0) {
             console.log('💰 PricingSchedule[0]:', {
@@ -453,6 +478,21 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     return netPrice;
   };
 
+  // Calculate minimum vehicle price from transportVehicles
+  const getMinimumVehiclePrice = (tour: any) => {
+    if (!tour.transportVehicles || !Array.isArray(tour.transportVehicles) || tour.transportVehicles.length === 0) {
+      return null;
+    }
+    
+    const prices = tour.transportVehicles
+      .map((vehicle: any) => parseFloat(vehicle.price))
+      .filter((price: number) => !isNaN(price));
+    
+    if (prices.length === 0) return null;
+    
+    return Math.min(...prices);
+  };
+
   const handleActualPriceChange = (e: any) => {
     const price = e.target.value;
     const netPrice = calculateNetPrice(price, formData.discountPercentage);
@@ -479,55 +519,32 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     console.log('🔍 Adding Pricing Schedule:', {
       days: currentPricing.days,
       timeSlots: currentPricing.timeSlots,
-      actualPrice: currentPricing.actualPrice,
-      netPrice: currentPricing.netPrice,
       duration: currentPricing.duration,
       existingSchedules: formData.pricingSchedule.length,
-      transportDetails: {
-        transportType: formData.transportType,
-        transportModal: formData.transportModal,
-        makeVariant: formData.makeVariant
-      }
+      savedVehicles: savedTransportVehicles.length
     });
     
-    // *** FIX: Only require actualPrice to add schedule, use defaults for rest ***
-    const hasActualPrice = currentPricing.actualPrice && currentPricing.actualPrice !== '' && !isNaN(parseFloat(currentPricing.actualPrice));
+    // *** UPDATED: Create shared schedule for all vehicles, not dependent on current vehicle price ***
+    // Check if we have any saved vehicles or if this is a general schedule
+    const hasVehicles = savedTransportVehicles.length > 0;
     
-    if (hasActualPrice) {
-      // *** FIX: Always calculate netPrice properly ***
-      let calculatedNetPrice = currentPricing.netPrice;
-      
-      // If netPrice is empty or invalid, calculate it
-      if (!calculatedNetPrice || calculatedNetPrice === '' || isNaN(parseFloat(calculatedNetPrice))) {
-        calculatedNetPrice = calculateNetPrice(currentPricing.actualPrice, formData.discountPercentage);
-      }
-      
-      // If still empty, use actual price
-      if (!calculatedNetPrice || calculatedNetPrice === '') {
-        calculatedNetPrice = currentPricing.actualPrice;
-      }
-      
-      console.log('💰 Price Calculation:', {
-        actualPrice: currentPricing.actualPrice,
-        discountPercentage: formData.discountPercentage,
-        calculatedNetPrice: calculatedNetPrice
-      });
-      
+    if (hasVehicles || currentPricing.days.length > 0 || currentPricing.timeSlots.length > 0) {
       // *** FIX: Use defaults if days/timeSlots/duration are empty ***
       const newSchedule = {
         days: currentPricing.days.length > 0 ? [...currentPricing.days] : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         timeSlots: currentPricing.timeSlots.length > 0 ? [...currentPricing.timeSlots] : ['9:00 AM', '10:00 AM', '11:00 AM'],
         duration: currentPricing.duration || '4 Hours',
-        actualPrice: currentPricing.actualPrice,
-        netPrice: calculatedNetPrice,
-        currency: currentPricing.currency,
-        // *** ADD: Transport Details from formData ***
-        transportType: formData.transportType || '',
-        transportModal: formData.transportModal || '',
-        makeVariant: formData.makeVariant || ''
+        // *** REMOVED: Individual vehicle pricing - schedule applies to all vehicles ***
+        actualPrice: '', // Will be determined by selected vehicle
+        netPrice: '', // Will be determined by selected vehicle
+        currency: 'USD',
+        // *** REMOVED: Individual transport details - schedule is shared ***
+        transportType: '',
+        transportModal: '',
+        makeVariant: ''
       };
       
-      console.log('✅ New Schedule Created:', newSchedule);
+      console.log('✅ New Shared Schedule Created:', newSchedule);
 
       setFormData(prev => ({
         ...prev,
@@ -551,31 +568,29 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         currency: 'USD'
       });
       
-      console.log('✅ Pricing Schedule Added Successfully');
+      console.log('✅ Shared Pricing Schedule Added Successfully');
       console.log('📊 Updated pricingSchedule:', [...formData.pricingSchedule, newSchedule]);
       
       toast({
         title: "Success",
-        description: "Pricing schedule added successfully!",
+        description: "Pricing schedule added successfully! This schedule applies to all vehicles.",
         variant: "default",
       });
     } else {
-      // *** FIX: Show error if no actual price ***
-      console.log('⚠️ No valid actual price - cannot add schedule');
-      console.log('📊 Current form state:', {
+      // *** UPDATED: Show error if no vehicles and no schedule details ***
+      console.log('⚠️ No vehicles saved and no schedule details - cannot add schedule');
+      console.log('📊 Current state:', {
         days: currentPricing.days.length,
         timeSlots: currentPricing.timeSlots.length,
-        actualPrice: currentPricing.actualPrice,
+        savedVehicles: savedTransportVehicles.length,
         duration: currentPricing.duration
       });
       
       toast({
         title: "Error",
-        description: "Please enter an actual price to add a schedule.",
+        description: "Please add vehicles first or select days/time slots to create a schedule.",
         variant: "destructive",
       });
-      
-      // Don't show any error toast
     }
   };
 
@@ -584,6 +599,67 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       ...prev,
       pricingSchedule: prev.pricingSchedule.filter((_, i) => i !== index)
     }));
+  };
+
+  // Add Transport Vehicle
+  const addTransportVehicle = () => {
+    console.log('🚗 Adding Transport Vehicle:', {
+      transportType: formData.transportType,
+      transportModal: formData.transportModal,
+      makeVariant: formData.makeVariant,
+      groupSize: formData.groupSize,
+      vehiclePrice: formData.vehiclePrice
+    });
+
+    // Validate at least transport type is selected
+    if (!formData.transportType) {
+      toast({
+        title: "Error",
+        description: "Please select a transport type to add a vehicle.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newVehicle = {
+      id: Date.now(), // Unique ID for each vehicle
+      transportType: formData.transportType,
+      transportModal: formData.transportModal || '',
+      makeVariant: formData.makeVariant || '',
+      capacity: formData.groupSize || '',
+      price: formData.vehiclePrice || ''
+    };
+
+    setSavedTransportVehicles(prev => [...prev, newVehicle]);
+
+    // Reset transport fields
+    setFormData(prev => ({
+      ...prev,
+      transportType: '',
+      transportModal: '',
+      makeVariant: '',
+      groupSize: '',
+      vehiclePrice: ''
+    }));
+
+    toast({
+      title: "Success",
+      description: "Transport vehicle added successfully!",
+      variant: "default",
+    });
+
+    console.log('✅ Transport Vehicle Added:', newVehicle);
+    console.log('🚗 Current savedTransportVehicles:', [...savedTransportVehicles, newVehicle]);  // *** ADDED: Show current vehicles ***
+  };
+
+  // Remove Transport Vehicle
+  const removeTransportVehicle = (id: number) => {
+    setSavedTransportVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
+    toast({
+      title: "Success",
+      description: "Transport vehicle removed.",
+      variant: "default",
+    });
   };
 
   // File Handlers - Upload to server
@@ -820,7 +896,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       description: data.description,
       pricingSchedule: data.pricingSchedule,
       imageUrl: data.imageUrl,
-      images: data.images
+      images: data.images,
+      transportVehicles: data.transportVehicles  // *** ADDED: transportVehicles logging ***
     });
     
     const formatted = { ...data };
@@ -1028,7 +1105,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       'highlightsList', 'taglinesList', 'themesList', 'selectedSellingPoints', 'thingsToBring',
       'sameDropOff', 'dropArea', 'dropLocation', 'dropPoint', 'dropDetails',
       'minGroup', 'maxGroup', 'capacity', 'duration', 'durationHours', 'startTime', 'endTime', 'operatingHours',
-      'priceNumber', 'pricePerPerson', 'currency', 'discountPercentage', 'validUntil'  // *** REMOVED: 'price' ***
+      'priceNumber', 'pricePerPerson', 'currency', 'discountPercentage', 'validUntil', 'transportVehicles'  // *** ADDED: 'transportVehicles' ***
     ];
     
     // Ensure all required fields are present
@@ -1049,6 +1126,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       pricingSchedule: formatted.pricingSchedule,
       mainImage: formatted.mainImage,
       additionalImages: formatted.additionalImages?.length || 0,
+      transportVehicles: formatted.transportVehicles,  // *** ADDED: transportVehicles logging ***
       totalFields: Object.keys(formatted).length
     });
     
@@ -1061,6 +1139,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     
     // *** FIX: Complete bypass - no validation, no checks, direct submit ***
     console.log('🚀 COMPLETE BYPASS - Direct submission without any validation...');
+    console.log('🚀 SUBMISSION STARTED - About to save vehicles to database...');
+    console.log('🚀 Current savedTransportVehicles before submit:', savedTransportVehicles);
     
     // Log all form data
     console.log('📊 Complete Form Data:', formData);
@@ -1074,7 +1154,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         ...formData,
         slug: formData.title.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-'),
         status: 'published',
-        featured: false
+        featured: false,
+        transportVehicles: savedTransportVehicles // Include saved transport vehicles
       });
 
       console.log('=== TOUR DATA BEFORE SUBMIT ===');
@@ -1089,6 +1170,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       console.log('👥 Form Data - Min/Max Group:', formData.minGroup, '/', formData.maxGroup);
       console.log('📍 Form Data - City:', formData.city);
       console.log('🎯 Form Data - Booking Type:', formData.bookingType);
+      console.log('🚗 Saved Transport Vehicles:', savedTransportVehicles);  // *** ADDED: transportVehicles logging ***
       console.log('👤 Form Data - Single Person:', {
         name: formData.singlePersonName,
         age: formData.singlePersonAge,
@@ -1113,6 +1195,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         transportModal: formData.transportModal,
         makeVariant: formData.makeVariant
       });
+      console.log('🚗 Saved Transport Vehicles:', savedTransportVehicles);
       console.log('📋 Form Data - Itinerary Items:', formData.itineraryItems);
       console.log('📋 Itinerary Items Count:', formData.itineraryItems?.length || 0);
       if (formData.itineraryItems?.length > 0) {
@@ -1130,6 +1213,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       console.log('📋 All Fields:', Object.keys(tourData).join(', '));
       console.log('================================');
 
+      console.log('🚀 Sending tour data to API:', tourData);
+      console.log('🚀 Tour data transportVehicles:', tourData.transportVehicles);
+      console.log('🚀 Tour data keys:', Object.keys(tourData));
+      
       if (modalMode === 'create') {
         const response = await postsAPI.createPost(tourData);
         console.log('✅ API Response:', response);
@@ -1153,6 +1240,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         
         console.log('✅ Tour creation completed successfully');
       } else if (modalMode === 'edit') {
+        console.log('🔄 Updating tour with ID:', selectedTour._id);
+        console.log('🔄 Update data transportVehicles:', tourData.transportVehicles);
         const response = await postsAPI.updatePost(selectedTour._id, tourData);
         console.log('✅ Update API Response:', response);
         
@@ -1201,6 +1290,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       transportType: '',
       transportModal: '',
       makeVariant: '',
+      vehiclePrice: '',
       mainImage: null,
       additionalImages: [],
       galleryImages: [],
@@ -1266,6 +1356,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     setCurrentHighlight('');
     setCurrentTagline('');
     setCurrentTheme('');
+    setSavedTransportVehicles([]); // Reset saved transport vehicles
   };
 
   const openCreateModal = () => {
@@ -1283,6 +1374,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     console.log('🔧 Tour transportType:', tour.transportType);
     console.log('🔧 Tour transportModal:', tour.transportModal);
     console.log('🔧 Tour makeVariant:', tour.makeVariant);
+    console.log('🚗 Tour transportVehicles:', tour.transportVehicles);  // *** ADDED: transportVehicles debugging ***
+    console.log('🚗 Tour transportVehicles type:', typeof tour.transportVehicles);  // *** ADDED: type debugging ***
+    console.log('🚗 Tour transportVehicles isArray:', Array.isArray(tour.transportVehicles));  // *** ADDED: array check ***
     setFieldErrors({});
     
     const editFormData = {
@@ -1315,6 +1409,17 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     console.log('🔧 Form data transportType:', editFormData.transportType);
     
     setFormData(editFormData);
+    
+    // Load saved transport vehicles if they exist
+    if (tour.transportVehicles && Array.isArray(tour.transportVehicles)) {
+      console.log('✅ Loading transport vehicles:', tour.transportVehicles);
+      setSavedTransportVehicles(tour.transportVehicles);
+      console.log('🚗 Loaded transport vehicles:', tour.transportVehicles);
+    } else {
+      console.log('⚠️ No transport vehicles found or not an array');
+      console.log('⚠️ transportVehicles value:', tour.transportVehicles);
+      setSavedTransportVehicles([]);
+    }
     
     console.log('🔧 Form data set successfully');
     
@@ -1446,7 +1551,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                   });
                   
                   return (
-                  <div key={tour._id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
+                  <div key={tour._id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition flex flex-col h-full">
                     {tour.imageUrl || tour.images?.[0] ? (
                       <img 
                         src={tour.imageUrl || tour.images[0]} 
@@ -1462,7 +1567,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     <div className={`h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold ${tour.imageUrl || tour.images?.[0] ? 'hidden' : ''}`}>
                       {tour.title.charAt(0).toUpperCase()}
                     </div>
-                    <div className="p-5">
+                    <div className="p-5 flex flex-col flex-grow">
                       <div className="mb-3">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">{tour.title}</h3>
                         <div className="flex gap-2 flex-wrap">
@@ -1518,39 +1623,26 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <div className="flex justify-between items-center text-sm mb-4">
                         {/* Price Display */}
                         {(() => {
-                          // Try pricingSchedule first
-                          if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
-                            const schedule = tour.pricingSchedule[0];
-                            let actualPrice = parseFloat(String(schedule.actualPrice)) || 0;
-                            let netPrice = parseFloat(String(schedule.netPrice)) || actualPrice;
-                            
-                            // *** FIX: If actualPrice === netPrice but discount > 0, reverse calculate actualPrice ***
-                            if (actualPrice === netPrice && tour.discountPercentage > 0 && actualPrice > 0) {
-                              const discountDecimal = tour.discountPercentage / 100;
-                              actualPrice = Math.round(netPrice / (1 - discountDecimal));
-                              console.log('🔄 Reverse calculated actualPrice:', {
-                                netPrice,
-                                discountPercentage: tour.discountPercentage,
-                                calculatedActualPrice: actualPrice
-                              });
-                            }
-                            
-                            if (actualPrice > 0 && netPrice < actualPrice) {
+                          // *** NEW: Use utility function for consistent price display ***
+                          const priceInfo = getDisplayPrice(tour);
+                          
+                          if (priceInfo.isStartingFrom) {
+                            if (priceInfo.hasDiscount && priceInfo.originalPrice) {
                               return (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-gray-500 line-through text-xs">${actualPrice}</span>
-                                  <span className="text-green-600 font-bold text-lg">${netPrice}</span>
+                                  <span className="text-gray-500 line-through text-xs">${priceInfo.originalPrice.toFixed(2)}</span>
+                                  <span className="text-green-600 font-bold text-lg">${priceInfo.price.toFixed(2)}</span>
                                   <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
-                                    {Math.round(((actualPrice - netPrice) / actualPrice) * 100)}% OFF
+                                    {tour.discountPercentage}% OFF
                                   </span>
                                 </div>
                               );
-                            } else if (actualPrice > 0) {
-                              return <span className="text-primary font-bold text-lg">💰 ${actualPrice}</span>;
+                            } else {
+                              return <span className="text-primary font-bold text-lg">💰 ${priceInfo.price.toFixed(2)}</span>;
                             }
                           }
                           
-                          // Try priceNumber with discount
+                          // Fallback to original pricing logic if no vehicles
                           if (tour.priceNumber && tour.priceNumber > 0) {
                             // *** FIX: Check if discount exists and calculate actual price ***
                             if (tour.discountPercentage > 0) {
@@ -1582,7 +1674,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         <span className="text-gray-500">👥 {tour.bookingType || 'single'}</span>
                       </div>
 
-                      <div className="flex gap-2 mt-4">
+                      <div className="flex gap-2 mt-auto">
                         <button
                           onClick={() => openEditModal(tour)}
                           className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition flex items-center justify-center gap-2"
@@ -2358,7 +2450,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
                         🚗 Transport Details
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Transport Type</label>
                           <select 
@@ -2405,24 +2497,114 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                               value={formData.groupSize}
                               onChange={handleInputChange}
                               min="2"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (USD)</label>
+                            <input
+                              type="number"
+                              name="vehiclePrice"
+                              value={formData.vehiclePrice}
+                              onChange={handleInputChange}
+                              min="0"
+                              step="0.01"
+                              placeholder="e.g., 150"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                      </div>
+                      
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Net Price <span className="text-green-600">✓ Auto</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={(() => {
+                                if (!formData.vehiclePrice) return '';
+                                const price = parseFloat(formData.vehiclePrice);
+                                const discount = parseFloat(formData.discountPercentage) || 0;
+                                const netPrice = price - (price * discount / 100);
+                                return netPrice.toFixed(2);
+                              })()}
+                              readOnly
+                              className="w-full px-3 py-2 border-2 border-green-300 bg-green-50 text-green-800 rounded-md font-bold text-lg"
+                              placeholder="Auto-calculated from Price"
+                            />
+                            <p className="text-xs text-green-700 mt-1">
+                              {formData.vehiclePrice 
+                                ? `Final price after ${formData.discountPercentage || 0}% discount` 
+                                : "Will auto-calculate when you enter Price"
+                              }
+                            </p>
                           </div>
                       </div>
                       
-                      {/* Transport Details Preview */}
-                      {(formData.transportType || formData.transportModal || formData.makeVariant) && (
-                        <div className="mt-4 p-3 bg-white border border-blue-300 rounded-lg">
-                          <h5 className="text-sm font-medium text-blue-800 mb-2">🔍 Transport Details Preview:</h5>
-                          <p className="text-sm text-blue-700">
+                      {/* Add Vehicle Button */}
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={addTransportVehicle}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium shadow-md"
+                        >
+                          <Plus size={18} /> Add Vehicle
+                        </button>
+                      </div>
+
+                      {/* Saved Transport Vehicles Preview */}
+                      {savedTransportVehicles.length > 0 && (
+                        <div className="mt-4 p-4 bg-white border-2 border-blue-300 rounded-lg">
+                          <h5 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                            🚗 Transport Details Preview ({savedTransportVehicles.length} vehicle{savedTransportVehicles.length !== 1 ? 's' : ''})
+                          </h5>
+                          <div className="space-y-2">
+                            {savedTransportVehicles.map((vehicle, index) => (
+                              <div key={vehicle.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-md border border-blue-200">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-blue-900">
+                                    {index + 1}. {vehicle.transportType}
+                                    {vehicle.transportModal && ` (${vehicle.transportModal})`}
+                                    {vehicle.makeVariant && ` - ${vehicle.makeVariant}`}
+                                    {vehicle.capacity && ` | Capacity: ${vehicle.capacity}`}
+                                    {vehicle.price && ` | 💰 $${vehicle.price}`}
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeTransportVehicle(vehicle.id)}
+                                  className="ml-3 p-1.5 text-red-600 hover:bg-red-100 rounded-md transition-colors"
+                                  title="Remove vehicle"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Current Form Preview (before adding) */}
+                      {(formData.transportType || formData.transportModal || formData.makeVariant || formData.vehiclePrice) && (
+                        <div className="mt-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
+                          <h5 className="text-sm font-medium text-yellow-800 mb-2">📝 Current Vehicle (not saved yet):</h5>
+                          <p className="text-sm text-yellow-700">
                             <span className="font-medium">
                               {formData.transportType || 'Transport Type'}
                               {formData.transportModal && ` (${formData.transportModal})`}
                               {formData.makeVariant && ` - ${formData.makeVariant}`}
+                              {formData.groupSize && ` | Capacity: ${formData.groupSize}`}
+                              {formData.vehiclePrice && ` | 💰 $${formData.vehiclePrice}`}
+                              {formData.vehiclePrice && formData.discountPercentage && ` → Net: $${(() => {
+                                const price = parseFloat(formData.vehiclePrice);
+                                const discount = parseFloat(formData.discountPercentage) || 0;
+                                const netPrice = price - (price * discount / 100);
+                                return netPrice.toFixed(2);
+                              })()}`}
                             </span>
                           </p>
-                          <p className="text-xs text-blue-600 mt-1">
-                            ✅ Click "Add Schedule" button below to save these transport details with pricing schedule
+                          <p className="text-xs text-yellow-600 mt-1">
+                            ⬆️ Click "Add Vehicle" button above to save this vehicle
                           </p>
                         </div>
                       )}
@@ -2434,12 +2616,29 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     }`}>
                       <div className="flex items-center justify-between mb-4 pb-3 border-b">
                         <h3 className="text-xl font-semibold text-gray-800">Pricing Schedule</h3>
-                        <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">
-                          💰 Net Price = Card Display Price
+                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
+                          📅 Shared Schedule for All Vehicles
                         </div>
                       </div>
 
                       <div className="space-y-6">
+                        {/* Schedule Explanation */}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-blue-600 text-sm font-bold">ℹ️</span>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-blue-900 mb-1">Shared Schedule</h4>
+                              <p className="text-sm text-blue-800">
+                                This schedule applies to <strong>all vehicles</strong> added to this tour. 
+                                Users can book any vehicle during these days and time slots. 
+                                The actual price will be determined by the vehicle they select.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
                         {/* Days Selection */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-3">Select Days (Detailed Setup)</label>
@@ -2500,8 +2699,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           </div>
                         </div>
 
-                        {/* Duration, Price, and Currency */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Duration Only */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Tour Duration */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Tour Duration</label>
@@ -2513,69 +2712,6 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                               <option value="">Select Duration</option>
                               {durationOptions.map(duration => (
                                 <option key={duration} value={duration}>{duration}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {/* Actual Price */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Actual Price <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="number"
-                              value={currentPricing.actualPrice}
-                              onChange={(e) => {
-                                handleActualPriceChange(e);
-                                // Clear field errors when user types
-                                setFieldErrors((prev: any) => ({ 
-                                  ...prev, 
-                                  pricingSchedule: '',
-                                  [`pricingSchedule_${formData.pricingSchedule.length}_actualPrice`]: ''
-                                }));
-                              }}
-                              min="0"
-                              step="0.01"
-                              className={`w-full px-3 py-2 border-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                fieldErrors.pricingSchedule ? 'border-red-500 bg-red-50' : 'border-blue-300'
-                              }`}
-                              placeholder="Enter price"
-                            />
-                            <p className="text-xs text-blue-600 mt-1">Original price before discount</p>
-                          </div>
-
-                          {/* Net Price */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Net Price <span className="text-green-600">✓ Auto</span>
-                            </label>
-                            <input
-                              type="text"
-                              value={currentPricing.netPrice}
-                              readOnly
-                              className={`w-full px-3 py-2 border-2 rounded-lg shadow-sm font-bold text-lg ${
-                                fieldErrors.pricingSchedule ? 'border-red-500 bg-red-50 text-red-800' : 'border-green-300 bg-green-50 text-green-800'
-                              }`}
-                              placeholder="Calculated automatically"
-                            />
-                            <p className="text-xs text-green-700 mt-1">
-                              {currentPricing.netPrice 
-                                ? `Final price after ${formData.discountPercentage || 0}% discount` 
-                                : "Will calculate when you enter Actual Price & Discount"
-                              }
-                            </p>
-                          </div>
-
-                          {/* Currency */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                            <select
-                              value={currentPricing.currency}
-                              onChange={(e) => setCurrentPricing(prev => ({ ...prev, currency: e.target.value }))}
-                              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              {currencyOptions.map(currency => (
-                                <option key={currency} value={currency}>{currency}</option>
                               ))}
                             </select>
                           </div>

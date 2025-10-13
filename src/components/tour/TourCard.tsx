@@ -4,9 +4,66 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, MapPin, Star, Users, DollarSign, Car, MessageSquare } from 'lucide-react';
+import { getDisplayPrice } from '../../lib/priceUtils';
 
+<<<<<<< HEAD
 const TourCard = ({ tour }: { tour: any }) => {
   const navigate = useNavigate();
+=======
+interface TourCardProps {
+  tour: {
+    _id: string;
+    title: string;
+    imageUrl?: string;
+    images?: string[];
+    price?: string;
+    priceNumber?: number;
+    duration?: string;
+    durationHours?: number;
+    category: string;
+    rating?: {
+      average?: number;
+      count?: number;
+    };
+    prefecture?: string;
+    city?: string;
+    featured?: boolean;
+    description?: string;
+    groupSize?: {
+      min: number;
+      max: number;
+    };
+    capacity?: number;
+    maxGroup?: number;
+    minGroup?: number;
+    taglinesList?: string[];
+    themesList?: string[];
+    selectedSellingPoints?: string[];
+    pricingSchedule?: Array<{
+      actualPrice: string | number;
+      netPrice: string | number;
+      currency?: string;
+      days?: string[];
+      timeSlots?: string[];
+      duration?: string;
+    }>;
+    discountPercentage?: number;
+    discount?: {
+      percentage?: number;
+      validUntil?: string;
+    };
+    transportVehicles?: Array<{
+      price: number | string;
+      transportType: string;
+      makeVariant: string;
+      capacity: string;
+    }>;
+    [key: string]: any;
+  };
+}
+
+const TourCard: React.FC<TourCardProps> = ({ tour }) => {
+>>>>>>> df12a7e201b81b5c0fa7f51ac49f293a563793c2
   const imageUrl = tour.imageUrl || tour.images?.[0] || '/placeholder.svg';
 
   const handleCardClick = () => {
@@ -160,87 +217,30 @@ const TourCard = ({ tour }: { tour: any }) => {
         )}
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex-1">
-            {/* *** FIX: Enhanced Price Display with Better Fallbacks *** */}
+            {/* Enhanced Price Display with Minimum Vehicle Price */}
             {(() => {
-              console.log('💰 TourCard Price Display:', {
-                tourId: tour._id,
-                title: tour.title,
-                priceNumber: tour.priceNumber,
-                price: tour.price,
-                pricingSchedule: tour.pricingSchedule,
-                discountPercentage: tour.discountPercentage
-              });
-
-              // Try pricingSchedule first
-              if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
-                const schedule = tour.pricingSchedule[0];
-                let actualPrice = parseFloat(String(schedule.actualPrice)) || 0;
-                let netPrice = parseFloat(String(schedule.netPrice)) || actualPrice;
-
-                console.log('💰 Using PricingSchedule:', {
-                  actualPrice,
-                  netPrice,
-                  currency: schedule.currency
-                });
-
-                // *** FIX: If actualPrice === netPrice but discount > 0, reverse calculate actualPrice ***
-                if (actualPrice === netPrice && tour.discountPercentage > 0 && actualPrice > 0) {
-                  const discountDecimal = tour.discountPercentage / 100;
-                  actualPrice = Math.round(netPrice / (1 - discountDecimal));
-                  console.log('🔄 Reverse calculated actualPrice:', {
-                    netPrice,
-                    discountPercentage: tour.discountPercentage,
-                    calculatedActualPrice: actualPrice
-                  });
-                }
-
-                if (actualPrice > 0) {
-                  const discount = actualPrice > netPrice ? Math.round(((actualPrice - netPrice) / actualPrice) * 100) : 0;
-
-                  return (
-                    <div className="space-y-1">
-                      {/* Actual Price (Crossed out if discounted) */}
-                      <div className="flex items-center space-x-1">
-                        {/* <DollarSign className="h-4 w-4 text-gray-500" /> */}
-                        {discount > 0 ? (
-                          <span className="text-sm text-gray-500 line-through">
-                            ${actualPrice}
-                          </span>
-                        ) : (
-                          <span className="text-xl font-bold text-primary">
-                            ${actualPrice}
-                          </span>
-                        )}
-                        {/* Net Price (Highlighted if discounted) */}
-                        {discount > 0 && (
-                          <div className="flex items-center space-x-1">
-                            <span className="text-2xl font-extrabold text-green-600">
-                              ${netPrice}
-                            </span>
-
-                            <span className="text-xs text-muted-foreground block">
-                              Per vehicle
-                            </span>
-
-                          </div>
-                        )}
-
-                      </div>
-
-
-                      {/* Per Person */}
-
-                    </div>
-                  );
-                }
-              }
-
-
-
-              // Default fallback - show default price
-              console.log('⚠️ Using default price - no price data found');
+              const priceInfo = getDisplayPrice(tour);
+              
               return (
-                <div>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-1">
+                    {priceInfo.hasDiscount && priceInfo.originalPrice && (
+                      <span className="text-sm text-gray-500 line-through">
+                        ${priceInfo.originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className="text-lg font-bold text-green-600">
+                      ${priceInfo.price.toFixed(2)}
+                    </span>
+                    {priceInfo.hasDiscount && (
+                      <Badge variant="destructive" className="text-xs px-1 py-0">
+                        {tour.discountPercentage}% OFF
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {priceInfo.isStartingFrom ? 'Starting from / vehicle' : 'From / person'}
+                  </div>
                 </div>
               );
             })()}

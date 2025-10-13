@@ -53,16 +53,21 @@ const ToursPage = () => {
   const { toast } = useToast();
 
   const categories = [
+    "hiking",
     "adventure",
+    "experience",
+    "tour",
     "cultural",
-    "nature",
-    "food",
     "historical",
-    "spiritual",
-    "mountain",
-    "urban",
-    "temple",
-    "modern",
+    "nature",
+    "wildlife",
+    "photography",
+    "food",
+    "luxury",
+    "budget",
+    "family",
+    "romantic",
+    "educational",
   ];
 
   const locations = [
@@ -153,7 +158,9 @@ const ToursPage = () => {
         // Ensure views exists for sorting
         views: tour.views || 0,
         // Ensure createdAt exists for sorting
-        createdAt: tour.createdAt || new Date().toISOString()
+        createdAt: tour.createdAt || new Date().toISOString(),
+        // Ensure selectedSellingPoints exists for filtering
+        selectedSellingPoints: tour.selectedSellingPoints || []
       }));
 
       setTours(toursData);
@@ -184,9 +191,23 @@ const ToursPage = () => {
       );
     }
 
-    // Category
+    // Category - Check both category field and selectedSellingPoints array
     if (selectedCategory !== "all") {
-      filtered = filtered.filter((t) => t.category === selectedCategory);
+      filtered = filtered.filter((t) => {
+        // Check main category field
+        if (t.category === selectedCategory) {
+          return true;
+        }
+        
+        // Check selectedSellingPoints array
+        if (t.selectedSellingPoints && Array.isArray(t.selectedSellingPoints)) {
+          return t.selectedSellingPoints.some(point => 
+            point.toLowerCase() === selectedCategory.toLowerCase()
+          );
+        }
+        
+        return false;
+      });
     }
 
     // Location
