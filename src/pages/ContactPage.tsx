@@ -68,7 +68,7 @@ const ContactPage = () => {
     {
       icon: Phone,
       title: 'Call Us',
-      details: ['+1 (555) 123-4567', '+1 (555) 987-6543', 'Mon-Fri: 9AM-6PM'],
+      details: ['+81 80-7480-1156', '+1 (555) 987-6543', 'Mon-Fri: 9AM-6PM'],
       color: 'text-success'
     },
     {
@@ -175,7 +175,7 @@ const ContactPage = () => {
                         id="phone"
                         name="phone"
                         type="tel"
-                        placeholder="+1 (555) 123-4567"
+                        placeholder="+81 80-7480-1156"
                         value={formData.phone}
                         onChange={handleChange}
                       />

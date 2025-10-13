@@ -192,10 +192,10 @@ const HomePage = () => {
       <ConsultationSection />
 
       {/* Introduction */}
-      <IntroductionSection />
+      {/* <IntroductionSection /> */}
 
       {/* Happy Travelers */}
-      <HappyTravelers />
+      {/* <HappyTravelers /> */}
 
       {/* Why Choose Us */}
       <WhyChooseUs />
@@ -248,7 +248,7 @@ const HomePage = () => {
       <NewsletterSection />
 
       {/* Footer */}
-      <FooterSection />
+      {/* <FooterSection /> */}
     </div>
   );
 };

@@ -561,6 +561,8 @@ const BookingPage = () => {
   const { toast } = useToast();
   
   const [tour, setTour] = useState<any>(null);
+  
+  
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   

@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, MapPin, Star, Users, DollarSign } from 'lucide-react';
+import { Clock, MapPin, Star, Users, DollarSign, Car, MessageSquare } from 'lucide-react';
 
 interface TourCardProps {
   tour: {
@@ -54,6 +53,7 @@ interface TourCardProps {
 
 const TourCard: React.FC<TourCardProps> = ({ tour }) => {
   const imageUrl = tour.imageUrl || tour.images?.[0] || '/placeholder.svg';
+
   const categoryColors = {
     adventure: 'bg-gradient-sunset',
     cultural: 'bg-gradient-primary',
@@ -76,7 +76,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           className="w-full h-48 object-cover group-hover:scale-110 transition-smooth"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />
-        
+
         {/* Discount Badge (Priority) */}
         {(tour.discountPercentage || tour.discount?.percentage) ? (
           <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0 font-bold shadow-lg">
@@ -87,12 +87,11 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             ⭐ Featured
           </Badge>
         ) : null}
-        
+
         {/* Category Badge */}
-        <Badge 
-          className={`absolute top-3 right-3 text-white border-0 ${
-            categoryColors[tour.category as keyof typeof categoryColors] || 'bg-primary'
-          }`}
+        <Badge
+          className={`absolute top-3 right-3 text-white border-0 ${categoryColors[tour.category as keyof typeof categoryColors] || 'bg-primary'
+            }`}
         >
           {tour.category}
         </Badge>
@@ -100,9 +99,10 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         {/* Rating */}
         <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-xs font-medium">
-            {ratingAverage.toFixed(1)} ({ratingCount})
-          </span>
+         <span className="text-xs font-medium">
+  {ratingAverage === 0 ? '4.5' : ratingAverage.toFixed(1)} 
+</span>
+
         </div>
       </div>
 
@@ -111,21 +111,29 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-smooth">
             {tour.title}
           </h3>
-          
-          {tour.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {tour.description}
-            </p>
+
+          {/* Selling Points */}
+          {tour.selectedSellingPoints && tour.selectedSellingPoints.length > 0 && (
+            <div >
+              <div className="flex flex-wrap gap-2">
+                {tour.selectedSellingPoints.map((point: string, index: number) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
+                  >
+                    <span>{point}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-          
-          {/* Taglines */}
-          {tour.taglinesList && tour.taglinesList.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {tour.taglinesList.slice(0, 2).map((tagline: string, idx: number) => (
-                <span key={idx} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-                  {tagline}
-                </span>
-              ))}
+          <div><span className="text-xs text-green-600">Free Cancelation & Pickup Available </span></div>
+
+
+          {tour.bookingType && (
+            <div className="flex items-center gap-3 text-gray-700">
+              <Car className="h-5 w-5 text-gray-500" />
+              <p className="text-gray-600">{tour.bookingType}</p>
             </div>
           )}
         </div>
@@ -152,27 +160,21 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
               })()}
             </span>
           </div>
-          
+
           {(tour.prefecture || tour.city) && (
             <div className="flex items-center space-x-1">
               <MapPin className="h-4 w-4" />
               <span>{tour.prefecture || tour.city}</span>
             </div>
           )}
-          
-          {tour.groupSize && (
+
+          {/* {tour.groupSize && (
             <div className="flex items-center space-x-1">
               <Users className="h-4 w-4" />
               <span>{tour.groupSize.min}-{tour.groupSize.max}</span>
             </div>
-          )}
-          
-          {(tour.capacity || tour.maxGroup) && (
-            <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4" />
-              <span>Max: {tour.capacity || tour.maxGroup}</span>
-            </div>
-          )}
+          )} */}
+
         </div>
 
         {/* Themes/Selling Points */}
@@ -185,7 +187,13 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             ))}
           </div>
         )}
-
+        {tour.languages && (
+          <div className="flex items-center gap-3 text-gray-700">
+            <MessageSquare className="h-5 w-5 text-gray-500" />
+            {/* <span className="font-bold">Languages:</span> */}
+            <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex-1">
             {/* *** FIX: Enhanced Price Display with Better Fallbacks *** */}
@@ -198,19 +206,19 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                 pricingSchedule: tour.pricingSchedule,
                 discountPercentage: tour.discountPercentage
               });
-              
+
               // Try pricingSchedule first
               if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
                 const schedule = tour.pricingSchedule[0];
                 let actualPrice = parseFloat(String(schedule.actualPrice)) || 0;
                 let netPrice = parseFloat(String(schedule.netPrice)) || actualPrice;
-                
+
                 console.log('💰 Using PricingSchedule:', {
                   actualPrice,
                   netPrice,
                   currency: schedule.currency
                 });
-                
+
                 // *** FIX: If actualPrice === netPrice but discount > 0, reverse calculate actualPrice ***
                 if (actualPrice === netPrice && tour.discountPercentage > 0 && actualPrice > 0) {
                   const discountDecimal = tour.discountPercentage / 100;
@@ -221,15 +229,15 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                     calculatedActualPrice: actualPrice
                   });
                 }
-                
+
                 if (actualPrice > 0) {
                   const discount = actualPrice > netPrice ? Math.round(((actualPrice - netPrice) / actualPrice) * 100) : 0;
-                  
+
                   return (
                     <div className="space-y-1">
                       {/* Actual Price (Crossed out if discounted) */}
                       <div className="flex items-center space-x-1">
-                        <DollarSign className="h-4 w-4 text-gray-500" />
+                        {/* <DollarSign className="h-4 w-4 text-gray-500" /> */}
                         {discount > 0 ? (
                           <span className="text-sm text-gray-500 line-through">
                             ${actualPrice}
@@ -239,77 +247,41 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                             ${actualPrice}
                           </span>
                         )}
+                        {/* Net Price (Highlighted if discounted) */}
+                        {discount > 0 && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-2xl font-extrabold text-green-600">
+                              ${netPrice}
+                            </span>
+
+                            <span className="text-xs text-muted-foreground block">
+                              Per vehicle
+                            </span>
+
+                          </div>
+                        )}
+
                       </div>
-                      
-                      {/* Net Price (Highlighted if discounted) */}
-                      {discount > 0 && (
-                        <div className="flex items-center space-x-1">
-                          <span className="text-lg font-bold text-green-600">
-                            ${netPrice}
-                          </span>
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">
-                            {discount}% OFF
-                          </span>
-                        </div>
-                      )}
-                      
+
+
                       {/* Per Person */}
-                      <span className="text-xs text-muted-foreground block">
-                        per person
-                      </span>
+
                     </div>
                   );
                 }
               }
-              
-              // Try priceNumber
-              if (tour.priceNumber && tour.priceNumber > 0) {
-                console.log('💰 Using priceNumber:', tour.priceNumber);
-                return (
-                  <div>
-                    <div className="flex items-center space-x-1">
-                      <DollarSign className="h-5 w-5 text-primary" />
-                      <span className="text-xl font-bold text-primary">
-                        ${tour.priceNumber}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground ml-6">per person</span>
-                  </div>
-                );
-              }
-              
-              // Try price string
-              if (tour.price && tour.price !== '' && tour.price !== 'N/A') {
-                console.log('💰 Using price string:', tour.price);
-                return (
-                  <div>
-                    <div className="flex items-center space-x-1">
-                      <DollarSign className="h-5 w-5 text-primary" />
-                      <span className="text-xl font-bold text-primary">
-                        {tour.price}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground ml-6">per person</span>
-                  </div>
-                );
-              }
-              
+
+
+
               // Default fallback - show default price
               console.log('⚠️ Using default price - no price data found');
               return (
                 <div>
-                  <div className="flex items-center space-x-1">
-                    <DollarSign className="h-5 w-5 text-primary" />
-                    <span className="text-xl font-bold text-primary">
-                      $100
-                    </span>
-                  </div>
-                  <span className="text-xs text-muted-foreground ml-6">per person</span>
                 </div>
               );
             })()}
           </div>
-          
+
           <Link to={`/tours/${tour._id}`}>
             <Button variant="hero" size="sm" className="shadow-medium">
               View Details

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+// import image from "@/../public/images"
 import { CheckCircle, Phone, Calendar, MessageCircle } from 'lucide-react';
 
 const ConsultationSection = () => {
@@ -92,7 +93,7 @@ const ConsultationSection = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900 text-xs">Schedule a Call</h3>
-                      <p className="text-[10px] text-gray-600">+1 (555) 123-4567</p>
+                      <p className="text-[10px] text-gray-600">+81 80-7480-1156</p>
                     </div>
                   </div>
                 </div>

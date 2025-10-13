@@ -157,7 +157,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const categories = ['Tour', 'Transport', 'Hotel'];
   const tourTypes = ['Private', 'Group', 'Shared', 'Custom'];
   const transportTypes = ['Bus', 'Car', 'Van', 'Boat', 'Train', 'Airplane', 'Other'];
-  const transportModals = Array.from({ length: 10 }, (_, i) => (2001 + i).toString());
+  const transportModals = Array.from({ length: 10 }, (_, i) => (2015 + i).toString());
   
   const japanCities = [
     'Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara', 'Yokohama', 
@@ -2236,7 +2236,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         <h3 className="text-lg font-semibold text-green-800">Group Booking Details</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Title</label>
                             <input
                               type="text"
                               name="groupName"
@@ -2248,7 +2248,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Leader Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Guider Name</label>
                             <input
                               type="text"
                               name="groupLeaderName"
@@ -2258,17 +2258,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                             />
                           </div>
                           
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Size</label>
-                            <input
-                              type="number"
-                              name="groupSize"
-                              value={formData.groupSize}
-                              onChange={handleInputChange}
-                              min="2"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            />
-                          </div>
+                         
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Group Type</label>
@@ -2406,6 +2396,18 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                           />
                         </div>
+
+                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                            <input
+                              type="number"
+                              name="groupSize"
+                              value={formData.groupSize}
+                              onChange={handleInputChange}
+                              min="2"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            />
+                          </div>
                       </div>
                       
                       {/* Transport Details Preview */}

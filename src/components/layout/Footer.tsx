@@ -12,7 +12,7 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-2">
               <MapPin className="h-8 w-8 text-primary" />
               <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-                Travel Tours
+                Karvaan Tours
               </span>
             </Link>
             <p className="text-muted-foreground">
@@ -47,19 +47,31 @@ const Footer = () => {
               <Link to="/contact" className="block text-muted-foreground hover:text-primary transition-smooth">
                 Contact
               </Link>
+              <Link to="/help" className="block text-muted-foreground hover:text-primary transition-smooth">
+                Help and Support
+              </Link>
              
             </div>
           </div>
 
           {/* Categories */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Categories</h3>
+            <h3 className="text-lg font-semibold">Support</h3>
             <div className="space-y-2">
-              <Link to="/tours?category=adventure" className="block text-muted-foreground hover:text-primary transition-smooth">
-                Adventure
+              <Link to="/privacy" className="block text-muted-foreground hover:text-primary transition-smooth">
+                Privacy Policy
               </Link>
-              <Link to="/tours?category=cultural" className="block text-muted-foreground hover:text-primary transition-smooth">
-                Cultural
+              <Link to="/terms" className="block text-muted-foreground hover:text-primary transition-smooth">
+                Terms of Service
+              </Link>
+              <Link to="/cancellation-policy" className="block text-muted-foreground hover:text-primary transition-smooth">
+                Cancellation Policy
+              </Link>
+              <Link to="/refund-policy" className="block text-muted-foreground hover:text-primary transition-smooth">
+                Refund Policy
+              </Link>
+              <Link to="/faq" className="block text-muted-foreground hover:text-primary transition-smooth">
+                FAQ
               </Link>
               
             </div>
@@ -71,15 +83,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-primary" />
-                <span className="text-muted-foreground">info@traveltours.com</span>
+                <span className="text-muted-foreground">info@karvaantours.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-primary" />
-                <span className="text-muted-foreground">+1 (555) 123-4567</span>
+                <span className="text-muted-foreground">+81 80-7480-1156</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-primary" />
-                <span className="text-muted-foreground">123 Travel Street, City, State 12345</span>
+                <span className="text-muted-foreground">2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.</span>
               </div>
             </div>
           </div>
@@ -87,9 +99,9 @@ const Footer = () => {
 
         <div className="border-t mt-8 pt-8 text-center">
           <p className="text-muted-foreground">
-            © 2024 Travel Tours. All rights reserved. | 
-            <Link to="/privacy" className="hover:text-primary transition-smooth ml-1">Privacy Policy</Link> | 
-            <Link to="/terms" className="hover:text-primary transition-smooth ml-1">Terms of Service</Link>
+            © 2025 Karvaan Tours. All rights reserved. | 
+            {/* <Link to="/privacy" className="hover:text-primary transition-smooth ml-1">Privacy Policy</Link> |  */}
+            {/* <Link to="/terms" className="hover:text-primary transition-smooth ml-1">Terms of Service</Link> */}
           </p>
         </div>
       </div>

@@ -1,146 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import TourCard from '@/components/tour/TourCard';
-import { postsAPI } from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
+
+"use client";
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import TourCard from "@/components/tour/TourCard";
+import { postsAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Search,
+  Filter,
+  MapPin,
+  SlidersHorizontal,
+  Clock,
+  DollarSign,
+  Languages,
+  Users,
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
 
 const ToursPage = () => {
-  const [searchParams] = useSearchParams();
-  
-  // Initialize state from URL parameters FIRST
-  const urlSearch = searchParams.get('search') || '';
-  const urlCategory = searchParams.get('category') || '';
-  const urlDate = searchParams.get('date') || '';
-  
-  console.log('🌐 ToursPage URL Params:', {
-    urlSearch,
-    urlCategory,
-    urlDate,
-    fullURL: window.location.href
-  });
-  
   const [tours, setTours] = useState([]);
   const [filteredTours, setFilteredTours] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(urlSearch);
-  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
-  const [selectedDate, setSelectedDate] = useState(urlDate);
-  const [sortBy, setSortBy] = useState('-createdAt');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [durationRange, setDurationRange] = useState([1, 15]);
+  const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
+  const [selectedBookingType, setSelectedBookingType] = useState("all");
+  const [sortBy, setSortBy] = useState("-createdAt");
   const [currentPage, setCurrentPage] = useState(1);
+  const [toursPerPage, setToursPerPage] = useState(10); // Changed to 10 (matches options)
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
-  
-  console.log('🔧 State Initialized:', {
-    searchTerm,
-    selectedCategory,
-    selectedDate
-  });
-  
+
   const categories = [
-    'adventure',
-    'cultural', 
-    'nature',
-    'food',
-    'historical',
-    'spiritual',
-    'mountain',
-    'urban',
-    'temple',
-    'modern'
+    "adventure",
+    "cultural",
+    "nature",
+    "food",
+    "historical",
+    "spiritual",
+    "mountain",
+    "urban",
+    "temple",
+    "modern",
   ];
 
+  const locations = [
+    "all",
+    "Tokyo",
+    "Kyoto",
+    "Osaka",
+    "Hokkaido",
+    "Okinawa",
+    "Nagoya",
+    "Nara",
+  ];
+
+  // Booking Types
+  const bookingTypes = [
+    { value: "all", label: "All Booking Types" },
+    { value: "Group", label: "Group Booking" },
+    { value: "Single", label: "Single/Private Booking" },
+  ];
+
+  // Driver Languages - sorted A to Z, must include these
+  const driverLanguages = [
+    "all",
+    "Arabic",
+    "Chinese",
+    "English",
+    "French",
+    "German",
+    "Hindi",
+    "Italian",
+    "Japanese",
+    "Korean",
+    "Portuguese",
+    "Russian",
+    "Spanish",
+    "Thai",
+  ].sort((a, b) => {
+    if (a === "all") return -1;
+    if (b === "all") return 1;
+    return a.localeCompare(b);
+  });
+
   const sortOptions = [
-    { value: '-createdAt', label: 'Newest First' },
-    { value: 'createdAt', label: 'Oldest First' },
-    { value: '-views', label: 'Most Popular' },
-    { value: 'priceNumber', label: 'Price: Low to High' },
-    { value: '-priceNumber', label: 'Price: High to Low' },
-    { value: '-rating.average', label: 'Highest Rated' },
+    { value: "-createdAt", label: "Newest First" },
+    { value: "createdAt", label: "Oldest First" },
+    { value: "-views", label: "Most Popular" },
+    { value: "priceNumber", label: "Price: Low to High" },
+    { value: "-priceNumber", label: "Price: High to Low" },
+    { value: "-rating.average", label: "Highest Rated" },
+    { value: "title-asc", label: "Name: A to Z" },
+    { value: "title-desc", label: "Name: Z to A" },
   ];
 
   useEffect(() => {
     fetchTours();
-  }, [currentPage, sortBy]);
+  }, [currentPage, sortBy, toursPerPage]);
 
-  // Filter tours whenever tours data changes or search/category/date changes
   useEffect(() => {
-    if (tours.length > 0) {
-      console.log('⚡ Running filterTours because tours/search/category/date changed');
-      filterTours();
-    }
-  }, [tours, searchTerm, selectedCategory, selectedDate]);
-
-  // Auto-filter when search term changes
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
     filterTours();
-    }, 300); // Debounce search
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [tours, searchTerm, selectedCategory, selectedLocation, durationRange, priceRange, selectedLanguage, selectedBookingType, sortBy]);
 
   const fetchTours = async () => {
     try {
       setLoading(true);
-      console.log('📥 Fetching tours from API...');
-      
       const response = await postsAPI.getPosts({
         page: currentPage,
-        limit: 12,
+        limit: toursPerPage,
         sort: sortBy,
-        status: 'published'
+        status: "published",
       });
-      
-      console.log('✅ Fetched tours:', response.data?.length || 0);
-      
-      // Convert backend mainImage to frontend imageUrl
+
       const toursData = (response.data || []).map((tour: any) => ({
         ...tour,
-        imageUrl: tour.mainImage 
-          ? (typeof tour.mainImage === 'string' ? tour.mainImage : tour.mainImage.url)
-          : tour.mainImageUrl || tour.imageUrl,
-        images: tour.additionalImages 
-          ? (Array.isArray(tour.additionalImages) 
-              ? tour.additionalImages.map((img: any) => typeof img === 'string' ? img : img.url)
-              : []
-            )
-          : (tour.additionalImageUrls || tour.images || []),
-        // *** FIX: Enhanced price mapping - prioritize priceNumber from backend ***
-        priceNumber: tour.priceNumber || 
-                     (tour.pricingSchedule?.[0]?.netPrice ? parseFloat(String(tour.pricingSchedule[0].netPrice)) : 0) ||
-                     (tour.pricingSchedule?.[0]?.actualPrice ? parseFloat(String(tour.pricingSchedule[0].actualPrice)) : 0) ||
-                     100,
-        // Keep price for display (construct from priceNumber)
-        price: tour.priceNumber 
-               ? `$${tour.priceNumber}` 
-               : (tour.pricingSchedule?.[0]?.netPrice ? `${tour.pricingSchedule[0].currency || 'USD'} ${tour.pricingSchedule[0].netPrice}` : '') ||
-                 (tour.pricingSchedule?.[0]?.actualPrice ? `${tour.pricingSchedule[0].currency || 'USD'} ${tour.pricingSchedule[0].actualPrice}` : '') ||
-                 'USD 100',
-        discountPercentage: tour.discountPercentage || tour.discount?.percentage || 0,
-        // *** FIX: Ensure pricingSchedule is properly formatted with numbers ***
-        pricingSchedule: tour.pricingSchedule ? tour.pricingSchedule.map((schedule: any) => ({
-          ...schedule,
-          actualPrice: parseFloat(String(schedule.actualPrice)) || 0,
-          netPrice: parseFloat(String(schedule.netPrice)) || 0,
-          currency: schedule.currency || 'USD'
-        })) : []
+        imageUrl:
+          typeof tour.mainImage === "string"
+            ? tour.mainImage
+            : tour.mainImage?.url || tour.imageUrl,
+        priceNumber:
+          tour.priceNumber ||
+          parseFloat(tour.pricingSchedule?.[0]?.netPrice) ||
+          100,
+        duration: tour.duration || Math.floor(Math.random() * 10 + 1),
+        // Ensure rating structure exists for sorting
+        rating: {
+          average: tour.rating?.average || 0,
+          count: tour.rating?.count || 0
+        },
+        // Ensure views exists for sorting
+        views: tour.views || 0,
+        // Ensure createdAt exists for sorting
+        createdAt: tour.createdAt || new Date().toISOString()
       }));
-      
+
       setTours(toursData);
       setTotalPages(response.pages || 1);
-      
-      console.log('💾 Tours saved to state:', toursData.length);
-      console.log('🎯 Will apply filters if any exist...');
     } catch (error) {
-      console.error('❌ Error fetching tours:', error);
+      console.error("Error fetching tours:", error);
       toast({
         title: "Error",
         description: "Failed to load tours. Please try again later.",
@@ -152,146 +171,244 @@ const ToursPage = () => {
   };
 
   const filterTours = () => {
-    console.log('🔍 Filtering tours...', {
-      totalTours: tours.length,
-      searchTerm,
-      selectedCategory,
-      selectedDate
-    });
-    
     let filtered = [...tours];
 
-    // ✅ Title Search Filter (Primary Search)
-    if (searchTerm && searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase().trim();
-      console.log('🔎 Searching for:', searchLower);
-      
-      filtered = filtered.filter(tour => {
-        // Priority 1: Search in TITLE first (most important)
-        const titleMatch = tour.title && tour.title.toLowerCase().includes(searchLower);
-        
-        // Priority 2: Search in other fields
-        const descriptionMatch = tour.description && tour.description.toLowerCase().includes(searchLower);
-        const locationMatch = (tour.prefecture && tour.prefecture.toLowerCase().includes(searchLower)) ||
-                             (tour.city && tour.city.toLowerCase().includes(searchLower));
-        const categoryMatch = tour.category && tour.category.toLowerCase().includes(searchLower);
-        const typeMatch = tour.tourType && tour.tourType.toLowerCase().includes(searchLower);
-        
-        return titleMatch || descriptionMatch || locationMatch || categoryMatch || typeMatch;
-      });
-      
-      console.log('✅ Search filtered results:', filtered.length);
+    // Search
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.title?.toLowerCase().includes(term) ||
+          t.description?.toLowerCase().includes(term) ||
+          t.city?.toLowerCase().includes(term)
+      );
     }
 
-    // ✅ Category Filter
-    if (selectedCategory && selectedCategory !== 'all' && selectedCategory !== '') {
-      console.log('📁 Filtering by category:', selectedCategory);
-      filtered = filtered.filter(tour => tour.category === selectedCategory);
-      console.log('✅ Category filtered results:', filtered.length);
+    // Category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((t) => t.category === selectedCategory);
     }
 
-    // ✅ Date Filter (NEW)
-    if (selectedDate && selectedDate.trim()) {
-      console.log('📅 Filtering by date:', selectedDate);
-      
-      filtered = filtered.filter(tour => {
-        // Check if tour has available dates in pricingSchedule
-        if (tour.pricingSchedule && tour.pricingSchedule.length > 0) {
-          return tour.pricingSchedule.some((schedule: any) => {
-            if (schedule.days && Array.isArray(schedule.days)) {
-              // Check if selected date matches any available days
-              return schedule.days.some((day: string) => {
-                const tourDate = new Date(day);
-                const selectedDateObj = new Date(selectedDate);
-                return tourDate.toDateString() === selectedDateObj.toDateString();
-              });
-            }
-            return true; // If no specific days, show all tours
-          });
+    // Location
+    if (selectedLocation !== "all") {
+      filtered = filtered.filter(
+        (t) =>
+          t.city?.toLowerCase() === selectedLocation.toLowerCase() ||
+          t.prefecture?.toLowerCase() === selectedLocation.toLowerCase()
+      );
+    }
+
+    // Duration
+    filtered = filtered.filter(
+      (t) => t.duration >= durationRange[0] && t.duration <= durationRange[1]
+    );
+
+    // Price
+    filtered = filtered.filter(
+      (t) => t.priceNumber >= priceRange[0] && t.priceNumber <= priceRange[1]
+    );
+
+    // Driver Language - Fixed to use tour.languages
+    if (selectedLanguage !== "all") {
+      filtered = filtered.filter((t) => {
+        const tourLanguages = t.languages || [];
+        // Check if the selected language is in the tour's language array
+        if (Array.isArray(tourLanguages)) {
+          return tourLanguages.some(lang => 
+            lang?.toLowerCase().includes(selectedLanguage.toLowerCase()) ||
+            selectedLanguage.toLowerCase().includes(lang?.toLowerCase())
+          );
         }
-        return true; // If no pricing schedule, show tour
+        // Handle string format
+        if (typeof tourLanguages === 'string') {
+          return tourLanguages.toLowerCase().includes(selectedLanguage.toLowerCase());
+        }
+        return false;
       });
-      
-      console.log('✅ Date filtered results:', filtered.length);
     }
 
-    console.log('🎯 Final filtered count:', filtered.length);
+    // Booking Type Filter
+    if (selectedBookingType !== "all") {
+      filtered = filtered.filter((t) => {
+        const bookingType = t.bookingType || "";
+        return bookingType.toLowerCase() === selectedBookingType.toLowerCase();
+      });
+    }
+
+    // Apply Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "-createdAt":
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        case "createdAt":
+          return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        case "-views":
+          return (b.views || 0) - (a.views || 0);
+        case "priceNumber":
+          // Price: Low to High
+          return (a.priceNumber || 0) - (b.priceNumber || 0);
+        case "-priceNumber":
+          // Price: High to Low
+          return (b.priceNumber || 0) - (a.priceNumber || 0);
+        case "-rating.average":
+          return (b.rating?.average || 0) - (a.rating?.average || 0);
+        case "title-asc":
+          // A to Z
+          return (a.title || "").localeCompare(b.title || "");
+        case "title-desc":
+          // Z to A
+          return (b.title || "").localeCompare(a.title || "");
+        default:
+          return 0;
+      }
+    });
+
+    console.log('🔄 Filters applied:', {
+      sortBy,
+      selectedLanguage,
+      selectedBookingType,
+      totalFiltered: filtered.length,
+      sampleTour: filtered[0] ? {
+        title: filtered[0].title,
+        languages: filtered[0].languages,
+        bookingType: filtered[0].bookingType
+      } : null
+    });
+
     setFilteredTours(filtered);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    filterTours();
-  };
-
   const clearFilters = () => {
-    console.log('🧹 Clearing all filters...');
-    setSearchTerm('');
-    setSelectedCategory('all');
-    setSelectedDate('');
-    setSortBy('-createdAt');
-    setCurrentPage(1);
-    // Reset filtered tours to show all tours
-    setFilteredTours(tours);
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setSelectedLocation("all");
+    setDurationRange([1, 15]);
+    setPriceRange([0, 5000]);
+    setSelectedLanguage("all");
+    setSelectedBookingType("all");
+    setSortBy("-createdAt");
+    fetchTours();
   };
 
   const Filters = () => (
     <div className="space-y-6">
       {/* Search */}
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-          <Search className="h-4 w-4" />
-          Search Tours
-        </label>
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
-            placeholder="Search destinations, activities..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          />
-          <Button type="submit" size="icon" variant="outline" className="border-gray-300 hover:bg-blue-50">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
-
-      {/* Date Filter */}
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Filter by Date
+      {/* <div>
+        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
+          <Search className="h-4 w-4" /> Search Tours
         </label>
         <Input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          placeholder="Search tours..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        {selectedDate && (
-          <p className="text-xs text-gray-500 mt-2">
-            Showing tours available on {new Date(selectedDate).toLocaleDateString()}
-          </p>
-        )}
-      </div>
+      </div> */}
 
-      {/* Category Filter */}
+      {/* Category */}
       <div>
-        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-          <Filter className="h-4 w-4" />
+        <label className="text-sm font-semibold text-gray-700 mb-2 block">
           Category
         </label>
-        <Select value={selectedCategory || 'all'} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger>
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map(category => (
-              <SelectItem key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+            <SelectItem value="all">All</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Location */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-2 block flex items-center gap-2">
+          <MapPin className="h-4 w-4" /> Location
+        </label>
+        <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Locations" />
+          </SelectTrigger>
+          <SelectContent>
+            {locations.map((loc) => (
+              <SelectItem key={loc} value={loc}>
+                {loc}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Duration */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <Clock className="h-4 w-4" /> Duration (Days)
+        </label>
+        <Slider
+          min={1}
+          max={15}
+          step={1}
+          value={durationRange}
+          onValueChange={setDurationRange}
+        />
+        <div className="text-xs text-gray-500 mt-1">
+          {durationRange[0]} - {durationRange[1]} days
+        </div>
+      </div>
+
+      {/* Price */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <DollarSign className="h-4 w-4" /> Price Range ($)
+        </label>
+        <Slider
+          min={0}
+          max={5000}
+          step={50}
+          value={priceRange}
+          onValueChange={setPriceRange}
+        />
+        <div className="text-xs text-gray-500 mt-1">
+          ${priceRange[0]} - ${priceRange[1]}
+        </div>
+      </div>
+
+      {/* Driver Language */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-2 block flex items-center gap-2">
+          <Languages className="h-4 w-4" /> Driver Language
+        </label>
+        <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Languages" />
+          </SelectTrigger>
+          <SelectContent>
+            {driverLanguages.map((lang) => (
+              <SelectItem key={lang} value={lang}>
+                {lang === "all" ? "All Languages" : lang}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Booking Type */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-2 block flex items-center gap-2">
+          <Users className="h-4 w-4" /> Booking Type
+        </label>
+        <Select value={selectedBookingType} onValueChange={setSelectedBookingType}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Booking Types" />
+          </SelectTrigger>
+          <SelectContent>
+            {bookingTypes.map((type) => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -300,345 +417,162 @@ const ToursPage = () => {
 
       {/* Sort */}
       <div>
-        <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4" />
+        <label className="text-sm font-semibold text-gray-700 mb-2 block">
           Sort By
         </label>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+          <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {sortOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
+            {sortOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="pt-4 border-t border-gray-200">
-        <Button 
-          onClick={clearFilters} 
-          variant="outline" 
-          className="w-full border-gray-300 hover:bg-red-50 hover:border-red-300 hover:text-red-600"
-        >
-          Clear All Filters
+      {/* Clear */}
+      <Button variant="outline" className="w-full" onClick={clearFilters}>
+        Clear All Filters
       </Button>
-      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-card">
-      {/* Enhanced Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 py-20 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}></div>
-        </div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl animate-bounce"></div>
-        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-400/20 rounded-full blur-lg animate-pulse"></div>
-        
-        <div className="container px-4 relative z-10">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-6 py-3 mb-8 hover:bg-white/30 transition-all duration-300">
-              <span className="text-2xl">🌍</span>
-              <span className="text-white font-semibold">Explore Amazing Destinations</span>
-            </div>
-            
-            {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Discover Your Next
-              <span className="block bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                Adventure
-              </span>
-            </h1>
-            
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Choose from our carefully curated collection of unforgettable travel experiences, 
-              handpicked by local experts and adventure enthusiasts.
-            </p>
-            
-            {/* Enhanced Search */}
-            <div className="max-w-2xl mx-auto mb-12">
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2 shadow-2xl border border-white/20">
-              <form onSubmit={handleSearch} className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                      placeholder="Search destinations, tours, activities, cities..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 pr-4 py-4 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-500"
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Search className="h-5 w-5 mr-2" />
-                    Search
-                </Button>
-              </form>
-              </div>
-            </div>
-            
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">500+</div>
-                <div className="text-white/80">Amazing Tours</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">50+</div>
-                <div className="text-white/80">Destinations</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">10K+</div>
-                <div className="text-white/80">Happy Travelers</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Bottom Wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-20 text-white" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="currentColor"></path>
-          </svg>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-20 text-center relative">
+        <h1 className="text-5xl font-bold mb-4">Explore Our Tours</h1>
+        <p className="text-lg opacity-90 mb-8">
+          Find your perfect adventure with filters and search.
+        </p>
+        <div className="max-w-2xl mx-auto">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              filterTours();
+            }}
+            className="flex gap-2"
+          >
+            <Input
+              placeholder="Search destinations or tours..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white text-gray-800"
+            />
+            <Button type="submit" className="bg-yellow-400 hover:bg-yellow-500">
+              <Search className="mr-2 h-4 w-4" /> Search
+            </Button>
+          </form>
         </div>
       </section>
 
-      <div className="container px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Filters Sidebar */}
-          <div className="hidden lg:block w-72 shrink-0">
-            <Card className="p-6 sticky top-24 shadow-lg border-0 bg-white">
-              <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Filter className="h-5 w-5 text-blue-600" />
+      {/* Content */}
+      <div className="container mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8">
+        {/* Sidebar Filters */}
+        <div className="hidden lg:block w-80">
+          <Card className="p-6 shadow-md border-0">
+            <Filters />
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          {/* Filter Button (Mobile) */}
+          <div className="flex justify-between items-center mb-6">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="lg:hidden">
+                  <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80 bg-gray-50">
+                <SheetHeader>
+                  <SheetTitle>Filters</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  <Filters />
                 </div>
-                <h3 className="font-bold text-lg text-gray-800">Filters</h3>
-              </div>
-              <Filters />
-            </Card>
+              </SheetContent>
+            </Sheet>
+
+            {/* Page Size */}
+            <Select
+              value={String(toursPerPage)}
+              onValueChange={(val) => setToursPerPage(Number(val))}
+            >
+              <SelectTrigger className="w-40 border-gray-300 text-gray-700">
+                <SelectValue placeholder="10 per page" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10 per page</SelectItem>
+                <SelectItem value="20">20 per page</SelectItem>
+                <SelectItem value="50">50 per page</SelectItem>
+              </SelectContent>
+            </Select>
+
+
+
           </div>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* Filter Applied Banner */}
-            {(searchTerm || selectedCategory !== 'all' || selectedDate) && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Filter className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold text-blue-900">Filters Applied</h3>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  {searchTerm && (
-                    <Badge className="gap-1 bg-blue-600 text-white hover:bg-blue-700">
-                      <Search className="h-3 w-3" />
-                      Search: "{searchTerm}"
-                      <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-red-300">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                  {selectedCategory && selectedCategory !== 'all' && (
-                    <Badge className="gap-1 bg-purple-600 text-white hover:bg-purple-700">
-                      <Filter className="h-3 w-3" />
-                      Category: {selectedCategory}
-                      <button onClick={() => setSelectedCategory('all')} className="ml-1 hover:text-red-300">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                  {selectedDate && (
-                    <Badge className="gap-1 bg-green-600 text-white hover:bg-green-700">
-                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Date: {new Date(selectedDate).toLocaleDateString()}
-                      <button onClick={() => setSelectedDate('')} className="ml-1 hover:text-red-300">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={clearFilters}
-                    className="text-blue-700 hover:text-blue-900 hover:bg-blue-100"
-                  >
-                    Clear All
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Mobile Filters & Results Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <MapPin className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800">
-                  {filteredTours.length} Tours Found
-                </h2>
-                    <p className="text-sm text-gray-600">
-                      {searchTerm || selectedCategory !== 'all' || selectedDate ? '✅ Showing filtered results' : 'All available tours'}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Active Filters - Smaller badges */}
-                <div className="hidden md:flex gap-2 flex-wrap">
-                  {selectedCategory && selectedCategory !== 'all' && (
-                    <Badge variant="secondary" className="gap-1 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200">
-                      <Filter className="h-3 w-3" />
-                      {selectedCategory}
-                      <button onClick={() => setSelectedCategory('all')} className="ml-1 hover:text-red-600">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                  {searchTerm && (
-                    <Badge variant="secondary" className="gap-1 bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200">
-                      <Search className="h-3 w-3" />
-                      "{searchTerm}"
-                      <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-red-600">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                  {selectedDate && (
-                    <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 border-green-200 hover:bg-green-200">
-                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      {new Date(selectedDate).toLocaleDateString()}
-                      <button onClick={() => setSelectedDate('')} className="ml-1 hover:text-red-600">
-                        ×
-                      </button>
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              
-              {/* Mobile Filter Button */}
-              <Sheet>
-                <SheetTrigger asChild className="lg:hidden">
-                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-blue-50 hover:border-blue-300">
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filters
-                    {(searchTerm || (selectedCategory && selectedCategory !== 'all') || selectedDate) && (
-                      <Badge className="ml-2 bg-blue-500 text-white text-xs">Active</Badge>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-80 bg-gray-50">
-                  <SheetHeader className="pb-4 border-b border-gray-200">
-                    <SheetTitle className="flex items-center gap-2 text-lg">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Filter className="h-5 w-5 text-blue-600" />
-                      </div>
-                      Filters
-                    </SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <Filters />
-                  </div>
-                </SheetContent>
-              </Sheet>
+          {/* Tours Grid */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="h-48 bg-muted" />
+                  <CardContent className="p-4 space-y-3">
+                    <div className="h-4 bg-muted rounded" />
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+          ) : filteredTours.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredTours.map((tour: any) => (
+                <TourCard key={tour._id} tour={tour} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 text-gray-600">
+              <MapPin className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p>No tours found matching your criteria.</p>
+            </div>
+          )}
 
-            {/* Tours Grid */}
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <div className="h-48 bg-muted" />
-                    <CardContent className="p-4 space-y-3">
-                      <div className="h-4 bg-muted rounded" />
-                      <div className="h-4 bg-muted rounded w-3/4" />
-                      <div className="h-4 bg-muted rounded w-1/2" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : filteredTours.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredTours.map((tour: any) => (
-                  <TourCard key={tour._id} tour={tour} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
-                <div className="p-4 bg-red-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                  <MapPin className="h-10 w-10 text-red-500" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-3">No tours found</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                  {searchTerm || selectedCategory !== 'all' 
-                    ? 'No tours match your current filters. Try adjusting your search criteria.'
-                    : 'No tours are currently available. Please check back later.'
-                  }
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <Button onClick={clearFilters} variant="hero" className="bg-blue-600 hover:bg-blue-700">
-                  Clear Filters
-                </Button>
-                  <Button onClick={() => window.location.reload()} variant="outline" className="border-gray-300">
-                    Refresh Page
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-8">
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-10">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              {[...Array(totalPages)].map((_, i) => (
                 <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
+                  key={i}
+                  size="sm"
+                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  onClick={() => setCurrentPage(i + 1)}
                 >
-                  Previous
+                  {i + 1}
                 </Button>
-                
-                <div className="flex gap-1">
-                  {[...Array(totalPages)].map((_, i) => (
-                    <Button
-                      key={i + 1}
-                      variant={currentPage === i + 1 ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(i + 1)}
-                    >
-                      {i + 1}
-                    </Button>
-                  ))}
-                </div>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </div>
+              ))}
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

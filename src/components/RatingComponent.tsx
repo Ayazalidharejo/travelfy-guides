@@ -62,32 +62,39 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
 
+  const fetchRatings = useCallback(async () => {
+    if (!tourId) {
+      console.warn('No tourId provided to fetchRatings');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      console.log('Fetching ratings for tour:', tourId);
+      const response = await postsAPI.getRatings(tourId);
+      console.log('Ratings response:', response);
+      
+      if (response.success) {
+        setRatings(response.data || []);
+      } else {
+        console.warn('Failed to fetch ratings:', response.message);
+        // Don't show error toast for failed fetch, just log it
+        setRatings([]);
+      }
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      // Don't show error toast, just set empty ratings
+      setRatings([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [tourId]);
+
   useEffect(() => {
     if (tourId) {
       fetchRatings();
     }
   }, [tourId, fetchRatings]);
-
-  const fetchRatings = useCallback(async () => {
-    if (!tourId) return;
-    
-    try {
-      setLoading(true);
-      const response = await postsAPI.getRatings(tourId);
-      if (response.success) {
-        setRatings(response.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching ratings:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load ratings.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [tourId, toast]);
 
   const handleSubmitRating = async () => {
     if (!isAuthenticated) {
@@ -347,10 +354,10 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
             {/* Overall Rating */}
             <div className="text-center">
               <div className="text-4xl font-bold text-primary mb-2">
-                {calculateAverageRating()}
+                {calculateAverageRating}
               </div>
               <div className="flex justify-center mb-2">
-                {renderStars(Math.round(parseFloat(calculateAverageRating())))}
+                {renderStars(Math.round(parseFloat(calculateAverageRating)))}
               </div>
               <p className="text-sm text-muted-foreground">
                 Based on {ratings.length} review{ratings.length !== 1 ? 's' : ''}
@@ -360,7 +367,7 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
             {/* Rating Distribution */}
             <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
-                const count = getRatingDistribution()[star as keyof typeof getRatingDistribution];
+                const count = getRatingDistribution[star as keyof typeof getRatingDistribution];
                 const percentage = ratings.length > 0 ? (count / ratings.length) * 100 : 0;
                 
                 return (

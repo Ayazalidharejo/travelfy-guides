@@ -199,7 +199,7 @@ const PrivacyPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-5 w-5" />
-                <span>+1 (555) 123-4567</span>
+                <span>+81 80-7480-1156</span>
               </div>
             </div>
           </CardContent>

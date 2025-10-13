@@ -71,7 +71,7 @@ const FAQ: React.FC = () => {
         </div>
 
         {/* Contact CTA */}
-        <div className="text-center mt-16">
+        {/* <div className="text-center mt-16">
           <p className="text-gray-700 text-lg">
             Didn't find your question?
           </p>
@@ -81,7 +81,7 @@ const FAQ: React.FC = () => {
           >
             Contact Our Support Team
           </a>
-        </div>
+        </div> */}
       </div>
     </section>
   );

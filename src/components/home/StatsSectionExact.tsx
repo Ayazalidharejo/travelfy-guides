@@ -6,9 +6,10 @@ import statImage3 from "@/../public/images/Subtract.png" // Add your 3rd stat im
 
 const StatsSectionExact = () => {
   const stats = [
-    { image: statImage1, value: '3.0k+', label: 'SATISFIED TRAVELERS' },
-    { image: statImage2, value: '96%', label: 'RATE US TRAVEL QUALITY' },
-    { image: statImage3, value: '300+', label: 'BOOKINGS WITH WORRY BOOKING' },
+    { image: statImage1, value: '2500+', label: 'SATISFIED TRAVELERS' },
+    { image: statImage2, value: '150+', label: 'DESTINATION QUALITY' },
+    { image: statImage3, value: '50+', label: 'EXPERIENCED GUIDES' },
+    { image: statImage3, value: '4.5', label: 'AVERAGE RATING' },
   ];
 
   return (
@@ -27,7 +28,7 @@ const StatsSectionExact = () => {
       ></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 lg:gap-16 max-w-6xl mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="flex justify-center">
               <div className="text-center relative" style={{ width: '280px', height: '250px' }}>

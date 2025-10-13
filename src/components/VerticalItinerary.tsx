@@ -212,7 +212,7 @@ const VerticalItinerary = () => {
                 <div className={`p-2 rounded-full bg-gray-100 ${item.color}`}>
                   <item.icon className="w-5 h-5" />
                 </div>
-                <div className="flex-shrink-0 w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-[#307172] to-[#204f4f]  text-white rounded-full flex items-center justify-center text-sm font-semibold">
                   {item.id}
                 </div>
               </div>
@@ -264,7 +264,7 @@ const VerticalItinerary = () => {
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header with Trip Info */}
-      <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-[#307172] to-[#204f4f] p-6 text-white">
         <div className="flex items-center gap-3 mb-2">
           <MapPin className="w-6 h-6" />
           <h1 className="text-2xl font-bold">{tripName}</h1>

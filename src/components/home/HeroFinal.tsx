@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import image from "@/../public/hero.png"
 
 const HeroFinal = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +41,7 @@ const HeroFinal = () => {
       <div 
         className="absolute inset-0"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2000')`,
+          backgroundImage: `url(${image})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -74,7 +75,7 @@ const HeroFinal = () => {
               <h1 
                 className="font-black uppercase" 
                 style={{ 
-                  fontSize: 'clamp(70px, 11vw, 130px)', 
+                  fontSize: 'clamp(60px, 11vw, 50px)', 
                   lineHeight: '0.9',
                   color: '#3B82F6',
                   fontFamily: 'Arial, sans-serif',
@@ -88,7 +89,7 @@ const HeroFinal = () => {
               <h1 
                 className="text-white font-black uppercase" 
                 style={{ 
-                  fontSize: 'clamp(44px, 7vw, 75px)', 
+                  fontSize: 'clamp(44px, 7vw, 50px)', 
                   lineHeight: '1',
                   fontFamily: 'Arial, sans-serif',
                   fontWeight: '900',
@@ -100,35 +101,38 @@ const HeroFinal = () => {
             </div>
           </div>
 
-          {/* Description Text - Bottom Left */}
-          <div className="mb-5 max-w-xs">
-            <p className="text-white text-xs leading-relaxed mb-1">
-              Discover unforgettable journeys,
+     {/* Description Text - Bottom Left
+<div className="w-full h-full flex items-end justify-start ">
+  <p className="text-white text-xl leading-relaxed text-left  mb-4 ml-4">
+    Discover unforgettable journeys, unique experiences,
+  </p>
+</div> */}
+
+          {/* <div className="mb-5 ">
+        
+
+          
+            <p className="text-white  text-start text-lg ms-4 leading-relaxed">
+            and meaningful connections — all in one place.
             </p>
-            <p className="text-white text-xs leading-relaxed mb-1">
-              unique experiences, and meaningful
-            </p>
-            <p className="text-white text-xs leading-relaxed">
-              connections — all in one place.
-            </p>
-          </div>
+          </div> */}
           
           {/* Button-style CTA */}
-          <div 
-            className="inline-block px-4 py-2 rounded-md text-white"
+          {/* <div 
+            className="inline-block px-4 py-2 rounded-md text-white ms-2"
             style={{ 
               backgroundColor: 'rgba(59, 130, 246, 0.8)',
               border: '1px solid rgba(255, 255, 255, 0.3)',
-              fontSize: '10px',
+              fontSize: '18px',
               maxWidth: 'fit-content'
             }}
           >
-            Start exploring the world and create stories worth telling
-          </div>
+            Start exploring Japan and create stories.
+          </div> */}
         </div>
 
         {/* Search Card - "Find Your Escape" - Bottom Center */}
-        <div className="w-full max-w-5xl mx-auto">
+        {/* <div className="w-full max-w-5xl mx-auto">
           <div 
             className="bg-white rounded-xl shadow-2xl"
             style={{ padding: '32px' }}
@@ -142,7 +146,7 @@ const HeroFinal = () => {
             
             <div className="flex flex-col md:flex-row gap-4 items-center">
               {/* Search Destination Input with Icon */}
-              <div className="flex-1 relative w-full">
+              {/* <div className="flex-1 relative w-full">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -157,10 +161,10 @@ const HeroFinal = () => {
                   className="w-full pl-12 pr-4 py-3 text-base border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   style={{ height: '50px' }}
                 />
-              </div>
+              </div> */}
               
               {/* Check Dates Input with Icon */}
-              <div className="md:w-64 relative w-full">
+              {/* <div className="md:w-64 relative w-full">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -175,9 +179,9 @@ const HeroFinal = () => {
                   className="w-full pl-12 pr-4 py-3 text-base border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   style={{ height: '50px' }}
                 />
-              </div>
+              </div> */}
               
-              {/* Find Button */}
+{/*              
               <button
                 onClick={handleFind}
                 className="md:w-36 w-full px-8 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition-all duration-200 text-base"
@@ -187,7 +191,7 @@ const HeroFinal = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1139,6 +1139,7 @@ import {
 
 
 } from 'lucide-react';
+import RatingComponent from '@/components/RatingComponent';
 
 const TourDetailPage = () => {
   const { id } = useParams();
@@ -1756,11 +1757,15 @@ const TourDetailPage = () => {
 
 
 
-
-
-
-
-
+            {/* Rating and Reviews Section */}
+            {tour._id && (
+              <div className="mt-8">
+                <RatingComponent 
+                  tourId={tour._id} 
+                  tourTitle={tour.title}
+                />
+              </div>
+            )}
 
             {/* Tour Details Section - Organized and Styled */}
             <div className="space-y-4 bg-gray-50 p-6 rounded-lg">
