@@ -626,6 +626,11 @@ const BookingPage = () => {
       setLoading(true);
       const response = await postsAPI.getPost(tourId!);
       if (response.success) {
+        console.log('🚗 TOUR DATA RECEIVED:', response.data);
+        console.log('🚗 Transport Vehicles:', response.data.transportVehicles);
+        console.log('🚗 Transport Type:', response.data.transportType);
+        console.log('🚗 Transport Modal:', response.data.transportModal);
+        console.log('🚗 Make Variant:', response.data.makeVariant);
         setTour(response.data);
       } else {
         navigate('/tours');
@@ -664,15 +669,18 @@ const BookingPage = () => {
 
   const calculateTotal = () => {
     if (!tour) return 0;
-    const totalParticipants = participants.adults + participants.children + participants.seniors;
     
     let basePrice = 0;
-    // Use selected pricing schedule if available
-    if (selectedPricingSchedule && selectedPricingSchedule.netPrice) {
-      basePrice = selectedPricingSchedule.netPrice * totalParticipants;
+    
+    // Use selected vehicle price if available
+    if (selectedVehicle && selectedVehicle.price) {
+      basePrice = parseFloat(selectedVehicle.price) || 0;
+    } else if (selectedPricingSchedule && selectedPricingSchedule.netPrice) {
+      // Fallback to pricing schedule price (not multiplied by participants)
+      basePrice = parseFloat(selectedPricingSchedule.netPrice) || 0;
     } else {
-      // Fallback to tour price
-      basePrice = (tour.priceNumber || 0) * totalParticipants;
+      // Fallback to tour price (not multiplied by participants)
+      basePrice = tour.priceNumber || 0;
     }
     
     // Add additional options cost
@@ -716,11 +724,25 @@ const BookingPage = () => {
   };
 
   const handleParticipantsConfirm = () => {
+    console.log('👥 Participants confirmed:', getTotalParticipants());
+    console.log('🚗 Tour transportVehicles:', tour.transportVehicles);
+    console.log('🚗 Tour makeVariant:', tour.makeVariant);
+    console.log('🚗 Tour transportType:', tour.transportType);
+    console.log('🚗 Tour transportModal:', tour.transportModal);
+    
     if (getTotalParticipants() > 0) {
-      // Check if transport/variant options exist
-      if (tour.makeVariant || tour.transportType || tour.transportModal) {
-        setCurrentStep(4);
+      // Check if transport vehicles exist (new system) or old transport fields (backward compatibility)
+      const hasTransportVehicles = tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0;
+      const hasOldTransportFields = tour.makeVariant || tour.transportType || tour.transportModal;
+      
+      console.log('🔍 Has transport vehicles:', hasTransportVehicles);
+      console.log('🔍 Has old transport fields:', hasOldTransportFields);
+      
+      if (hasTransportVehicles || hasOldTransportFields) {
+        console.log('✅ Going to Step 4 - Vehicle selection');
+        setCurrentStep(4); // Go to vehicle selection
       } else {
+        console.log('⚠️ Skipping to Step 5 - No transport data');
         setCurrentStep(5); // Skip to additional options
       }
     }
@@ -742,9 +764,9 @@ const BookingPage = () => {
     
     setVehicleError('');
     setSelectedVehicle(vehicle);
-    setSelectedVariant(vehicle.variant || '');
-    setSelectedTransportType(vehicle.type || '');
-    setSelectedTransportModal(vehicle.model || '');
+    setSelectedVariant(vehicle.makeVariant || '');
+    setSelectedTransportType(vehicle.transportType || '');
+    setSelectedTransportModal(vehicle.transportModal || '');
   };
 
   const toggleAdditionalOption = (option: keyof typeof additionalOptions) => {
@@ -893,9 +915,20 @@ const BookingPage = () => {
                   {tour.category && <Badge variant="secondary">{tour.category}</Badge>}
                   <div className="text-right">
                     <div className="text-2xl font-bold text-primary">
-                      ${selectedPricingSchedule?.netPrice || tour.priceNumber || 0}
+                      ${(() => {
+                        // Show selected vehicle price if available
+                        if (selectedVehicle && selectedVehicle.price) {
+                          return parseFloat(selectedVehicle.price).toFixed(2);
+                        }
+                        // Show pricing schedule price if available
+                        if (selectedPricingSchedule?.netPrice) {
+                          return parseFloat(selectedPricingSchedule.netPrice).toFixed(2);
+                        }
+                        // Fallback to tour price
+                        return (tour.priceNumber || 0).toFixed(2);
+                      })()}
                     </div>
-                    {/* <div className="text-sm text-muted-foreground">per person</div> */}
+                    <div className="text-sm text-muted-foreground">Fixed Vehicle Price</div>
                   </div>
                 </div>
               </CardContent>
@@ -1051,7 +1084,24 @@ const BookingPage = () => {
                 )}
 
                 {/* Step 4: Transport & Options */}
-                {currentStep >= 4 && (tour.makeVariant || tour.transportType || tour.transportModal) && (
+                {(() => {
+                  const hasTransportVehicles = tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0;
+                  const hasOldTransportFields = tour.makeVariant || tour.transportType || tour.transportModal;
+                  const shouldShowStep4 = currentStep >= 4 && (hasTransportVehicles || hasOldTransportFields);
+                  
+                  console.log('🔍 Step 4 Check:', {
+                    currentStep,
+                    hasTransportVehicles,
+                    hasOldTransportFields,
+                    shouldShowStep4,
+                    transportVehicles: tour.transportVehicles,
+                    makeVariant: tour.makeVariant,
+                    transportType: tour.transportType,
+                    transportModal: tour.transportModal
+                  });
+                  
+                  return shouldShowStep4;
+                })() && (
                   <div className="space-y-4">
                     <Label className="text-lg font-semibold flex items-center gap-2">
                       <Car className="h-5 w-5" />
@@ -1066,36 +1116,69 @@ const BookingPage = () => {
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Create vehicle options by combining variant, type, and model */}
+                      {/* Use transportVehicles array from tour data */}
                       {(() => {
-                        const variants = tour.makeVariant ? tour.makeVariant.split(',').map((v: string) => v.trim()) : [''];
-                        const types = tour.transportType ? tour.transportType.split(',').map((t: string) => t.trim()) : [''];
-                        const models = tour.transportModal ? tour.transportModal.split(',').map((m: string) => m.trim()) : [''];
+                        console.log('🚗 RENDERING VEHICLES - Tour Data:', tour);
+                        console.log('🚗 Transport Vehicles Array:', tour.transportVehicles);
+                        console.log('🚗 Transport Type:', tour.transportType);
+                        console.log('🚗 Transport Modal:', tour.transportModal);
+                        console.log('🚗 Make Variant:', tour.makeVariant);
                         
-                        // Create vehicle combinations
-                        const vehicles = [];
-                        for (let i = 0; i < Math.max(variants.length, types.length, models.length); i++) {
-                          const vehicle = {
-                            variant: variants[i] || variants[0] || '',
-                            type: types[i] || types[0] || '',
-                            model: models[i] || models[0] || '',
-                            capacity: 4 + (i * 3), // Example: 4, 7, 10, 13 capacity
+                        // Use transportVehicles array if available, otherwise fallback to old logic
+                        let vehicles = [];
+                        
+                        if (tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0) {
+                          console.log('✅ Using transportVehicles array:', tour.transportVehicles);
+                          // Use the new transportVehicles array
+                          vehicles = tour.transportVehicles.map((vehicle: any) => ({
+                            id: vehicle.id,
+                            transportType: vehicle.transportType || '',
+                            transportModal: vehicle.transportModal || '',
+                            makeVariant: vehicle.makeVariant || '',
+                            capacity: parseInt(vehicle.capacity) || 4,
+                            price: vehicle.price || '',
                             image: '/placeholder-car.png'
-                          };
-                          vehicles.push(vehicle);
+                          }));
+                        } else {
+                          console.log('⚠️ Falling back to old logic');
+                          // Fallback to old logic for backward compatibility
+                          const variants = tour.makeVariant ? tour.makeVariant.split(',').map((v: string) => v.trim()) : [''];
+                          const types = tour.transportType ? tour.transportType.split(',').map((t: string) => t.trim()) : [''];
+                          const models = tour.transportModal ? tour.transportModal.split(',').map((m: string) => m.trim()) : [''];
+                          
+                          console.log('🔍 Fallback data:', { variants, types, models });
+                          
+                          for (let i = 0; i < Math.max(variants.length, types.length, models.length); i++) {
+                            const vehicle = {
+                              id: `fallback-${i}`,
+                              transportType: types[i] || types[0] || '',
+                              transportModal: models[i] || models[0] || '',
+                              makeVariant: variants[i] || variants[0] || '',
+                              capacity: 4 + (i * 3), // Example: 4, 7, 10, 13 capacity
+                              price: '',
+                              image: '/placeholder-car.png'
+                            };
+                            vehicles.push(vehicle);
+                          }
                         }
                         
-                        return vehicles.map((vehicle, idx) => {
+                        console.log('🚗 Final vehicles array:', vehicles);
+                        return vehicles.map((vehicle: any, idx: number) => {
                           const isSelected = selectedVehicle && 
-                            selectedVehicle.variant === vehicle.variant && 
-                            selectedVehicle.type === vehicle.type && 
-                            selectedVehicle.model === vehicle.model;
+                            selectedVehicle.id === vehicle.id;
                           const totalParticipants = getTotalParticipants();
                           const canAccommodate = totalParticipants <= vehicle.capacity;
                           
+                          // Create display name
+                          const displayName = [
+                            vehicle.transportType,
+                            vehicle.transportModal,
+                            vehicle.makeVariant
+                          ].filter(Boolean).join(' / ') || 'Vehicle';
+                          
                           return (
                             <div
-                              key={idx}
+                              key={vehicle.id || idx}
                               onClick={() => canAccommodate && handleVehicleSelect(vehicle)}
                               className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
                                 isSelected 
@@ -1111,21 +1194,20 @@ const BookingPage = () => {
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-semibold text-gray-900">
-                                    {[vehicle.variant, vehicle.type, vehicle.model].filter(Boolean).join(' ')}
+                                    {displayName}
                                   </h4>
                                   <div className="flex items-center gap-2 mt-1">
                                     <Users className="h-4 w-4 text-gray-500" />
                                     <span className={`text-sm font-medium ${
                                       canAccommodate ? 'text-green-600' : 'text-red-600'
                                     }`}>
-                                      {tour.groupSize && (
-  <div className=" gap-1 text-gray-700 text-xs">
-    <span className="">Up to {tour.groupSize} Persons</span>
-  </div>
-)}
-
-
+                                      Up to {vehicle.capacity} Persons
                                     </span>
+                                    {vehicle.price && (
+                                      <span className="text-sm font-bold text-blue-600 ml-2">
+                                        ${vehicle.price}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                                 {isSelected && (
@@ -1315,22 +1397,32 @@ const BookingPage = () => {
                     <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                       <h4 className="font-semibold text-gray-900 mb-3">Price Breakdown</h4>
                       
+                      {/* Vehicle Price - Fixed Price */}
                       <div className="flex justify-between text-sm">
-                        <span>Adults × {participants.adults}</span>
-                        <span>${((selectedPricingSchedule?.netPrice || tour.priceNumber || 0) * participants.adults).toFixed(2)}</span>
+                        <span>
+                          {selectedVehicle ? 
+                            `${selectedVehicle.transportType} ${selectedVehicle.makeVariant} (${selectedVehicle.capacity} people)` : 
+                            'Vehicle Price'
+                          }
+                        </span>
+                        <span>${(() => {
+                          if (selectedVehicle && selectedVehicle.price) {
+                            return parseFloat(selectedVehicle.price).toFixed(2);
+                          }
+                          if (selectedPricingSchedule?.netPrice) {
+                            return parseFloat(selectedPricingSchedule.netPrice).toFixed(2);
+                          }
+                          return (tour.priceNumber || 0).toFixed(2);
+                        })()}</span>
                       </div>
-                      {participants.children > 0 && (
-                        <div className="flex justify-between text-sm">
-                          <span>Children × {participants.children}</span>
-                          <span>${((selectedPricingSchedule?.netPrice || tour.priceNumber || 0) * participants.children).toFixed(2)}</span>
+                      
+                      {/* Participants Info - Not affecting price */}
+                      <div className="text-xs text-gray-500 mt-2">
+                        <div className="flex justify-between">
+                          <span>Participants:</span>
+                          <span>{participants.adults} adults{participants.children > 0 ? `, ${participants.children} children` : ''}{participants.seniors > 0 ? `, ${participants.seniors} seniors` : ''}</span>
                         </div>
-                      )}
-                      {participants.seniors > 0 && (
-                        <div className="flex justify-between text-sm">
-                          <span>Seniors × {participants.seniors}</span>
-                          <span>${((selectedPricingSchedule?.netPrice || tour.priceNumber || 0) * participants.seniors).toFixed(2)}</span>
-                        </div>
-                      )}
+                      </div>
                       
                       {/* Additional Options */}
                       {(additionalOptions.stroller || additionalOptions.wheelchair || additionalOptions.extraLuggage) && (

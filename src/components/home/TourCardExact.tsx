@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getDisplayPrice } from '../../lib/priceUtils';
 
 interface TourCardExactProps {
   tour: {
@@ -15,18 +16,25 @@ interface TourCardExactProps {
       count?: number;
     };
     discountPercentage?: number;
+    transportVehicles?: Array<{
+      price: number | string;
+      transportType: string;
+      makeVariant: string;
+      capacity: string;
+    }>;
     [key: string]: any;
   };
 }
 
 const TourCardExact: React.FC<TourCardExactProps> = ({ tour }) => {
   const imageUrl = tour.imageUrl || tour.images?.[0] || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=400';
-  const price = tour.priceNumber || 100;
   const duration = tour.duration || 'Full day';
   const city = tour.city || 'Location';
   const rating = tour.rating?.average?.toFixed(1) || '4.5';
   const reviewCount = tour.rating?.count || 0;
-  const discount = tour.discountPercentage || 0;
+  
+  // Get display price information
+  const priceInfo = getDisplayPrice(tour);
 
   return (
     <Link to={`/tours/${tour._id}`} className="block group">
@@ -43,10 +51,10 @@ const TourCardExact: React.FC<TourCardExactProps> = ({ tour }) => {
           />
           
           {/* Discount Badge - Top Left */}
-          {discount > 0 && (
+          {priceInfo.hasDiscount && (
             <div className="absolute top-3 left-3">
               <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                {discount}% OFF
+                {tour.discountPercentage}% OFF
               </div>
             </div>
           )}
@@ -109,11 +117,22 @@ const TourCardExact: React.FC<TourCardExactProps> = ({ tour }) => {
           <div className="pt-4 border-t border-gray-200">
             <div className="flex items-end justify-between">
               <div>
-                <div className="text-xs text-gray-500 mb-1">From</div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-gray-900">${price}</span>
+                <div className="text-xs text-gray-500 mb-1">
+                  {priceInfo.isStartingFrom ? 'Starting from' : 'From'}
                 </div>
-                <div className="text-xs text-gray-500">/ person</div>
+                <div className="flex items-baseline gap-1">
+                  {priceInfo.hasDiscount && priceInfo.originalPrice && (
+                    <span className="text-sm text-gray-400 line-through">
+                      ${priceInfo.originalPrice.toFixed(2)}
+                    </span>
+                  )}
+                  <span className="text-2xl font-bold text-gray-900">
+                    ${priceInfo.price.toFixed(2)}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {priceInfo.isStartingFrom ? '/ vehicle' : '/ person'}
+                </div>
               </div>
             </div>
           </div>
