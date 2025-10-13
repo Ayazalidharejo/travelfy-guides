@@ -6,10 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Clock, MapPin, Star, Users, DollarSign, Car, MessageSquare } from 'lucide-react';
 import { getDisplayPrice } from '../../lib/priceUtils';
 
-<<<<<<< HEAD
-const TourCard = ({ tour }: { tour: any }) => {
-  const navigate = useNavigate();
-=======
+// Move interface outside the component
 interface TourCardProps {
   tour: {
     _id: string;
@@ -63,7 +60,7 @@ interface TourCardProps {
 }
 
 const TourCard: React.FC<TourCardProps> = ({ tour }) => {
->>>>>>> df12a7e201b81b5c0fa7f51ac49f293a563793c2
+  const navigate = useNavigate();
   const imageUrl = tour.imageUrl || tour.images?.[0] || '/placeholder.svg';
 
   const handleCardClick = () => {
