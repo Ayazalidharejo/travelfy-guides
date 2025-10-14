@@ -50,54 +50,38 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-card">
+    <div className="min-h-screen bg-gradient-card overflow-x-hidden">
       {/* Hero Section */}
       <AboutHero/>
       <MissionVision/>
 
-      <section className="bg-gradient-hero py-20">
-        <div className="container px-4">
+      <section className="bg-gradient-hero py-12 sm:py-16 md:py-20">
+        <div className="container px-4 mx-auto max-w-7xl">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm mb-6">
+            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm mb-4 sm:mb-6 text-sm sm:text-base">
               🌍 About Travel Tours
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-2">
               Your Journey Starts Here
             </h1>
-            <p className="text-xl text-white/90 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed px-4">
               For over a decade, we've been crafting unforgettable travel experiences that connect people 
               with cultures, nature, and themselves. Every tour we create is a story waiting to be lived.
             </p>
           </div>
         </div>
       </section>
-<CoreValues/>
-<Achievements/>
-<AboutCTA/>
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="container px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {stats.map((stat, index) => (
-              <div key={index} className="space-y-3">
-                <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
-                  <stat.icon className="h-8 w-8 text-white" />
-                </div>
-                <div className="text-3xl font-bold text-primary">{stat.value}</div>
-                <div className="text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CoreValues/>
+      <Achievements/>
+      {/* <AboutCTA/> */}
 
       {/* Story Section */}
-      <section className="py-16">
-        <div className="container px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">Our Story</h2>
-              <div className="space-y-4 text-muted-foreground leading-relaxed">
+      <section className="py-12 sm:py-16">
+        <div className="container px-4 mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Our Story</h2>
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
                 <p>
                   Travel Tours was born from a simple belief: that travel has the power to transform lives, 
                   build bridges between cultures, and create lasting memories that shape who we are.
@@ -114,16 +98,16 @@ const AboutPage = () => {
                 </p>
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-ocean">
+            <div className="relative mt-8 lg:mt-0 px-4 sm:px-8 lg:px-0">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-ocean max-w-md mx-auto lg:max-w-none">
                 <img 
                   src="/placeholder.svg" 
                   alt="Our team" 
                   className="w-full h-full object-cover opacity-80"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-sunset rounded-full flex items-center justify-center">
-                <Camera className="h-12 w-12 text-white" />
+              <div className="absolute bottom-0 right-0 sm:bottom-2 sm:right-2 lg:-bottom-6 lg:-right-6 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-sunset rounded-full flex items-center justify-center">
+                <Camera className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-white" />
               </div>
             </div>
           </div>
@@ -131,26 +115,26 @@ const AboutPage = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 bg-white">
-        <div className="container px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Drives Us</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="container px-4 mx-auto max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">What Drives Us</h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
               Our core values guide everything we do, from planning your itinerary to the moment you return home with new stories to tell.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {values.map((value, index) => (
               <Card key={index} className="hover:shadow-medium transition-smooth">
-                <CardContent className="p-8">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center shrink-0">
-                      <value.icon className="h-6 w-6 text-white" />
+                <CardContent className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-primary rounded-lg flex items-center justify-center shrink-0">
+                      <value.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{value.title}</h3>
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{value.description}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -161,29 +145,29 @@ const AboutPage = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-16">
-        <div className="container px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Meet Our Team</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+      <section className="py-12 sm:py-16">
+        <div className="container px-4 mx-auto max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">Meet Our Team</h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
               Behind every great tour is a team of passionate individuals who live and breathe travel.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {[
               { name: 'Sarah Johnson', role: 'Founder & CEO', experience: '15 years guiding' },
               { name: 'Michael Chen', role: 'Head of Operations', experience: '12 years in tourism' },
               { name: 'Emily Rodriguez', role: 'Cultural Experience Director', experience: '10 years local expertise' }
             ].map((member, index) => (
               <Card key={index} className="text-center hover:shadow-medium transition-smooth">
-                <CardContent className="p-8">
-                  <div className="w-24 h-24 bg-gradient-primary rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">{member.name.split(' ').map(n => n[0]).join('')}</span>
+                <CardContent className="p-4 sm:p-6 lg:p-8">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-primary rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                    <span className="text-xl sm:text-2xl font-bold text-white">{member.name.split(' ').map(n => n[0]).join('')}</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
-                  <p className="text-primary font-medium mb-1">{member.role}</p>
-                  <p className="text-sm text-muted-foreground">{member.experience}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{member.name}</h3>
+                  <p className="text-sm sm:text-base text-primary font-medium mb-1">{member.role}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{member.experience}</p>
                 </CardContent>
               </Card>
             ))}
@@ -192,21 +176,21 @@ const AboutPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-sunset">
-        <div className="container px-4 text-center">
+      <section className="py-12 sm:py-16 bg-gradient-sunset">
+        <div className="container px-4 mx-auto max-w-7xl text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 px-2">
               Ready to Start Your Adventure?
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 px-4">
               Join our community of travelers and discover the world through our eyes. 
               Your next great story is just one booking away.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/tours" className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary rounded-lg hover:bg-white/90 transition-smooth font-semibold">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+              <a href="/tours" className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary rounded-lg hover:bg-white/90 transition-smooth font-semibold text-sm sm:text-base">
                 Browse Tours
               </a>
-              <a href="/contact" className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-smooth font-semibold">
+              <a href="/contact" className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-smooth font-semibold text-sm sm:text-base">
                 Contact Us
               </a>
             </div>

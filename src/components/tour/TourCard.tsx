@@ -244,7 +244,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           </div>
 
           <Button
-            variant="hero"
+            // variant=""
             size="sm"
             className="shadow-medium"
             onClick={e => {

@@ -187,7 +187,7 @@ const HomePage = () => {
       {popularTours.length > 0 && (
         <section className="container mx-auto px-4 py-10">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Recently Viewed
+            Products 
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {popularTours.map((tour: any) => (
@@ -201,7 +201,7 @@ const HomePage = () => {
       
 
       {/* Consultation Section */}
-      <ConsultationSection />
+  
 
       {/* Why Choose Us */}
    
@@ -211,7 +211,7 @@ const HomePage = () => {
 
       {/* Gallery */}
       <Gallery />
-
+    <ConsultationSection />
       {/* Itinerary */}
       {/* <VerticalItinerary /> */}
       
@@ -236,7 +236,7 @@ const HomePage = () => {
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Reviews for: {featuredTours[0]?.title}
+                 Products: {featuredTours[0]?.title}
                 </h3>
                 <p className="text-gray-600">
                   Share your experience or read what others have to say

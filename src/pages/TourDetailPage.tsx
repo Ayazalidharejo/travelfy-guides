@@ -296,13 +296,13 @@ const TourDetailPage = () => {
                   </span>
                 </div>
               )}
-              {tour.city && (
+              {/* {tour.city && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <MapPin className="h-5 w-5 text-gray-500" />
                   <span className="font-bold">Drop-Off:</span>
                   <span>Return to {tour.city}</span>
                 </div>
-              )}
+              )} */}
               <div className="flex items-center gap-3 text-gray-700">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <span className="font-bold">Availability:</span>

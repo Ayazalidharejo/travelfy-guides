@@ -54,14 +54,15 @@ const features = [
     link: "/features/trusted-travelers",
   },
 ];
+// bg-gradient-to-r from-blue-300 to-blue-400 text-transparent
 
 const WhyChooseUs: React.FC = () => {
   return (
-    <section className="bg-white py-16 px-6 md:px-20">
+    <section className="bg-white py-16 px-6 md:px-20 bg-[#f9fafb]">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
           Why Choose{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">
+          <span className=" bg-clip-text ">
             Karvaan Tours
           </span>
           ?

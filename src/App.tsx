@@ -34,6 +34,7 @@ import CustomerSupportPage from "./pages/CustomerSupportPage";
 import TrustedTravelersPage from "./pages/TrustedTravelersPage";
 import CancellationPolicyPage from "./pages/CancellationPolicyPage";
 import RefundPolicyPage from "./pages/RefundPolicyPage";
+import TransportPage from "./pages/TransportPage";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/tours/:id" element={<Layout><TourDetailPage /></Layout>} />
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
             <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
+            <Route path="/vehicle" element={<Layout><TransportPage /></Layout>} />
             <Route path="/privacy" element={<Layout><PrivacyPage /></Layout>} />
             <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
             <Route path="/cancellation-policy" element={<Layout><CancellationPolicyPage /></Layout>} />

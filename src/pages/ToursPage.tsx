@@ -328,7 +328,7 @@ const ToursPage = () => {
       {/* Category */}
       <div>
         <label className="text-sm font-semibold text-gray-700 mb-2 block">
-          Category
+          Theme
         </label>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger>
@@ -418,7 +418,7 @@ const ToursPage = () => {
       </div>
 
       {/* Booking Type */}
-      <div>
+      {/* <div>
         <label className="text-sm font-semibold text-gray-700 mb-2 block flex items-center gap-2">
           <Users className="h-4 w-4" /> Booking Type
         </label>
@@ -434,7 +434,7 @@ const ToursPage = () => {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       {/* Sort */}
       <div>
