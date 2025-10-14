@@ -229,11 +229,11 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                     <span className="text-lg font-bold text-green-600">
                       ${priceInfo.price.toFixed(2)}
                     </span>
-                    {priceInfo.hasDiscount && (
+                    {/* {priceInfo.hasDiscount && (
                       <Badge variant="destructive" className="text-xs px-1 py-0">
                         {tour.discountPercentage}% OFF
                       </Badge>
-                    )}
+                    )} */}
                   </div>
                   <div className="text-xs text-gray-500">
                     {priceInfo.isStartingFrom ? 'Starting from / vehicle' : 'From / person'}

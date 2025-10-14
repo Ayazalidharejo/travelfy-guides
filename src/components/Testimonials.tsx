@@ -3,56 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { postsAPI } from '@/lib/api';
 
-// ========== DUMMY DATA (COMMENTED OUT) ==========
-// const testimonials = [
-//   {
-//     id: 1,
-//     name: "Aisha Khan",
-//     location: "Tokyo, Japan",
-//     review:
-//       "Karvaan Tours made my trip unforgettable! The guides were knowledgeable and the itinerary was perfect.",
-//     rating: 5,
-//     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-//   },
-//   {
-//     id: 2,
-//     name: "Ali Raza",
-//     location: "Osaka, Japan",
-//     review:
-//       "Great service and friendly drivers. Highly recommend Karvaan Tours for anyone visiting Japan.",
-//     rating: 4,
-//     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-//   },
-//   {
-//     id: 3,
-//     name: "Sara Malik",
-//     location: "Kyoto, Japan",
-//     review:
-//       "Beautiful experience with excellent support throughout the trip. Will book again!",
-//     rating: 5,
-//     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-//   },
-//   {
-//     id: 4,
-//     name: "John Doe",
-//     location: "Nagoya, Japan",
-//     review:
-//       "Very professional and friendly team. Everything was smooth and hassle-free.",
-//     rating: 5,
-//     avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-//   },
-//   {
-//     id: 5,
-//     name: "Fatima Noor",
-//     location: "Hokkaido, Japan",
-//     review:
-//       "Amazing tour experience with a lot of cultural insights and fun moments.",
-//     rating: 4,
-//     avatar: "https://randomuser.me/api/portraits/women/55.jpg",
-//   },
-// ];
 
-// ========== REAL-TIME DATA INTERFACE ==========
 interface RealReview {
   _id: string;
   userName: string;
@@ -160,7 +111,7 @@ const Testimonials: React.FC = () => {
             What Our Customers Say
           </h2>
           <p className="text-gray-600 text-lg md:text-xl mb-10">
-            Real feedback from travelers who explored Japan with Karvaan Tours.
+             Feedback from travelers who explored Japan with Karvaan Tours.
           </p>
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -179,7 +130,7 @@ const Testimonials: React.FC = () => {
             What Our Customers Say
           </h2>
           <p className="text-gray-600 text-lg md:text-xl mb-10">
-            Real feedback from travelers who explored Japan with Karvaan Tours.
+             Feedback from travelers who explored Japan with Karvaan Tours.
           </p>
           <p className="text-gray-500 py-10">No reviews yet. Be the first to share your experience!</p>
         </div>
@@ -194,7 +145,7 @@ const Testimonials: React.FC = () => {
           What Our Customers Say
         </h2>
         <p className="text-gray-600 text-lg md:text-xl">
-          Real feedback from travelers who explored Japan with Karvaan Tours.
+           Feedback from travelers who explored Japan with Karvaan Tours.
         </p>
       </div>
 

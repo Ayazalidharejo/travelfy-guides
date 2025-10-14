@@ -213,7 +213,7 @@ const HomePage = () => {
       <Gallery />
 
       {/* Itinerary */}
-      <VerticalItinerary />
+      {/* <VerticalItinerary /> */}
       
 <StatsSectionExact />
       {/* FAQ */}

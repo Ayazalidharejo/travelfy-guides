@@ -26,6 +26,14 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import FeaturedTours from "./components/FeaturedTours";
+import ExpertGuidesPage from "./pages/ExpertGuidesPage";
+import CustomizedToursPage from "./pages/CustomizedToursPage";
+import FreeCancellationPage from "./pages/FreeCancellationPage";
+import ReliableTransportationPage from "./pages/ReliableTransportationPage";
+import CustomerSupportPage from "./pages/CustomerSupportPage";
+import TrustedTravelersPage from "./pages/TrustedTravelersPage";
+import CancellationPolicyPage from "./pages/CancellationPolicyPage";
+import RefundPolicyPage from "./pages/RefundPolicyPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +61,16 @@ const App = () => (
             <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
             <Route path="/privacy" element={<Layout><PrivacyPage /></Layout>} />
             <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
+            <Route path="/cancellation-policy" element={<Layout><CancellationPolicyPage /></Layout>} />
+            <Route path="/refund-policy" element={<Layout><RefundPolicyPage /></Layout>} />
+            
+            {/* Feature detail routes */}
+            <Route path="/features/expert-guides" element={<Layout><ExpertGuidesPage /></Layout>} />
+            <Route path="/features/customized-tours" element={<Layout><CustomizedToursPage /></Layout>} />
+            <Route path="/features/free-cancellation" element={<Layout><FreeCancellationPage /></Layout>} />
+            <Route path="/features/reliable-transportation" element={<Layout><ReliableTransportationPage /></Layout>} />
+            <Route path="/features/customer-support" element={<Layout><CustomerSupportPage /></Layout>} />
+            <Route path="/features/trusted-travelers" element={<Layout><TrustedTravelersPage /></Layout>} />
             
             {/* Protected routes with layout */}
             <Route path="/booking/:tourId" element={<Layout><BookingPage /></Layout>} />

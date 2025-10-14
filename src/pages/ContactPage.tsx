@@ -45,7 +45,7 @@ const ContactPage = () => {
     setTimeout(() => {
       toast({
         title: "Message Sent!",
-        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+        description: "Thank you for contacting us. We'll get back to you within 2-3 days.",
       });
       setFormData({
         name: '',

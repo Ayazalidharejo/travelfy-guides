@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   MapPin,
   Clock,
@@ -15,36 +16,42 @@ const features = [
     title: "Expert Guides & Best Drivers ",
     description:
       "Our experienced guides bring Japan's culture and history to life with every tour.",
+    link: "/features/expert-guides",
   },
   {
     icon: <UserCheck className="text-red-600 w-8 h-8 mb-3" />,
     title: "Customized & Private Tours",
     description:
       "Our drivers know every corner of Japan to ensure you have a smooth, safe journey.",
+    link: "/features/customized-tours",
   },
   {
     icon: <Clock className="text-red-600 w-8 h-8 mb-3" />,
     title: "24 Hours Free Cancellation",
     description:
       "Book with confidence — cancel free up to 24 hours before your tour starts.",
+    link: "/features/free-cancellation",
   },
   {
     icon: <Truck className="text-red-600 w-8 h-8 mb-3" />,
     title: "Reliable Transportation",
     description:
       "Comfortable and safe rides so you can relax and enjoy your adventure.",
+    link: "/features/reliable-transportation",
   },
   {
     icon: <Headset className="text-red-600 w-8 h-8 mb-3" />,
     title: "24/7 Customer Support",
     description:
       "We're here for you anytime during your journey for any assistance you need.",
+    link: "/features/customer-support",
   },
   {
     icon: <Star className="text-red-600 w-8 h-8 mb-3" />,
     title: "Trusted by 1000+ Travelers",
     description:
       "Highly rated and loved by our customers worldwide for unforgettable experiences.",
+    link: "/features/trusted-travelers",
   },
 ];
 
@@ -65,16 +72,20 @@ const WhyChooseUs: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {features.map((feature, index) => (
-            <div
+            <Link
               key={index}
-              className="bg-gray-50 p-6 rounded-xl shadow hover:shadow-md transition"
+              to={feature.link}
+              className="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer block"
             >
               {feature.icon}
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm">{feature.description}</p>
-            </div>
+              <p className="text-gray-600 text-sm mb-3">{feature.description}</p>
+              <span className="text-red-600 font-semibold text-sm inline-flex items-center">
+                Learn More →
+              </span>
+            </Link>
           ))}
         </div>
       </div>

@@ -10,7 +10,7 @@ const NaganoDetail = ({ onClose }) => {
     id: 6,
     name: "Nagano",
     subtitle: "Alpine Beauty & Snow Monkeys",
-    mainImage: "https://images.unsplash.com/photo-1583725094311-ee8f5c85d63b?w=1200&h=800&fit=crop",
+    mainImage:   "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop",
     description: "Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs.",
     longDescription: "Nagano Prefecture is Japan's roof, encompassing much of the Japanese Alps. Famous for 1998 Winter Olympics and snow monkeys. This mountainous region offers pristine nature, ancient temples, and unique wildlife experiences.",
     highlights: [

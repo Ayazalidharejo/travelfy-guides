@@ -21,7 +21,7 @@ const TermsPage = () => {
       icon: AlertTriangle,
       content: [
         'Free cancellation up to 24 hours before tour start time',
-        'Cancellations within 24 hours are subject to full charge',
+        'Cancellations within 2-3 days are subject to full charge',
         'No-shows will be charged the full amount',
         'Weather-related cancellations by us result in full refund or rescheduling',
         'Refunds are processed within 5-10 business days to original payment method'

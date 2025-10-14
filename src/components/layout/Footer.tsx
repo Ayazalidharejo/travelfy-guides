@@ -10,8 +10,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <MapPin className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+              <MapPin className="h-8 w-8 text-[#307172]" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-[#307172] to-[#204f4f]  bg-clip-text text-transparent">
                 Karvaan Tours
               </span>
             </Link>
