@@ -1,12 +1,13 @@
 "use client";
 import React from "react";
+import image from "@/../public/images/about.jpg"
 
 const AboutHero: React.FC = () => {
   return (
     <section className="relative w-full h-[70vh] md:h-[80vh] overflow-hidden">
       {/* ✅ Background Image from Unsplash */}
       <img
-        src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80"
+        src={image}
         alt="Japan travel"
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -18,7 +19,7 @@ const AboutHero: React.FC = () => {
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-6">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           About{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-400">
+          <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_10%)]">
             Karvaan Tours
           </span>
         </h1>

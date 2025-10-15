@@ -45,16 +45,17 @@ const AboutPage = () => {
     {
       icon: Compass,
       title: 'Expert Guidance',
-      description: 'Our local guides are not just knowledgeable - they are storytellers who bring destinations to life with authentic insights.'
+      description: 'Our local guides are not just knowledgeable - they are storytellers who bring destinations to life with their expertise.'
     }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-card overflow-x-hidden">
       {/* Hero Section */}
-      <AboutHero/>
-      <MissionVision/>
+      <AboutHero />
+      <MissionVision />
 
+      {/* About Section */}
       <section className="bg-gradient-hero py-12 sm:py-16 md:py-20">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="text-center max-w-4xl mx-auto">
@@ -71,16 +72,15 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
-      <CoreValues/>
-      <Achievements/>
-      {/* <AboutCTA/> */}
 
-      {/* Story Section */}
+      {/* Our Story Section */}
       <section className="py-12 sm:py-16">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="space-y-4 sm:space-y-6">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Our Story</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5C7AC0] hover:text-[#284078] transition-colors duration-300 cursor-pointer">
+                Our Story
+              </h2>
               <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
                 <p>
                   Travel Tours was born from a simple belief: that travel has the power to transform lives, 
@@ -106,7 +106,7 @@ const AboutPage = () => {
                   className="w-full h-full object-cover opacity-80"
                 />
               </div>
-              <div className="absolute bottom-0 right-0 sm:bottom-2 sm:right-2 lg:-bottom-6 lg:-right-6 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-sunset rounded-full flex items-center justify-center">
+              <div className="absolute bottom-0 right-0 sm:bottom-2 sm:right-2 lg:-bottom-6 lg:-right-6 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-[#5C7AC0] hover:bg-[#284078] rounded-full flex items-center justify-center transition-colors duration-300">
                 <Camera className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-white" />
               </div>
             </div>
@@ -114,11 +114,13 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Values Section */}
+      {/* What Drives Us Section */}
       <section className="py-12 sm:py-16 bg-white">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">What Drives Us</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5C7AC0] hover:text-[#284078] mb-3 sm:mb-4 px-2 transition-colors duration-300 cursor-pointer">
+              What Drives Us
+            </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
               Our core values guide everything we do, from planning your itinerary to the moment you return home with new stories to tell.
             </p>
@@ -126,15 +128,19 @@ const AboutPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {values.map((value, index) => (
-              <Card key={index} className="hover:shadow-medium transition-smooth">
+              <Card key={index} className="hover:shadow-medium transition-smooth group">
                 <CardContent className="p-4 sm:p-6 lg:p-8">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-primary rounded-lg flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#5C7AC0] group-hover:bg-[#284078] rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300">
                       <value.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{value.title}</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{value.description}</p>
+                      <h3 className="text-lg sm:text-xl font-semibold text-[#5C7AC0] group-hover:text-[#284078] mb-2 sm:mb-3 transition-colors duration-300">
+                        {value.title}
+                      </h3>
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                        {value.description}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -144,11 +150,13 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Meet Our Team Section */}
       <section className="py-12 sm:py-16">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">Meet Our Team</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5C7AC0] hover:text-[#284078] mb-3 sm:mb-4 px-2 transition-colors duration-300 cursor-pointer">
+              Meet Our Team
+            </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
               Behind every great tour is a team of passionate individuals who live and breathe travel.
             </p>
@@ -160,14 +168,22 @@ const AboutPage = () => {
               { name: 'Michael Chen', role: 'Head of Operations', experience: '12 years in tourism' },
               { name: 'Emily Rodriguez', role: 'Cultural Experience Director', experience: '10 years local expertise' }
             ].map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-medium transition-smooth">
+              <Card key={index} className="text-center hover:shadow-medium transition-smooth group">
                 <CardContent className="p-4 sm:p-6 lg:p-8">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-primary rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                    <span className="text-xl sm:text-2xl font-bold text-white">{member.name.split(' ').map(n => n[0]).join('')}</span>
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#5C7AC0] group-hover:bg-[#284078] rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center transition-colors duration-300">
+                    <span className="text-xl sm:text-2xl font-bold text-white">
+                      {member.name.split(' ').map(n => n[0]).join('')}
+                    </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{member.name}</h3>
-                  <p className="text-sm sm:text-base text-primary font-medium mb-1">{member.role}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{member.experience}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#5C7AC0] group-hover:text-[#284078] mb-1 sm:mb-2 transition-colors duration-300">
+                    {member.name}
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#5C7AC0] font-medium mb-1">
+                    {member.role}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {member.experience}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -175,8 +191,11 @@ const AboutPage = () => {
         </div>
       </section>
 
+      <CoreValues />
+      <Achievements />
+
       {/* CTA Section */}
-      <section className="py-12 sm:py-16 bg-gradient-sunset">
+      <section className="py-12 sm:py-16 bg-[#5C7AC0]">
         <div className="container px-4 mx-auto max-w-7xl text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 px-2">
@@ -187,16 +206,24 @@ const AboutPage = () => {
               Your next great story is just one booking away.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
-              <a href="/tours" className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary rounded-lg hover:bg-white/90 transition-smooth font-semibold text-sm sm:text-base">
+              <a 
+                href="/tours" 
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-[#5C7AC0] hover:bg-gray-100 hover:text-[#284078] rounded-lg transition-all duration-300 font-semibold text-sm sm:text-base"
+              >
                 Browse Tours
               </a>
-              <a href="/contact" className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-smooth font-semibold text-sm sm:text-base">
+              <a 
+                href="/contact" 
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white hover:bg-white hover:text-[#5C7AC0] rounded-lg transition-all duration-300 font-semibold text-sm sm:text-base"
+              >
                 Contact Us
               </a>
             </div>
           </div>
         </div>
       </section>
+
+      {/* <AboutCTA /> */}
     </div>
   );
 };

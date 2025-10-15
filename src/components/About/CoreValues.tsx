@@ -40,7 +40,7 @@ const CoreValues: React.FC = () => {
     <section className="bg-gray-50 py-16 px-6 md:px-20">
       <div className="max-w-6xl mx-auto text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">Core Values</span>
+          Our <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">Core Values</span>
         </h2>
         <p className="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">
           These are the principles that guide everything we do at Karvaan Tours.

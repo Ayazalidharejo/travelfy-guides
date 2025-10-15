@@ -6,7 +6,7 @@ const TrustedTravelersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white py-20 px-6">
+      <div className="bg-gradient-to-r from-[#000] to-[#5C7AC0] text-white py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <Star className="w-20 h-20 mx-auto mb-6 fill-white" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -278,7 +278,7 @@ const TrustedTravelersPage: React.FC = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-red-600 to-yellow-500 rounded-2xl p-8 md:p-12 text-center text-white">
+        <section className="bg-gradient-to-r from-[#000] to-[#5C7AC0] rounded-2xl p-8 md:p-12 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Become Our Next Success Story?</h2>
           <p className="text-xl mb-8 text-white/90">
             Join thousands of satisfied travelers and book your unforgettable Japanese adventure today!

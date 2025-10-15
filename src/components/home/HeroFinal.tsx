@@ -190,7 +190,7 @@ const HeroFinal = () => {
                 style={{ 
                   fontSize: 'clamp(40px, 11vw, 70px)', 
                   lineHeight: '0.9',
-                  color: '#3B82F6',
+                  color: '#284078',
                   fontFamily: 'Arial, sans-serif',
                   fontWeight: '900',
                   letterSpacing: '2px'
@@ -228,9 +228,9 @@ const HeroFinal = () => {
           {/* Start Your Journey Button - Gold/Tan Color */}
           <button
             onClick={() => navigate('/tours')}
-            className="px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:opacity-90"
+            className="px-8 py-3 rounded-full bg-[#5C7AC0] text-white hover:bg-[#284078] font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:opacity-90"
             style={{
-              backgroundColor: '#C9A961',
+             
               fontSize: '14px',
               letterSpacing: '1px'
             }}
@@ -243,13 +243,13 @@ const HeroFinal = () => {
             onClick={() => navigate('/contact')}
             className="px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:bg-white hover:text-white"
             style={{
-              border: '2px solid white',
+              border: '2px solid #5C7AC0',
               backgroundColor: 'transparent',
               fontSize: '14px',
               letterSpacing: '1px'
             }}
           >
-            EXPLORE TOURS
+            Contact us
           </button>
         </div>
 

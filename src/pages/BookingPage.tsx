@@ -879,7 +879,7 @@
 //                       >
 //                         <div className="flex items-center justify-between">
 //                           <div className="flex items-center gap-3">
-//                             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+//                             <div className="w-12 h-12 bg-[#5C7AC0]  hover:bg-[#284078] rounded-lg flex items-center justify-center">
 //                               <Baby className="h-6 w-6 text-blue-600" />
 //                             </div>
 //                             <div>
@@ -1691,7 +1691,7 @@
 //                   >
 //                     <div className="flex items-center justify-between">
 //                       <div className="flex items-center gap-3">
-//                         <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+//                         <div className="w-12 h-12 bg-[#5C7AC0]  hover:bg-[#284078] rounded-lg flex items-center justify-center">
 //                           <Baby className="h-6 w-6 text-blue-600" />
 //                         </div>
 //                         <div>
@@ -2517,7 +2517,7 @@ const BookingPage = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-[#5C7AC0]  hover:bg-[#284078] rounded-lg flex items-center justify-center">
                           <Baby className="h-6 w-6 text-blue-600" />
                         </div>
                         <div>

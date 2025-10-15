@@ -3,7 +3,7 @@ import React from "react";
 
 const AboutCTA: React.FC = () => {
   return (
-    <section className="bg-gradient-to-r from-red-600 to-yellow-500 py-16 px-6 md:px-20 text-center rounded-lg max-w-6xl mx-auto my-20 shadow-lg">
+    <section className="bg-gradient-to-r from-[#000] to-[#5C7AC0] py-16 px-6 md:px-20 text-center rounded-lg max-w-6xl mx-auto my-20 shadow-lg">
       <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
         Ready to start your unforgettable journey with <span className="underline decoration-white/70">Karvaan Tours</span>?
       </h2>

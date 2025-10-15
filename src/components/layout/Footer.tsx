@@ -19,16 +19,16 @@ const Footer = () => {
               Discover amazing destinations and create unforgettable memories with our curated travel experiences.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
+              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
+              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
+              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
+              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -82,15 +82,15 @@ const Footer = () => {
             <h3 className="text-lg font-semibold">Contact Info</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-primary" />
+                <Mail className="h-5 w-5 text-[#4C9684]  hover:text-[#166955]" />
                 <span className="text-muted-foreground">info@karvaantours.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-primary" />
+                <Phone className="h-5 w-5 text-[#4C9684]  hover:text-[#166955]" />
                 <span className="text-muted-foreground">+81 80-7480-1156</span>
               </div>
               <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-primary" />
+                <MapPin className="h-5 w-6 text-[#4C9684]  hover:text-[#166955]" />
                 <span className="text-muted-foreground">2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.</span>
               </div>
             </div>

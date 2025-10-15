@@ -95,7 +95,7 @@ const BasicInfoSection = ({
             {formData.taglinesList.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.taglinesList.map((tagline, index) => (
-                  <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
                     {tagline}
                     <button 
                       type="button" 
@@ -128,7 +128,7 @@ const BasicInfoSection = ({
               {formData.selectedSellingPoints.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.selectedSellingPoints.map((point, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
                       {point}
                       <button 
                         type="button" 

@@ -277,7 +277,7 @@ const CompleteBlogManagement = () => {
                       {post.featured && <Star className="ml-2 h-4 w-4 text-yellow-400 fill-current" />}
                     </div>
                   </td>
-                  <td className="px-6 py-4"><span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{post.category}</span></td>
+                  <td className="px-6 py-4"><span className="px-2 py-1 text-xs rounded-full bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800">{post.category}</span></td>
                   <td className="px-6 py-4 text-sm">{post.price}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 text-xs rounded-full ${

@@ -3,7 +3,7 @@ import React from "react";
 
 const CallToAction: React.FC = () => {
   return (
-    <section className="bg-gradient-to-r from-red-600 to-yellow-500 py-16 px-6 md:px-20 text-center text-white rounded-lg mx-6 md:mx-20 my-12 shadow-lg">
+    <section className="bg-gradient-to-r from-[#000] to-[#5C7AC0] py-16 px-6 md:px-20 text-center text-white rounded-lg mx-6 md:mx-20 my-12 shadow-lg">
       <h2 className="text-3xl md:text-4xl font-bold mb-4">
         Ready to Start Your Adventure with{" "}
         <span className="bg-white/30 px-2 rounded">Karvaan</span>?

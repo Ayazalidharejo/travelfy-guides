@@ -244,7 +244,7 @@ const TourDetailPage = () => {
                   {tour.selectedSellingPoints.map((point: string, index: number) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
+                      className="flex items-center gap-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
                     >
                       <span>{point}</span>
                     </div>
@@ -373,7 +373,7 @@ const TourDetailPage = () => {
                         <span className="font-semibold text-gray-700 block mb-2">Taglines:</span>
                         <div className="flex flex-wrap gap-2">
                           {tour.taglinesList.map((tag: string, i: number) => (
-                            <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                            <span key={i} className="px-3 py-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded-full text-sm">
                               {tag}
                             </span>
                           ))}
@@ -808,7 +808,7 @@ const TourDetailPage = () => {
                             <p className="font-semibold text-gray-700 mb-1">Days:</p>
                             <div className="flex flex-wrap gap-2">
                               {item.days.map((day: string, i: number) => (
-                                <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                                <span key={i} className="px-2 py-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded text-sm">
                                   {day}
                                 </span>
                               ))}
@@ -890,7 +890,7 @@ const TourDetailPage = () => {
       {tour.selectedSellingPoints.map((point: string, index: number) => (
         <div
           key={index}
-          className="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
+          className="flex items-center gap-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
         >
           <span>{point}</span>
         </div>

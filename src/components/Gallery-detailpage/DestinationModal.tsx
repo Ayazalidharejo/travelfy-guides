@@ -205,7 +205,7 @@ const DestinationModal = ({ data, onClose, expandedItems, toggleExpand, openInGo
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {data.activities.map((activity, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <span key={idx} className="px-4 py-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full text-sm font-medium">
                       {activity}
                     </span>
                   ))}

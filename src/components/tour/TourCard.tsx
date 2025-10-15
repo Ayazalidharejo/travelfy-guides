@@ -97,7 +97,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
 
         {/* Discount Badge (Priority) */}
         {(tour.discountPercentage || tour.discount?.percentage) ? (
-          <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0 font-bold shadow-lg">
+          <Badge className="absolute top-3 left-3 bg-[#5C7AC0]  hover:bg-[#284078] text-white border-0 font-bold shadow-lg">
             🔥 {tour.discountPercentage || tour.discount?.percentage}% OFF
           </Badge>
         ) : tour.featured ? (
@@ -108,7 +108,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
 
         {/* Category Badge */}
         <Badge
-          className={`absolute top-3 right-3 text-white border-0 ${categoryColors[tour.category as keyof typeof categoryColors] || 'bg-primary'
+          className={`absolute top-3 right-3 text-white border-0 ${categoryColors[tour.category as keyof typeof categoryColors] || 'bg-[#5C7AC0]  hover:bg-[#284078]'
             }`}
         >
           {tour.category}
@@ -226,7 +226,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                         ${priceInfo.originalPrice.toFixed(2)}
                       </span>
                     )}
-                    <span className="text-lg font-bold text-green-600">
+                    <span className="text-lg font-bold text-[#5C7AC0]  hover:text-[#284078]">
                       ${priceInfo.price.toFixed(2)}
                     </span>
                     {/* {priceInfo.hasDiscount && (
@@ -235,7 +235,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                       </Badge>
                     )} */}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-[#5C7AC0]  hover:text-[#284078]">
                     {priceInfo.isStartingFrom ? 'Starting from / vehicle' : 'From / person'}
                   </div>
                 </div>
@@ -243,7 +243,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             })()}
           </div>
 
-          <Button
+          {/* <Button
             // variant=""
             size="sm"
             className="shadow-medium"
@@ -252,8 +252,20 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
               handleCardClick();
             }}
           >
+            
             View Details
-          </Button>
+          </Button> */}
+          <Button
+  size="sm"
+  className="shadow-medium  bg-[#5C7AC0]  hover:bg-[#284078]"
+  onClick={e => {
+    e.stopPropagation();
+    handleCardClick();
+  }}
+>
+  View Details
+</Button>
+
         </div>
       </CardContent>
     </Card>

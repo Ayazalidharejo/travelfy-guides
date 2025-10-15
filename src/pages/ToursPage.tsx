@@ -366,17 +366,17 @@ const ToursPage = () => {
 
       {/* Duration */}
       <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2 ">
           <Clock className="h-4 w-4" /> Duration (Days)
         </label>
-        <Slider
+        <Slider className="bg-[#5C7AC0]"
           min={1}
           max={15}
           step={1}
           value={durationRange}
           onValueChange={setDurationRange}
         />
-        <div className="text-xs text-gray-500 mt-1">
+        <div className="text-xs   mt-1">
           {durationRange[0]} - {durationRange[1]} days
         </div>
       </div>
@@ -386,13 +386,15 @@ const ToursPage = () => {
         <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
           <DollarSign className="h-4 w-4" /> Price Range ($)
         </label>
-        <Slider
-          min={0}
-          max={5000}
-          step={50}
-          value={priceRange}
-          onValueChange={setPriceRange}
-        />
+      <Slider
+  min={0}
+  max={5000}
+  step={50}
+  value={priceRange}
+  className="bg-[#5C7AC0]"
+  onValueChange={setPriceRange}
+/>
+
         <div className="text-xs text-gray-500 mt-1">
           ${priceRange[0]} - ${priceRange[1]}
         </div>
@@ -456,16 +458,16 @@ const ToursPage = () => {
       </div>
 
       {/* Clear */}
-      <Button variant="outline" className="w-full" onClick={clearFilters}>
+      <Button variant="outline" className="w-full bg-[#5C7AC0] text-white hover:bg-[#284078]" onClick={clearFilters}>
         Clear All Filters
       </Button>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-20 text-center relative">
+      <section className="bg-gradient-to-br from-[#5C7AC0] to-[#284078] text-white py-20 text-center relative">
         <h1 className="text-5xl font-bold mb-4">Explore Our Tours</h1>
         <p className="text-lg opacity-90 mb-8">
           Find your perfect adventure with filters and search.
@@ -484,7 +486,7 @@ const ToursPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-white text-gray-800"
             />
-            <Button type="submit" className="bg-yellow-400 hover:bg-yellow-500">
+            <Button type="submit" className="bg-[#5C7AC0] text-white hover:bg-[#284078]">
               <Search className="mr-2 h-4 w-4" /> Search
             </Button>
           </form>

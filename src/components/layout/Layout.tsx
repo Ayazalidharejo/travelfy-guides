@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import StickyChatButton from '@/components/StickyChatButton';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => {
         {children}
       </main>
       {showFooter && <Footer />}
+      <StickyChatButton />
     </div>
   );
 };

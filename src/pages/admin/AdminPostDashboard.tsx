@@ -1571,7 +1571,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <div className="mb-3">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">{tour.title}</h3>
                         <div className="flex gap-2 flex-wrap">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          <span className="px-2 py-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 text-xs rounded-full">
                             {tour.category || 'Tour'}
                           </span>
                           {tour.city && (
@@ -1677,7 +1677,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <div className="flex gap-2 mt-auto">
                         <button
                           onClick={() => openEditModal(tour)}
-                          className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition flex items-center justify-center gap-2"
+                          className="flex-1 px-3 py-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded hover:bg-blue-200 transition flex items-center justify-center gap-2"
                         >
                           <Edit2 size={16} />
                           Edit
@@ -1814,7 +1814,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       {formData.taglinesList.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {formData.taglinesList.map((tagline, index) => (
-                            <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
                               {tagline}
                               <button 
                                 type="button" 
@@ -1847,7 +1847,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         {formData.selectedSellingPoints.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-2">
                             {formData.selectedSellingPoints.map((point, index) => (
-                              <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                              <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
                                 {point}
                                 <button 
                                   type="button" 
@@ -2616,7 +2616,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     }`}>
                       <div className="flex items-center justify-between mb-4 pb-3 border-b">
                         <h3 className="text-xl font-semibold text-gray-800">Pricing Schedule</h3>
-                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <div className="bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
                           📅 Shared Schedule for All Vehicles
                         </div>
                       </div>
@@ -2625,7 +2625,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         {/* Schedule Explanation */}
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 bg-[#5C7AC0]  hover:bg-[#284078] rounded-full flex items-center justify-center flex-shrink-0">
                               <span className="text-blue-600 text-sm font-bold">ℹ️</span>
                             </div>
                             <div>
@@ -2794,7 +2794,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                                     {schedule.days.map((day: string) => (
                                       <span
                                         key={day}
-                                        className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full mr-1 mb-1"
+                                        className="inline-block bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 text-xs px-2 py-1 rounded-full mr-1 mb-1"
                                       >
                                         {day}
                                       </span>

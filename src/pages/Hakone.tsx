@@ -137,7 +137,7 @@ const Hakone = () => {
             </h2>
             <div className="flex flex-wrap gap-3">
               {destination.activities.map((activity, idx) => (
-                <span key={idx} className="px-6 py-3 bg-blue-100 text-blue-800 rounded-full text-base font-medium shadow-sm">
+                <span key={idx} className="px-6 py-3 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full text-base font-medium shadow-sm">
                   {activity}
                 </span>
               ))}

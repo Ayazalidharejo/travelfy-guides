@@ -44,12 +44,8 @@ const ConsultationSection = () => {
               </div>
 
               <Button 
-                className="text-sm px-6 py-2 rounded-lg font-medium"
-                style={{ 
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
-                  border: 'none'
-                }}
+                className="text-sm px-6 py-2 rounded-lg font-medium bg-[#4C9684]  hover:bg-[#166955] text-white "
+             
               >
                 Book Free Consultation
               </Button>

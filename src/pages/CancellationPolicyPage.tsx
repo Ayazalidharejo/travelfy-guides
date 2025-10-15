@@ -16,7 +16,7 @@ const CancellationPolicyPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white py-16 px-6">
+      <div className="bg-gradient-to-r from-[#000] to-[#5C7AC0] text-white py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center mb-4">
             <FileText className="w-12 h-12 mr-3" />
@@ -315,7 +315,7 @@ const CancellationPolicyPage: React.FC = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="bg-gradient-to-r from-red-600 to-yellow-500 rounded-2xl p-8 md:p-12 text-white">
+        <section className="bg-gradient-to-r from-[#000] to-[#5C7AC0] rounded-2xl p-8 md:p-12 text-white">
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold mb-4">Need Help with Cancellation?</h2>
             <p className="text-xl text-white/90 mb-8">

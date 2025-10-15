@@ -37,7 +37,7 @@ const FAQ: React.FC = () => {
         {/* Heading */}
         <h2 className="text-3xl font-extrabold text-center mb-4 text-gray-900">
           Frequently Asked Questions about{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#000] to-[#5C7AC0]">
             Karvaan Tours
           </span>
         </h2>
@@ -56,10 +56,10 @@ const FAQ: React.FC = () => {
             >
               <div className="flex justify-between items-center px-8 py-5 bg-white group-hover:bg-gray-100 transition">
                 <span className="text-lg font-semibold text-gray-800">{question}</span>
-                <span className="text-red-600 group-hover:hidden">
+                <span className="text-[#4C9684] group-hover:hidden">
                   <Plus className="w-6 h-6" />
                 </span>
-                <span className="text-red-600 hidden group-hover:block">
+                <span className="text-[#166955] hidden group-hover:block">
                   <Minus className="w-6 h-6" />
                 </span>
               </div>

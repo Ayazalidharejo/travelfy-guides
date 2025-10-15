@@ -65,7 +65,7 @@
 //     <section className="relative bg-gradient-to-br from-[#fff7f0] via-[#f5f5fa] to-[#EDE3D8] py-20 px-6 overflow-hidden">
 //       {/* Decorative elements */}
 //       <div className="absolute top-0 left-0 w-40 h-40 bg-pink-100 rounded-full opacity-30 blur-3xl" />
-//       <div className="absolute bottom-0 right-0 w-56 h-56 bg-blue-100 rounded-full opacity-20 blur-3xl" />
+//       <div className="absolute bottom-0 right-0 w-56 h-56 bg-[#5C7AC0]  hover:bg-[#284078] rounded-full opacity-20 blur-3xl" />
 //       <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-yellow-100 rounded-full opacity-20 blur-2xl" />
 
 //       <div className="max-w-7xl mx-auto text-center relative z-10">
@@ -98,7 +98,7 @@
 //         <div className="max-w-4xl mx-auto mb-12">
 //           <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 md:p-10 shadow-xl border border-white/50">
 //             <p className="text-lg md:text-xl text-gray-800 mb-5 leading-relaxed">
-//               Welcome to <strong className="text-transparent bg-gradient-to-r from-red-600 to-yellow-500 bg-clip-text">Karvaan Tours</strong>, your gateway to experiencing the real Japan. We craft <strong className="text-gray-900">personalized journeys</strong> that go beyond the ordinary tourist trail, revealing the heart and soul of this extraordinary land.
+//               Welcome to <strong className="text-transparent bg-gradient-to-r from-[#000] to-[#5C7AC0] bg-clip-text">Karvaan Tours</strong>, your gateway to experiencing the real Japan. We craft <strong className="text-gray-900">personalized journeys</strong> that go beyond the ordinary tourist trail, revealing the heart and soul of this extraordinary land.
 //             </p>
 //             <p className="text-base md:text-lg text-gray-700 leading-relaxed mb-5">
 //               From the neon-lit streets of <strong className="text-gray-900">Tokyo</strong> to the serene temples of <strong className="text-gray-900">Kyoto</strong>, from the majestic peak of <strong className="text-gray-900">Mount Fuji</strong> to the vibrant food scene of <strong className="text-gray-900">Osaka</strong>—we bring Japan's magic to life through authentic experiences, expert guides, and unforgettable moments.
@@ -134,7 +134,7 @@
 //         {/* CTA Buttons */}
 //        {/* <div className="flex flex-wrap items-center justify-center gap-4">
 //   <Link to="/tours">
-//     <button className="group bg-gradient-to-r from-red-600 to-yellow-500 hover:from-red-700 hover:to-yellow-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl transition-all transform hover:scale-105 hover:shadow-2xl relative overflow-hidden">
+//     <button className="group bg-gradient-to-r from-[#000] to-[#5C7AC0] hover:from-red-700 hover:to-yellow-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl transition-all transform hover:scale-105 hover:shadow-2xl relative overflow-hidden">
 //       <span className="relative z-10">Start Your Journey</span>
 //       <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
 //     </button>
@@ -155,18 +155,18 @@
 //     </section>
 //   );
 // }
-
+// #fce7ec
 
 import { Link } from 'react-router-dom';
 import IntroVersion1, { IntroVersion10, IntroVersion11, IntroVersion12, IntroVersion13, IntroVersion14, IntroVersion15, IntroVersion16, IntroVersion17, IntroVersion18, IntroVersion19, IntroVersion2, IntroVersion20, IntroVersion21, IntroVersion22, IntroVersion23, IntroVersion24, IntroVersion25, IntroVersion3, IntroVersion4, IntroVersion5, IntroVersion6, IntroVersion7, IntroVersion8, IntroVersion9 } from './Intro';
 
 export default function IntroductionSection() {
   return (
-    <section className="py-20" style={{ backgroundColor: '#dce7f3' }}>
+    <section className="py-20 bg-[linear-gradient(to_bottom,_#ffffff,_#e2e7f5)]" >
       <div className="max-w-8xl mx-auto text-center px-6">
         {/* Simple Heading */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-           Discover Japan  <span className="text-blue-600">With us</span>
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6  leading-tight">
+           Discover Japan  <span className="text-[#5C7AC0]">With us</span>
          </h1>
         
         {/* Simple Paragraph */}

@@ -12,42 +12,42 @@ import {
 
 const features = [
   {
-    icon: <MapPin className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <MapPin className="text-[#307072] w-8 h-8 mb-3" />,
     title: "Expert Guides & Best Drivers ",
     description:
       "Our experienced guides bring Japan's culture and history to life with every tour.",
     link: "/features/expert-guides",
   },
   {
-    icon: <UserCheck className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <UserCheck className="text-[#307072] w-8 h-8 mb-3" />,
     title: "Customized & Private Tours",
     description:
       "Our drivers know every corner of Japan to ensure you have a smooth, safe journey.",
     link: "/features/customized-tours",
   },
   {
-    icon: <Clock className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <Clock className="text-[#307072] w-8 h-8 mb-3" />,
     title: "24 Hours Free Cancellation",
     description:
       "Book with confidence — cancel free up to 24 hours before your tour starts.",
     link: "/features/free-cancellation",
   },
   {
-    icon: <Truck className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <Truck className="text-[#307072] w-8 h-8 mb-3" />,
     title: "Reliable Transportation",
     description:
       "Comfortable and safe rides so you can relax and enjoy your adventure.",
     link: "/features/reliable-transportation",
   },
   {
-    icon: <Headset className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <Headset className="text-[#307072] w-8 h-8 mb-3" />,
     title: "24/7 Customer Support",
     description:
       "We're here for you anytime during your journey for any assistance you need.",
     link: "/features/customer-support",
   },
   {
-    icon: <Star className="text-red-600 w-8 h-8 mb-3" />,
+    icon: <Star className="text-[#307072] w-8 h-8 mb-3" />,
     title: "Trusted by 1000+ Travelers",
     description:
       "Highly rated and loved by our customers worldwide for unforgettable experiences.",
@@ -83,7 +83,7 @@ const WhyChooseUs: React.FC = () => {
                 {feature.title}
               </h3>
               <p className="text-gray-600 text-sm mb-3">{feature.description}</p>
-              <span className="text-red-600 font-semibold text-sm inline-flex items-center">
+              <span className="text-[#5C7AC0] font-semibold text-sm inline-flex items-center">
                 Learn More →
               </span>
             </Link>

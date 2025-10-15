@@ -228,7 +228,7 @@ export function IntroVersion8() {
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <div className="bg-white rounded-2xl shadow-2xl p-10 md:p-12 mt-12">
           <div className="text-center mb-6">
-            <div className="inline-block bg-blue-100 rounded-full p-4 mb-4">
+            <div className="inline-block bg-[#5C7AC0]  hover:bg-[#284078] rounded-full p-4 mb-4">
               <Globe className="w-12 h-12 text-blue-600" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -429,7 +429,7 @@ export function IntroVersion14() {
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#5C7AC0]  hover:bg-[#284078] rounded-full flex items-center justify-center">
               <Star className="w-6 h-6 text-blue-600" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900">

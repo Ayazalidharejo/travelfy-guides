@@ -65,7 +65,7 @@ const Gallery = () => {
         {/* Header */}
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
           Explore Beautiful{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-yellow-500">
+          <span className="text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">
             Japan Destinations
           </span>
         </h2>
@@ -92,7 +92,7 @@ const Gallery = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end pb-6">
                 <h3 className="text-2xl font-bold text-white">{destination.name}</h3>
                 <p className="text-white mt-2 italic">{destination.subtitle}</p>
-                <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition opacity-0 group-hover:opacity-100">
+                <button className="mt-3 px-4 py-2 bg-[#5C7AC0]  hover:bg-[#284078] text-white rounded-md  transition opacity-0 group-hover:opacity-100">
                   View Details
                 </button>
               </div>

@@ -35,7 +35,9 @@ import TrustedTravelersPage from "./pages/TrustedTravelersPage";
 import CancellationPolicyPage from "./pages/CancellationPolicyPage";
 import RefundPolicyPage from "./pages/RefundPolicyPage";
 import TransportPage from "./pages/TransportPage";
-
+import FAQPage from "./pages/FAQPage";
+import HelpSupportPage from "./pages/HelpSupportPage";
+import Scroll from "@/components/Scroll"
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,6 +47,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+         <Scroll />
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="//test" element={<FeaturedTours />} />
@@ -65,6 +68,8 @@ const App = () => (
             <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
             <Route path="/cancellation-policy" element={<Layout><CancellationPolicyPage /></Layout>} />
             <Route path="/refund-policy" element={<Layout><RefundPolicyPage /></Layout>} />
+            <Route path="/faq" element={<Layout><FAQPage /></Layout>} />
+            <Route path="/help" element={<Layout><HelpSupportPage /></Layout>} />
             
             {/* Feature detail routes */}
             <Route path="/features/expert-guides" element={<Layout><ExpertGuidesPage /></Layout>} />

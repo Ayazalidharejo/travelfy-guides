@@ -106,7 +106,7 @@ const Gotemba = () => {
             <h2 className="text-4xl font-bold text-gray-900 mb-6 flex items-center gap-3"><Users className="w-10 h-10 text-[#307172]" />Activities</h2>
             <div className="flex flex-wrap gap-3">
               {destination.activities.map((activity, idx) => (
-                <span key={idx} className="px-6 py-3 bg-blue-100 text-blue-800 rounded-full text-base font-medium shadow-sm">{activity}</span>
+                <span key={idx} className="px-6 py-3 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full text-base font-medium shadow-sm">{activity}</span>
               ))}
             </div>
           </div>

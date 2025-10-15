@@ -238,7 +238,7 @@ const HomePage = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
                  Products: {featuredTours[0]?.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-[#284078]">
                   Share your experience or read what others have to say
                 </p>
               </div>

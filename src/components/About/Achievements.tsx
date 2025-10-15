@@ -30,7 +30,7 @@ const Achievements: React.FC = () => {
     <section className="bg-white py-16 px-6 md:px-20">
       <div className="max-w-6xl mx-auto text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">Achievements</span>
+          Our <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">Achievements</span>
         </h2>
         <p className="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">
           We’re proud of what we’ve accomplished together with our amazing travelers.
@@ -41,7 +41,7 @@ const Achievements: React.FC = () => {
         {achievements.map(({ icon, number, label }, idx) => (
           <div key={idx} className="flex flex-col items-center bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-lg transition">
             {icon}
-            <span className="mt-4 text-4xl font-extrabold text-red-600">{number}</span>
+            <span className="mt-4 text-4xl font-extrabold text-[#5C7AC0]  hover:text-[#284078]" >{number}</span>
             <span className="mt-2 text-lg font-medium text-gray-800">{label}</span>
           </div>
         ))}
