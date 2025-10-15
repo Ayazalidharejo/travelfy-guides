@@ -30,7 +30,7 @@ const ProfilePage = () => {
     }
 
     // For relative paths, use local backend URL
-    const baseURL = 'http://localhost:5000';
+    const baseURL = 'https://tour-backend-eight.vercel.app';
     return `${baseURL}${avatarPath}`;
   }, []);
 
