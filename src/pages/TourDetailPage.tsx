@@ -244,7 +244,7 @@ const TourDetailPage = () => {
                   {tour.selectedSellingPoints.map((point: string, index: number) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
+                      className="flex items-center gap-2  text-blue-800 rounded-full px-3 py-1 text-sm shadow-sm"
                     >
                       <span>{point}</span>
                     </div>
