@@ -373,7 +373,7 @@ const TourDetailPage = () => {
                         <span className="font-semibold text-gray-700 block mb-2">Taglines:</span>
                         <div className="flex flex-wrap gap-2">
                           {tour.taglinesList.map((tag: string, i: number) => (
-                            <span key={i} className="px-3 py-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded-full text-sm">
+                            <span key={i} className="px-3 py-1  text-blue-700 rounded-full text-sm">
                               {tag}
                             </span>
                           ))}
