@@ -333,6 +333,11 @@ export const bookingsAPI = {
     const response = await api.put(`/bookings/${id}/cancel`, { reason });
     return response.data;
   },
+
+  getUserBookings: async () => {
+    const response = await api.get('/bookings/my-bookings');
+    return { success: true, bookings: response.data || [] };
+  },
 };
 
 // Admin API calls

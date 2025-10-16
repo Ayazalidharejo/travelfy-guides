@@ -37,7 +37,7 @@ const FAQ: React.FC = () => {
         {/* Heading */}
         <h2 className="text-3xl font-extrabold text-center mb-4 text-gray-900">
           Frequently Asked Questions about{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#000] to-[#5C7AC0]">
+          <span className="text-[#5C7AC0] bg-clip-text ">
             Karvaan Tours
           </span>
         </h2>

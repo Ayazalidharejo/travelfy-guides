@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { postsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import UserChat from './UserChat';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Exact Design Components
 import HeroFinal from '@/components/home/HeroFinal';
@@ -25,7 +29,9 @@ const HomePage = () => {
   const [featuredTours, setFeaturedTours] = useState<any[]>([]);
   const [popularTours, setPopularTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -187,7 +193,7 @@ const HomePage = () => {
       {popularTours.length > 0 && (
         <section className="container mx-auto px-4 py-10">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Products 
+         Tranding Products 
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {popularTours.map((tour: any) => (
@@ -257,6 +263,25 @@ const HomePage = () => {
 
       {/* Footer */}
       {/* <FooterSection /> */}
+
+      {/* Floating Live Chat Button */}
+      {isAuthenticated && (
+        <>
+          <Button
+            onClick={() => setShowChat(true)}
+            className="fixed bottom-6 right-6 z-50 h-16 w-16 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+            size="icon"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+
+          {showChat && (
+            <div className="fixed bottom-24 right-6 z-50">
+              <UserChat onClose={() => setShowChat(false)} />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

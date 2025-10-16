@@ -1964,13 +1964,15 @@ import {
   Car,
   Baby,
   ShoppingBag,
-  ArrowLeft
+  ArrowLeft,
+  Globe,
+  CreditCard
 } from 'lucide-react';
 
 const BookingPage = () => {
   const { tourId } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const { toast } = useToast();
   
   const [tour, setTour] = useState(null);
@@ -2006,6 +2008,8 @@ const BookingPage = () => {
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [paymentMethod, setPaymentMethod] = useState('stripe'); // 'stripe' or 'bookNowPayLater'
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -2138,6 +2142,9 @@ const BookingPage = () => {
     const totalParticipants = getTotalParticipants();
     const capacity = parseInt(vehicle.capacity) || 0;
     
+    console.log('🚗 Vehicle selected:', vehicle);
+    console.log('👥 Total participants:', totalParticipants);
+    
     if (totalParticipants > capacity) {
       setVehicleError(`This vehicle can accommodate up to ${capacity} persons. You have ${totalParticipants} participants. Please select a larger vehicle.`);
       toast({
@@ -2164,11 +2171,23 @@ const BookingPage = () => {
     setSelectedTransportModal(vehicle.transportModal || '');
     
     // Show additional sections after vehicle selection
+    console.log('✅ Showing Language & Payment options...');
     setShowAdditionalSections(true);
+    
+    toast({
+      title: "Vehicle Selected! ✅",
+      description: "Scroll down to select language and payment method.",
+    });
     
     // Scroll to additional sections
     setTimeout(() => {
-      document.getElementById('additional-sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const element = document.getElementById('additional-sections');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log('📍 Scrolled to additional sections');
+      } else {
+        console.error('❌ additional-sections element not found!');
+      }
     }, 100);
   };
 
@@ -2230,20 +2249,80 @@ const BookingPage = () => {
           stroller: additionalOptions.stroller,
           wheelchair: additionalOptions.wheelchair,
           extraLuggage: additionalOptions.extraLuggage
-        }
+        },
+        preferredLanguage: selectedLanguage,
+        paymentMethod: paymentMethod,
+        totalAmount: total
       };
 
       const response = await bookingsAPI.createBooking(bookingData);
       
       if (response.success) {
-        toast({
-          title: "Booking Created!",
-          description: "Redirecting to your bookings...",
-        });
+        console.log('✅ Booking created successfully!', response.booking);
         
-        setTimeout(() => {
-          navigate('/bookings');
-        }, 1500);
+        // Send notification to admin via socket
+        const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        try {
+          const notificationData = {
+            booking: response.booking,
+            user: {
+              name: user?.name,
+              email: user?.email,
+              phone: user?.phone
+            },
+            tour: {
+              title: tour?.title,
+              location: tour?.location
+            },
+            preferredLanguage: selectedLanguage,
+            paymentMethod: paymentMethod,
+            totalAmount: total,
+            message: `🎉 New Booking from ${user?.name}!\n\n` +
+                    `Tour: ${tour?.title}\n` +
+                    `Language: ${selectedLanguage}\n` +
+                    `Payment: ${paymentMethod === 'stripe' ? 'Stripe (Paid Online)' : 'Pay Later at Tour'}\n` +
+                    `Amount: $${total.toFixed(2)}\n` +
+                    `Contact: ${user?.email} | ${user?.phone}`
+          };
+          
+          console.log('📧 Sending notification to admin...', notificationData);
+          
+          const notifResponse = await fetch(`${SERVER_URL}/api/notifications/booking`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notificationData)
+          });
+          
+          if (notifResponse.ok) {
+            console.log('✅ Admin notification sent successfully!');
+          } else {
+            console.warn('⚠️ Admin notification failed:', await notifResponse.text());
+          }
+        } catch (notifError) {
+          console.error('❌ Notification error:', notifError);
+        }
+
+        if (paymentMethod === 'stripe') {
+          toast({
+            title: "Redirecting to Payment",
+            description: "Please complete your payment...",
+          });
+          // Redirect to Stripe checkout
+          setTimeout(() => {
+            navigate('/payment', { state: { bookingId: response.booking._id, amount: total } });
+          }, 1000);
+        } else {
+          toast({
+            title: "Booking Created!",
+            description: "You can pay later at the tour. Confirmation sent to your email.",
+          });
+          setTimeout(() => {
+            navigate('/bookings');
+          }, 1500);
+        }
       }
     } catch (error) {
       console.error('Booking error:', error);
@@ -2497,6 +2576,147 @@ const BookingPage = () => {
         {/* Additional Sections - Show after vehicle selection */}
         {showAdditionalSections && selectedVehicle && (
           <div id="additional-sections" className="mt-8 space-y-6">
+            
+            {/* Language Selection Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Select Guide Language (گائیڈ کی زبان منتخب کریں)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { lang: 'English', flag: '🇬🇧', label: 'English' },
+                    { lang: 'Hindi', flag: '🇮🇳', label: 'हिंदी (Hindi)' },
+                    { lang: 'Japanese', flag: '🇯🇵', label: '日本語 (Japanese)' }
+                  ].map((item) => (
+                    <button
+                      key={item.lang}
+                      type="button"
+                      onClick={() => {
+                        setSelectedLanguage(item.lang);
+                        console.log('🌐 Language selected:', item.lang);
+                        toast({
+                          title: `Language Selected: ${item.lang}`,
+                          description: "Great! Now choose payment method below.",
+                        });
+                      }}
+                      className={`p-4 border-2 rounded-lg transition-all ${
+                        selectedLanguage === item.lang
+                          ? 'border-green-500 bg-green-50 shadow-md'
+                          : 'border-gray-200 hover:border-green-300 bg-white'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-3xl">{item.flag}</span>
+                        <span className="font-medium text-sm">{item.label}</span>
+                        {selectedLanguage === item.lang && (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mt-3">
+                  Selected: <strong className="text-green-600">{selectedLanguage}</strong>
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Payment Method Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Payment Method (ادائیگی کا طریقہ)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div
+                    onClick={() => {
+                      setPaymentMethod('stripe');
+                      console.log('💳 Payment method: Stripe');
+                      toast({
+                        title: "Payment: Stripe Selected",
+                        description: "You will be redirected to secure payment after booking.",
+                      });
+                    }}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                      paymentMethod === 'stripe'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : 'border-gray-200 hover:border-blue-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <CreditCard className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">💳 Pay with Stripe</h4>
+                          <p className="text-sm text-gray-600">Secure online payment - فوری ادائیگی</p>
+                        </div>
+                      </div>
+                      {paymentMethod === 'stripe' && (
+                        <CheckCircle className="h-6 w-6 text-blue-600" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      setPaymentMethod('bookNowPayLater');
+                      console.log('⏰ Payment method: Pay Later');
+                      toast({
+                        title: "Payment: Pay Later Selected",
+                        description: "You can pay at the tour location.",
+                      });
+                    }}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                      paymentMethod === 'bookNowPayLater'
+                        ? 'border-green-500 bg-green-50 shadow-md'
+                        : 'border-gray-200 hover:border-green-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Clock className="h-6 w-6 text-green-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">⏰ Book Now, Pay Later</h4>
+                          <p className="text-sm text-gray-600">Reserve now, pay at tour - بعد میں ادائیگی</p>
+                        </div>
+                      </div>
+                      {paymentMethod === 'bookNowPayLater' && (
+                        <CheckCircle className="h-6 w-6 text-green-600" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {paymentMethod === 'bookNowPayLater' && (
+                  <div className="mt-4 p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                    <p className="text-sm text-yellow-900 font-medium">
+                      ⚠️ <strong>Note:</strong> Payment will be collected at the tour location. 
+                      Please bring cash or card. Confirmation email will be sent.
+                    </p>
+                  </div>
+                )}
+
+                {paymentMethod === 'stripe' && (
+                  <div className="mt-4 p-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                    <p className="text-sm text-blue-900 font-medium">
+                      ✅ You will be redirected to secure Stripe payment page.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Additional Options Section */}
             <Card>
               <CardHeader>
@@ -2643,7 +2863,7 @@ const BookingPage = () => {
 
                   {/* Price Breakdown */}
                   <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 mb-3">Price Breakdown</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">📋 Booking Summary</h4>
                     
                     <div className="flex justify-between text-sm">
                       <span>
@@ -2652,10 +2872,20 @@ const BookingPage = () => {
                       <span>${parseFloat(selectedVehicle.price || 0).toFixed(2)}</span>
                     </div>
                     
-                    <div className="text-xs text-gray-500 mt-2">
+                    <div className="text-xs text-gray-500 mt-2 space-y-1">
                       <div className="flex justify-between">
                         <span>Participants:</span>
                         <span>{participants.adults} adults{participants.children > 0 ? `, ${participants.children} children` : ''}{participants.seniors > 0 ? `, ${participants.seniors} seniors` : ''}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>🌐 Guide Language:</span>
+                        <span className="font-semibold text-green-600">{selectedLanguage}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>💳 Payment:</span>
+                        <span className="font-semibold text-blue-600">
+                          {paymentMethod === 'stripe' ? 'Stripe (Online)' : 'Pay Later'}
+                        </span>
                       </div>
                     </div>
                     

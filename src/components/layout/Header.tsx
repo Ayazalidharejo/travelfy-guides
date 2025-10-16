@@ -25,8 +25,14 @@ const Header = React.memo(() => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Memoized avatar URL - handles both Cloudinary and local URLs
+  // Memoized avatar URL - handles both Cloudinary, local URLs, and Google photoURL
   const avatarUrl = useMemo(() => {
+    // Priority 1: Google photoURL (for Google authenticated users)
+    if (user?.photoURL) {
+      return user.photoURL;
+    }
+    
+    // Priority 2: Regular avatar field
     if (!user?.avatar) return null;
     
     // If already a full URL (Cloudinary, data URI, etc.), return as is
@@ -36,7 +42,7 @@ const Header = React.memo(() => {
     
     // For relative paths, use local backend URL
     return `http://localhost:5000${user.avatar}`;
-  }, [user?.avatar]);
+  }, [user?.avatar, user?.photoURL]);
 
   // Optimized logout handler
   const handleLogout = useCallback(() => {
@@ -187,16 +193,15 @@ const Header = React.memo(() => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden md:flex items-center space-x-2">
-              <Button 
-                variant="ghost" 
+            <div className="hidden  md:flex items-center space-x-2">
+              <Button                 variant="ghost" 
                 onClick={() => navigate('/login')}
-                className="font-medium"
+                className="font-medium hover:bg-[#307072]"
               >
                 Login
               </Button>
               <Button 
-                variant="hero" 
+                // variant="hero" 
                 onClick={() => navigate('/register')}
                 className="font-medium"
               >

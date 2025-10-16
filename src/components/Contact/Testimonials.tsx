@@ -1,7 +1,9 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -27,7 +29,7 @@ const testimonials = [
     role: "Photographer",
     photo: "https://randomuser.me/api/portraits/women/72.jpg",
     message:
-      "The cherry blossoms tour was magical. Karvaan Tours’s attention to detail is top-notch.",
+      "The cherry blossoms tour was magical. Karvaan Tours's attention to detail is top-notch.",
   },
   {
     name: "Bilal Shah",
@@ -39,43 +41,86 @@ const testimonials = [
 ];
 
 const Testimonials: React.FC = () => {
+  const swiperRef = useRef<SwiperType | null>(null);
+
   return (
-    <section className="bg-gray-50 py-16 px-6 md:px-20 max-w-7xl mx-auto overflow-x-hidden">
+    <section className="bg-gray-50 py-16 px-6 md:px-12 lg:px-20 max-w-7xl mx-auto">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-900">
         What Our Travelers Say
       </h2>
 
-      <Swiper
-        modules={[Navigation, Pagination, A11y]}
-        spaceBetween={30}
-        slidesPerView={1}
-        navigation
-        pagination={{ clickable: true }}
-        breakpoints={{
-          768: {
-            slidesPerView: 2,
-          },
-          1024: {
-            slidesPerView: 3,
-          },
-        }}
-        className="max-w-full"
-      >
-        {testimonials.map(({ name, role, photo, message }, index) => (
-          <SwiperSlide key={index}>
-            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col items-center text-center max-w-md mx-auto">
-              <img
-                src={photo}
-                alt={name}
-                className="w-20 h-20 rounded-full mb-4 object-cover"
-              />
-              <p className="text-gray-700 italic mb-4">"{message}"</p>
-              <h3 className="font-semibold text-lg text-gray-900">{name}</h3>
-              <span className="text-sm text-red-600">{role}</span>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="relative">
+        {/* Custom Previous Button */}
+        <button
+          onClick={() => swiperRef.current?.slidePrev()}
+          className="absolute left-0 lg:-left-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-[#5C7AC0] hover:bg-[#284078] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+
+        {/* Custom Next Button */}
+        <button
+          onClick={() => swiperRef.current?.slideNext()}
+          className="absolute right-0 lg:-right-16 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-[#5C7AC0] hover:bg-[#284078] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        <Swiper
+          modules={[Pagination, A11y]}
+          spaceBetween={30}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
+          loop={true}
+          breakpoints={{
+            768: {
+              slidesPerView: 2,
+            },
+            1024: {
+              slidesPerView: 3,
+            },
+          }}
+          className="pb-12"
+        >
+          {testimonials.map(({ name, role, photo, message }, index) => (
+            <SwiperSlide key={index}>
+              <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col items-center text-center max-w-md mx-auto hover:shadow-xl transition-shadow duration-300 h-full">
+                <img
+                  src={photo}
+                  alt={name}
+                  className="w-20 h-20 rounded-full mb-4 object-cover border-4 border-red-100"
+                />
+                <p className="text-gray-700 italic mb-4 flex-grow">"{message}"</p>
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900">{name}</h3>
+                  <span className="text-sm text-red-600">{role}</span>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      <style jsx global>{`
+        .swiper-pagination-bullet {
+          background: #5C7AC0;
+          opacity: 0.5;
+          width: 10px;
+          height: 10px;
+        }
+
+        .swiper-pagination-bullet-active {
+          background: #5C7AC0;
+          opacity: 1;
+          width: 24px;
+          border-radius: 5px;
+        }
+      `}</style>
     </section>
   );
 };

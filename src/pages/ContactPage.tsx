@@ -111,16 +111,16 @@ const ContactPage = () => {
       {/* Hero Section */}
       <ContactHero/>
       <Testimonials/>
-      <section className="bg-gradient-hero py-20">
+      <section className="bg-[linear-gradient(to_bottom,_#ffffff,_#e2e7f5)] py-20">
         <div className="container px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm mb-6">
+            <Badge className="bg-black text-white border-white/30 backdrop-blur-sm mb-6">
               📞 Get In Touch
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-black mb-6">
               Contact Us
             </h1>
-            <p className="text-xl text-white/90">
+            <p className="text-xl text-black/90">
               Have questions about our tours? Need help planning your adventure? 
               We're here to help make your travel dreams come true.
             </p>
@@ -210,7 +210,7 @@ const ContactPage = () => {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    variant="hero" 
+                    // variant="hero" 
                     size="lg"
                     disabled={loading}
                   >
@@ -284,15 +284,15 @@ const ContactPage = () => {
             </div>
 
             {/* Emergency Contact */}
-            <Card className="bg-gradient-sunset text-white">
+            <Card className="bg-[linear-gradient(to_bottom,_#ffffff,_#e2e7f5)] text-black">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-3">24/7 Emergency Support</h3>
-                <p className="text-white/90 mb-4">
+                <p className="text-black/90 mb-4">
                   For travelers currently on tour who need immediate assistance:
                 </p>
                 <div className="flex items-center gap-2 text-lg font-semibold">
                   <Phone className="h-5 w-5" />
-                  <span>+1 (555) 911-HELP</span>
+                  <span>+81-80-7480-1156</span>
                 </div>
               </CardContent>
             </Card>
@@ -301,7 +301,7 @@ const ContactPage = () => {
 
         {/* FAQ Section */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-[#5C7AC0] text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
               {

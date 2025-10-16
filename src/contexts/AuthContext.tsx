@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { authAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
 
 interface User {
   id: string;
@@ -10,13 +12,16 @@ interface User {
   email: string;
   role: string;
   avatar?: string;
+  photoURL?: string;
   phone?: string;
+  isGoogleUser?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   register: (userData: { name: string; email: string; password: string; phone?: string }) => Promise<boolean>;
   logout: () => void;
   updateUser: (updatedUserData: Partial<User>) => void;
@@ -42,10 +47,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   // Optimized logout function
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     // Clear localStorage first
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
+    // Sign out from Firebase if user is signed in
+    try {
+      await firebaseSignOut(auth);
+    } catch (error) {
+      console.error('Firebase sign out error:', error);
+    }
     
     // Batch state updates
     setUser(null);
@@ -57,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [toast]);
 
-  // Initialize auth
+  // Initialize auth and Firebase auth state listener
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
@@ -70,19 +82,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setToken(storedToken);
           setUser(parsedUser);
           
-          // Verify token is still valid
-          const response = await authAPI.getProfile();
-          setUser(response.user);
+          // Only verify token for non-Google users
+          if (!parsedUser.isGoogleUser) {
+            const response = await authAPI.getProfile();
+            setUser(response.user);
+          }
         } catch (error) {
           console.error('Token verification failed:', error);
-          logout();
+          // Only logout if it's not a Google user
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            if (!parsedUser.isGoogleUser) {
+              logout();
+            }
+          }
         }
       }
       
       setLoading(false);
     };
 
+    // Firebase auth state listener for Google users
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // User is signed in with Firebase (Google)
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser.isGoogleUser) {
+            // Update user state with fresh Firebase data
+            setUser(parsedUser);
+            setToken('google-auth-token');
+          }
+        }
+      }
+    });
+
     initAuth();
+
+    // Cleanup subscription
+    return () => unsubscribe();
   }, [logout]);
 
   const login = async (credentials: { email: string; password: string }) => {
@@ -115,6 +155,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast({
         title: "Login Failed",
         description: error.response?.data?.message || "Invalid credentials",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseUser = result.user;
+      
+      // Create user object from Firebase data
+      const googleUser: User = {
+        id: firebaseUser.uid,
+        name: firebaseUser.displayName || 'Google User',
+        email: firebaseUser.email || '',
+        role: 'user',
+        photoURL: firebaseUser.photoURL || '',
+        avatar: firebaseUser.photoURL || '',
+        isGoogleUser: true,
+      };
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(googleUser));
+      localStorage.setItem('token', 'google-auth-token'); // Placeholder token
+      
+      // Update state
+      setUser(googleUser);
+      setToken('google-auth-token');
+      
+      toast({
+        title: "Welcome!",
+        description: `Welcome, ${googleUser.name}!`,
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      toast({
+        title: "Login Failed",
+        description: error.message || "Failed to sign in with Google",
         variant: "destructive",
       });
       return false;
@@ -183,13 +267,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     token,
     login,
+    loginWithGoogle,
     register,
     logout,
     loading,
     updateUser,
     isAuthenticated,
     isAdmin,
-  }), [user, token, login, register, logout, loading, updateUser, isAuthenticated, isAdmin]);
+  }), [user, token, login, loginWithGoogle, register, logout, loading, updateUser, isAuthenticated, isAdmin]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

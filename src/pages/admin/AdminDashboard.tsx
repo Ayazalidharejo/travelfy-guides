@@ -19,6 +19,7 @@ import {
   Activity
 } from 'lucide-react';
 import AdminPostDashboard from './AdminPostDashboard';
+// import AdminChatManager from './AdminChatManager'; // Temporarily disabled - causing blink
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState<any>(null);
@@ -293,6 +294,12 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Live Chat Manager - Temporarily disabled */}
+        {/* <div className="mt-8">
+          <AdminChatManager />
+        </div> */}
+
         <AdminPostDashboard onTourChange={fetchStats} />
       </div>
     </div>

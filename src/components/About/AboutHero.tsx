@@ -19,7 +19,7 @@ const AboutHero: React.FC = () => {
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-6">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           About{" "}
-          <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_10%)]">
+          <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_0%,_black_0%,_#5C7AC0_0%)]">
             Karvaan Tours
           </span>
         </h1>

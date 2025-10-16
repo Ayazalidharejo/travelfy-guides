@@ -7,8 +7,8 @@ const MissionVision: React.FC = () => {
       <div className="max-w-6xl mx-auto text-center">
         {/* Section Heading */}
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">
-          Our <span className=" icons me green text-transparent bg-gradient-to-r from-[#284078] to-[#5C7AC0] text-transparent bg-clip-text">Mission</span> &{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#284078] to-[#5C7AC0] text-transparent bg-clip-text">Vision</span>
+          Our <span className=" icons me green text-black   bg-clip-text">Mission</span> &{" "}
+          <span className="   text-black ">Vision</span>
         </h2>
 
         {/* Grid Layout */}

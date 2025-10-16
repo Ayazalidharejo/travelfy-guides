@@ -98,11 +98,10 @@ const Footer = () => {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center">
-          <p className="text-muted-foreground">
-            © 2025 Karvaan Tours. All rights reserved. | 
-            {/* <Link to="/privacy" className="hover:text-primary transition-smooth ml-1">Privacy Policy</Link> |  */}
-            {/* <Link to="/terms" className="hover:text-primary transition-smooth ml-1">Terms of Service</Link> */}
+         <p> © 2025 Karvaan Tours Powered by <b>Ebada Group</b>
+           
           </p>
+          
         </div>
       </div>
     </footer>

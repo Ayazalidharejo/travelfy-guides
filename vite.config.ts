@@ -15,4 +15,23 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Production build configuration for Hostinger deployment
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: false,
+    // Optimize chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/analytics"],
+        },
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+  },
+  // Base URL for production
+  base: mode === "production" ? "/" : "/",
 }));

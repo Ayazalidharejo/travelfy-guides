@@ -65,7 +65,7 @@ const Gallery = () => {
         {/* Header */}
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
           Explore Beautiful{" "}
-          <span className="text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">
+          <span className="text-[#5C7AC0]">
             Japan Destinations
           </span>
         </h2>

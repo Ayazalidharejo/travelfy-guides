@@ -331,11 +331,12 @@ const ProfilePage = () => {
             </Button>
           </div>
 
-          {/* Tabs for Profile & Password */}
+          {/* Tabs for Profile, Password & Bookings */}
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="password">Change Password</TabsTrigger>
+              <TabsTrigger value="password">Password</TabsTrigger>
+              <TabsTrigger value="bookings">My Bookings</TabsTrigger>
             </TabsList>
 
             {/* Profile Update Form */}
@@ -488,6 +489,146 @@ const ProfilePage = () => {
                       )}
                     </Button>
                   </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* My Bookings Tab */}
+            <TabsContent value="bookings" className="p-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    My Bookings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {bookingsLoading ? (
+                    <div className="text-center py-8">
+                      <Upload className="h-8 w-8 animate-spin mx-auto mb-2 text-blue-600" />
+                      <p className="text-muted-foreground">Loading bookings...</p>
+                    </div>
+                  ) : bookings.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                      <p className="text-lg font-semibold mb-2">No Bookings Yet</p>
+                      <p className="text-muted-foreground">Start exploring tours and make your first booking!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {bookings.map((booking: any) => (
+                        <Card key={booking._id} className="border-2 hover:shadow-md transition-shadow">
+                          <CardContent className="p-6">
+                            {/* Booking Header */}
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                  {booking.post?.title || 'Tour Booking'}
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                  Booking ID: <span className="font-mono">{booking._id?.slice(-8)}</span>
+                                </p>
+                              </div>
+                              <Badge 
+                                variant={
+                                  booking.paymentMethod === 'bookNowPayLater' 
+                                    ? 'secondary' 
+                                    : booking.paymentStatus === 'paid' 
+                                    ? 'default' 
+                                    : 'destructive'
+                                }
+                                className={
+                                  booking.paymentMethod === 'bookNowPayLater'
+                                    ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                                    : booking.paymentStatus === 'paid'
+                                    ? 'bg-green-100 text-green-800 border-green-300'
+                                    : ''
+                                }
+                              >
+                                {booking.paymentMethod === 'bookNowPayLater' 
+                                  ? '⏰ Pay Later' 
+                                  : booking.paymentStatus === 'paid' 
+                                  ? '✅ Paid' 
+                                  : '❌ Unpaid'}
+                              </Badge>
+                            </div>
+
+                            <Separator className="my-4" />
+
+                            {/* Booking Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-4 w-4 text-blue-600" />
+                                <span className="font-medium">Date:</span>
+                                <span>{booking.tourDate ? format(new Date(booking.tourDate), 'PPP') : 'N/A'}</span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-green-600" />
+                                <span className="font-medium">Time:</span>
+                                <span>{booking.selectedTimeSlot || 'N/A'}</span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm">
+                                <User className="h-4 w-4 text-purple-600" />
+                                <span className="font-medium">Participants:</span>
+                                <span>
+                                  {booking.participants?.adults || 0} adults
+                                  {(booking.participants?.children || 0) > 0 && `, ${booking.participants.children} children`}
+                                  {(booking.participants?.seniors || 0) > 0 && `, ${booking.participants.seniors} seniors`}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm">
+                                <MapPin className="h-4 w-4 text-red-600" />
+                                <span className="font-medium">Language:</span>
+                                <span>{booking.preferredLanguage || 'English'}</span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm">
+                                <CreditCard className="h-4 w-4 text-indigo-600" />
+                                <span className="font-medium">Payment:</span>
+                                <span>
+                                  {booking.paymentMethod === 'bookNowPayLater' 
+                                    ? 'Pay Later at Tour' 
+                                    : 'Stripe (Online)'}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm">
+                                <DollarSign className="h-4 w-4 text-green-600" />
+                                <span className="font-medium">Total:</span>
+                                <span className="font-bold text-green-700">
+                                  ${booking.totalAmount?.toFixed(2) || '0.00'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Pay Later Warning */}
+                            {booking.paymentMethod === 'bookNowPayLater' && (
+                              <div className="mt-4 p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                                <p className="text-sm text-yellow-900 font-medium flex items-center gap-2">
+                                  <Clock className="h-4 w-4" />
+                                  <strong>Reminder:</strong> Please bring cash or card to pay ${booking.totalAmount?.toFixed(2)} at the tour location.
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Booking Status */}
+                            <Separator className="my-4" />
+                            <div className="flex justify-between items-center text-xs text-gray-600">
+                              <span>
+                                Booked on: {booking.createdAt ? format(new Date(booking.createdAt), 'PPp') : 'N/A'}
+                              </span>
+                              <Badge variant="outline" className="text-xs">
+                                {booking.status || 'Confirmed'}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
