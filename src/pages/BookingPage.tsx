@@ -1934,6 +1934,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -1950,6 +1952,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { postsAPI, bookingsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -1965,14 +1974,19 @@ import {
   Baby,
   ShoppingBag,
   ArrowLeft,
-  Globe,
-  CreditCard
+  MapPin,
+  Languages,
+  CreditCard,
+  Shield
 } from 'lucide-react';
+
+// Initialize Stripe with your publishable key
+const stripePromise = loadStripe('pk_test_51SIqBzHLSBbCIp3xEXsLJHg5bBOizEv4qyuzXJgyNTfh4KSQqmWW7lVXXmU2J2Ihd3F2TcFi6Iy8eClkZhSbG6CT00aGxMDuUk');
 
 const BookingPage = () => {
   const { tourId } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, token } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
   const [tour, setTour] = useState(null);
@@ -1992,8 +2006,12 @@ const BookingPage = () => {
     fullName: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    specialRequirements: ''
+    specialRequirements: '',
+    language: 'English',
+    pickupLocation: ''
   });
+  const [paymentMethod, setPaymentMethod] = useState('pay-now'); // 'pay-now' or 'pay-later'
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [selectedTransportType, setSelectedTransportType] = useState('');
@@ -2008,8 +2026,6 @@ const BookingPage = () => {
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
   const [isValid, setIsValid] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
-  const [paymentMethod, setPaymentMethod] = useState('stripe'); // 'stripe' or 'bookNowPayLater'
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -2142,9 +2158,6 @@ const BookingPage = () => {
     const totalParticipants = getTotalParticipants();
     const capacity = parseInt(vehicle.capacity) || 0;
     
-    console.log('🚗 Vehicle selected:', vehicle);
-    console.log('👥 Total participants:', totalParticipants);
-    
     if (totalParticipants > capacity) {
       setVehicleError(`This vehicle can accommodate up to ${capacity} persons. You have ${totalParticipants} participants. Please select a larger vehicle.`);
       toast({
@@ -2171,23 +2184,11 @@ const BookingPage = () => {
     setSelectedTransportModal(vehicle.transportModal || '');
     
     // Show additional sections after vehicle selection
-    console.log('✅ Showing Language & Payment options...');
     setShowAdditionalSections(true);
-    
-    toast({
-      title: "Vehicle Selected! ✅",
-      description: "Scroll down to select language and payment method.",
-    });
     
     // Scroll to additional sections
     setTimeout(() => {
-      const element = document.getElementById('additional-sections');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        console.log('📍 Scrolled to additional sections');
-      } else {
-        console.error('❌ additional-sections element not found!');
-      }
+      document.getElementById('additional-sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   };
 
@@ -2228,8 +2229,30 @@ const BookingPage = () => {
       return;
     }
 
+    if (!contactInfo.pickupLocation) {
+      toast({
+        title: "Pickup Location Required",
+        description: "Please enter your pickup location.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If pay now is selected, show payment dialog
+    if (paymentMethod === 'pay-now') {
+      setShowPaymentDialog(true);
+      return;
+    }
+
+    // If pay later, proceed directly with booking
+    await processBooking(null);
+  };
+
+  const processBooking = async (paymentIntentId) => {
     try {
       setSubmitting(true);
+      
+      const totalAmount = calculateTotal();
       
       const bookingData = {
         postId: tourId,
@@ -2250,89 +2273,51 @@ const BookingPage = () => {
           wheelchair: additionalOptions.wheelchair,
           extraLuggage: additionalOptions.extraLuggage
         },
-        preferredLanguage: selectedLanguage,
-        paymentMethod: paymentMethod,
-        totalAmount: total
+        paymentMethod,
+        paymentIntentId,
+        totalAmount: totalAmount
       };
 
+      console.log('📤 Sending booking data:', bookingData);
       const response = await bookingsAPI.createBooking(bookingData);
+      console.log('📥 Booking response:', response);
       
       if (response.success) {
-        console.log('✅ Booking created successfully!', response.booking);
+        // Show success toast
+        toast({
+          title: "🎉 Thank You!",
+          description: paymentMethod === 'pay-later' 
+            ? "Your booking is reserved. Payment will be collected later."
+            : "Payment successful! Your booking is confirmed.",
+        });
         
-        // Send notification to admin via socket
-        const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        try {
-          const notificationData = {
-            booking: response.booking,
-            user: {
-              name: user?.name,
-              email: user?.email,
-              phone: user?.phone
-            },
-            tour: {
-              title: tour?.title,
-              location: tour?.location
-            },
-            preferredLanguage: selectedLanguage,
-            paymentMethod: paymentMethod,
-            totalAmount: total,
-            message: `🎉 New Booking from ${user?.name}!\n\n` +
-                    `Tour: ${tour?.title}\n` +
-                    `Language: ${selectedLanguage}\n` +
-                    `Payment: ${paymentMethod === 'stripe' ? 'Stripe (Paid Online)' : 'Pay Later at Tour'}\n` +
-                    `Amount: $${total.toFixed(2)}\n` +
-                    `Contact: ${user?.email} | ${user?.phone}`
-          };
-          
-          console.log('📧 Sending notification to admin...', notificationData);
-          
-          const notifResponse = await fetch(`${SERVER_URL}/api/notifications/booking`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(notificationData)
-          });
-          
-          if (notifResponse.ok) {
-            console.log('✅ Admin notification sent successfully!');
-          } else {
-            console.warn('⚠️ Admin notification failed:', await notifResponse.text());
-          }
-        } catch (notifError) {
-          console.error('❌ Notification error:', notifError);
-        }
-
-        if (paymentMethod === 'stripe') {
-          toast({
-            title: "Redirecting to Payment",
-            description: "Please complete your payment...",
-          });
-          // Redirect to Stripe checkout
-          setTimeout(() => {
-            navigate('/payment', { state: { bookingId: response.booking._id, amount: total } });
-          }, 1000);
-        } else {
-          toast({
-            title: "Booking Created!",
-            description: "You can pay later at the tour. Confirmation sent to your email.",
-          });
-          setTimeout(() => {
-            navigate('/bookings');
-          }, 1500);
-        }
+        // Show detailed thank you message
+        toast({
+          title: "✅ Booking Confirmed!",
+          description: `Booking Reference: ${response.data.bookingReference || 'Generated'}\nYou will receive a confirmation email shortly.`,
+        });
+        
+        setTimeout(() => {
+          navigate('/bookings');
+        }, 2500);
       }
     } catch (error) {
-      console.error('Booking error:', error);
+      console.error('❌ Booking error:', error);
+      console.error('Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || error.message || "Failed to create booking. Please try again.";
+      const errorDetails = error.response?.data?.errors;
+      
       toast({
         title: "Booking Failed",
-        description: error.response?.data?.message || "Failed to create booking. Please try again.",
+        description: errorDetails 
+          ? `${errorMessage} - ${JSON.stringify(errorDetails)}`
+          : errorMessage,
         variant: "destructive",
       });
     } finally {
       setSubmitting(false);
+      setShowPaymentDialog(false);
     }
   };
 
@@ -2576,147 +2561,6 @@ const BookingPage = () => {
         {/* Additional Sections - Show after vehicle selection */}
         {showAdditionalSections && selectedVehicle && (
           <div id="additional-sections" className="mt-8 space-y-6">
-            
-            {/* Language Selection Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="h-5 w-5" />
-                  Select Guide Language (گائیڈ کی زبان منتخب کریں)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { lang: 'English', flag: '🇬🇧', label: 'English' },
-                    { lang: 'Hindi', flag: '🇮🇳', label: 'हिंदी (Hindi)' },
-                    { lang: 'Japanese', flag: '🇯🇵', label: '日本語 (Japanese)' }
-                  ].map((item) => (
-                    <button
-                      key={item.lang}
-                      type="button"
-                      onClick={() => {
-                        setSelectedLanguage(item.lang);
-                        console.log('🌐 Language selected:', item.lang);
-                        toast({
-                          title: `Language Selected: ${item.lang}`,
-                          description: "Great! Now choose payment method below.",
-                        });
-                      }}
-                      className={`p-4 border-2 rounded-lg transition-all ${
-                        selectedLanguage === item.lang
-                          ? 'border-green-500 bg-green-50 shadow-md'
-                          : 'border-gray-200 hover:border-green-300 bg-white'
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-3xl">{item.flag}</span>
-                        <span className="font-medium text-sm">{item.label}</span>
-                        {selectedLanguage === item.lang && (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mt-3">
-                  Selected: <strong className="text-green-600">{selectedLanguage}</strong>
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Payment Method Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Payment Method (ادائیگی کا طریقہ)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div
-                    onClick={() => {
-                      setPaymentMethod('stripe');
-                      console.log('💳 Payment method: Stripe');
-                      toast({
-                        title: "Payment: Stripe Selected",
-                        description: "You will be redirected to secure payment after booking.",
-                      });
-                    }}
-                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'stripe'
-                        ? 'border-blue-500 bg-blue-50 shadow-md'
-                        : 'border-gray-200 hover:border-blue-300 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <CreditCard className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">💳 Pay with Stripe</h4>
-                          <p className="text-sm text-gray-600">Secure online payment - فوری ادائیگی</p>
-                        </div>
-                      </div>
-                      {paymentMethod === 'stripe' && (
-                        <CheckCircle className="h-6 w-6 text-blue-600" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={() => {
-                      setPaymentMethod('bookNowPayLater');
-                      console.log('⏰ Payment method: Pay Later');
-                      toast({
-                        title: "Payment: Pay Later Selected",
-                        description: "You can pay at the tour location.",
-                      });
-                    }}
-                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'bookNowPayLater'
-                        ? 'border-green-500 bg-green-50 shadow-md'
-                        : 'border-gray-200 hover:border-green-300 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                          <Clock className="h-6 w-6 text-green-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">⏰ Book Now, Pay Later</h4>
-                          <p className="text-sm text-gray-600">Reserve now, pay at tour - بعد میں ادائیگی</p>
-                        </div>
-                      </div>
-                      {paymentMethod === 'bookNowPayLater' && (
-                        <CheckCircle className="h-6 w-6 text-green-600" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                {paymentMethod === 'bookNowPayLater' && (
-                  <div className="mt-4 p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
-                    <p className="text-sm text-yellow-900 font-medium">
-                      ⚠️ <strong>Note:</strong> Payment will be collected at the tour location. 
-                      Please bring cash or card. Confirmation email will be sent.
-                    </p>
-                  </div>
-                )}
-
-                {paymentMethod === 'stripe' && (
-                  <div className="mt-4 p-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
-                    <p className="text-sm text-blue-900 font-medium">
-                      ✅ You will be redirected to secure Stripe payment page.
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Additional Options Section */}
             <Card>
               <CardHeader>
@@ -2849,6 +2693,40 @@ const BookingPage = () => {
                       required
                     />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="language" className="flex items-center gap-2">
+                        <Languages className="h-4 w-4" />
+                        Preferred Language
+                      </Label>
+                      <Select
+                        value={contactInfo.language}
+                        onValueChange={(value) => handleContactInfoChange('language', value)}
+                      >
+                        <SelectTrigger id="language">
+                          <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="English">English</SelectItem>
+                          <SelectItem value="Hindi">Hindi</SelectItem>
+                          <SelectItem value="Japanese">Japanese</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="pickupLocation" className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Pickup Location *
+                      </Label>
+                      <Input
+                        id="pickupLocation"
+                        placeholder="Hotel name or address"
+                        value={contactInfo.pickupLocation}
+                        onChange={(e) => handleContactInfoChange('pickupLocation', e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor="specialRequirements">Special Requirements (Optional)</Label>
                     <Textarea
@@ -2861,9 +2739,68 @@ const BookingPage = () => {
 
                   <Separator />
 
+                  {/* Payment Method Selection */}
+                  <div className="space-y-4">
+                    <Label className="text-lg font-semibold flex items-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Payment Method
+                    </Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div
+                        onClick={() => setPaymentMethod('pay-now')}
+                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                          paymentMethod === 'pay-now'
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-gray-200 hover:border-green-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                              <CreditCard className="h-5 w-5" />
+                              Pay Now
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Secure payment with Stripe
+                            </p>
+                          </div>
+                          {paymentMethod === 'pay-now' && (
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div
+                        onClick={() => setPaymentMethod('pay-later')}
+                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                          paymentMethod === 'pay-later'
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                              <Clock className="h-5 w-5" />
+                              Reserve Now, Pay Later
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">
+                              No payment required now
+                            </p>
+                          </div>
+                          {paymentMethod === 'pay-later' && (
+                            <CheckCircle className="h-6 w-6 text-blue-600" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Price Breakdown */}
                   <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 mb-3">📋 Booking Summary</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">Price Breakdown</h4>
                     
                     <div className="flex justify-between text-sm">
                       <span>
@@ -2872,20 +2809,10 @@ const BookingPage = () => {
                       <span>${parseFloat(selectedVehicle.price || 0).toFixed(2)}</span>
                     </div>
                     
-                    <div className="text-xs text-gray-500 mt-2 space-y-1">
+                    <div className="text-xs text-gray-500 mt-2">
                       <div className="flex justify-between">
                         <span>Participants:</span>
                         <span>{participants.adults} adults{participants.children > 0 ? `, ${participants.children} children` : ''}{participants.seniors > 0 ? `, ${participants.seniors} seniors` : ''}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>🌐 Guide Language:</span>
-                        <span className="font-semibold text-green-600">{selectedLanguage}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>💳 Payment:</span>
-                        <span className="font-semibold text-blue-600">
-                          {paymentMethod === 'stripe' ? 'Stripe (Online)' : 'Pay Later'}
-                        </span>
                       </div>
                     </div>
                     
@@ -2923,7 +2850,11 @@ const BookingPage = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-green-600 hover:bg-green-700 py-6 text-lg"
+                    className={`w-full py-6 text-lg ${
+                      paymentMethod === 'pay-now'
+                        ? 'bg-green-600 hover:bg-green-700'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
                     disabled={submitting}
                   >
                     {submitting ? (
@@ -2931,8 +2862,10 @@ const BookingPage = () => {
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Processing...
                       </>
+                    ) : paymentMethod === 'pay-later' ? (
+                      `Reserve Now - $${total.toFixed(2)}`
                     ) : (
-                      `Book Now - $${total.toFixed(2)}`
+                      `Pay Now - $${total.toFixed(2)}`
                     )}
                   </Button>
                 </form>
@@ -2940,6 +2873,26 @@ const BookingPage = () => {
             </Card>
           </div>
         )}
+
+        {/* Payment Dialog */}
+        <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CreditCard className="h-6 w-6 text-green-600" />
+                Complete Payment
+              </DialogTitle>
+              <DialogDescription>
+                Enter your card details to complete the booking.
+              </DialogDescription>
+            </DialogHeader>
+            <PaymentForm 
+              total={total} 
+              onSuccess={processBooking}
+              onCancel={() => setShowPaymentDialog(false)}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Validation Dialog */}
         <Dialog open={showValidationDialog} onOpenChange={setShowValidationDialog}>
@@ -2978,4 +2931,211 @@ const BookingPage = () => {
   );
 };
 
-export default BookingPage;
+// Payment Form Component
+const PaymentForm = ({ total, onSuccess, onCancel }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(null);
+  const { toast } = useToast();
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setProcessing(true);
+    setError(null);
+
+    try {
+      const cardElement = elements.getElement(CardElement);
+
+      // Create payment method
+      const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (stripeError) {
+        setError(stripeError.message);
+        toast({
+          title: "Payment Error",
+          description: stripeError.message,
+          variant: "destructive",
+        });
+        setProcessing(false);
+        return;
+      }
+
+      // Create payment intent on backend and confirm payment
+      console.log('💳 Created payment method:', paymentMethod.id);
+      
+      toast({
+        title: "Processing Payment...",
+        description: "Please wait while we process your payment.",
+      });
+
+      // Call the success callback with payment method ID
+      // This will send the payment method to backend which creates PaymentIntent
+      await onSuccess(paymentMethod.id);
+      
+      toast({
+        title: "Payment Successful!",
+        description: "Your booking has been confirmed!",
+      });
+
+    } catch (err) {
+      console.error('Payment error:', err);
+      setError('Payment failed. Please try again.');
+      toast({
+        title: "Payment Failed",
+        description: "An error occurred while processing your payment.",
+        variant: "destructive",
+      });
+      setProcessing(false);
+    }
+  };
+
+  const cardElementOptions = {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#424770',
+        '::placeholder': {
+          color: '#aab7c4',
+        },
+        padding: '10px',
+      },
+      invalid: {
+        color: '#9e2146',
+      },
+    },
+    hidePostalCode: false,
+  };
+
+  return (
+    <form onSubmit={handlePayment} className="space-y-6">
+      {/* Header */}
+      <div className="text-center border-b pb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 mb-3">
+          <CreditCard className="h-8 w-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-1">Complete Payment</h3>
+        <p className="text-sm text-gray-600">Enter your card details to complete the booking</p>
+      </div>
+
+      {/* Card Details Section */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+          <CreditCard className="h-4 w-4 text-green-600" />
+          Card Information
+        </Label>
+        <div className="relative">
+          <div className="p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white hover:border-green-400 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all">
+            <CardElement options={cardElementOptions} />
+          </div>
+          <div className="absolute -bottom-2 right-4 flex gap-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" className="h-8 bg-white p-1 rounded shadow-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-8 bg-white p-1 rounded shadow-sm" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" className="h-8 bg-white p-1 rounded shadow-sm" />
+          </div>
+        </div>
+        {error && (
+          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-900">Payment Error</p>
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Amount Summary */}
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200 shadow-sm">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-sm font-medium text-gray-600">Booking Total</span>
+          <span className="text-sm text-gray-500">USD</span>
+        </div>
+        <div className="flex justify-between items-end">
+          <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
+          <div className="text-right">
+            <div className="text-4xl font-bold text-green-600 leading-none">
+              ${total.toFixed(2)}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Includes all fees</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Security Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <Shield className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-blue-900 mb-1">Secure Payment</h4>
+            <p className="text-xs text-blue-700">
+              Your payment information is encrypted and secure. We never store your card details.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={processing}
+          className="flex-1 h-12 text-base border-2 hover:bg-gray-50"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={!stripe || processing}
+          className="flex-1 h-12 text-base bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+        >
+          {processing ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Processing Payment...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              <span>Pay ${total.toFixed(2)}</span>
+            </div>
+          )}
+        </Button>
+      </div>
+
+      {/* Footer */}
+      <div className="text-center pt-2 border-t">
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+          <Shield className="h-4 w-4" />
+          <span>Powered by</span>
+          <span className="font-semibold text-indigo-600">Stripe</span>
+          <span>•</span>
+          <span>PCI-DSS Compliant</span>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+// Wrap BookingPage with Stripe Elements
+const BookingPageWrapper = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <BookingPage />
+    </Elements>
+  );
+};
+
+export default BookingPageWrapper;

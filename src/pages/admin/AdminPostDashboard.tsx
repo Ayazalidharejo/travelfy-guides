@@ -1677,7 +1677,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <div className="flex gap-2 mt-auto">
                         <button
                           onClick={() => openEditModal(tour)}
-                          className="flex-1 px-3 py-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded hover:bg-blue-200 transition flex items-center justify-center gap-2"
+                          className="flex-1 px-3 py-2 text-[#5C7AC0]  hover:bg-[#284078] text-blue-700 rounded hover:bg-blue-200 transition flex items-center justify-center gap-2"
                         >
                           <Edit2 size={16} />
                           Edit

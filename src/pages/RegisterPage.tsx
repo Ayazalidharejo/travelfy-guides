@@ -447,7 +447,7 @@ const RegisterPage = () => {
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
   const [passwordStrength, setPasswordStrength] = useState('');
 
-  const { register, loginWithGoogle } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   // Password strength checker

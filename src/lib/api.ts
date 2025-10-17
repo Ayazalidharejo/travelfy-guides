@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_BASE_URL = 'http://localhost:5200/api';
-const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
+const API_BASE_URL = 'http://localhost:5000/api';
+// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -324,6 +324,11 @@ export const bookingsAPI = {
     return response.data;
   },
   
+  getAllBookings: async () => {
+    const response = await api.get('/bookings');
+    return response.data;
+  },
+  
   getBooking: async (id: string) => {
     const response = await api.get(`/bookings/${id}`);
     return response.data;
@@ -333,10 +338,39 @@ export const bookingsAPI = {
     const response = await api.put(`/bookings/${id}/cancel`, { reason });
     return response.data;
   },
+};
 
-  getUserBookings: async () => {
-    const response = await api.get('/bookings/my-bookings');
-    return { success: true, bookings: response.data || [] };
+// Notifications API calls
+export const notificationsAPI = {
+  getAll: async (read?: boolean) => {
+    const params = read !== undefined ? { read } : {};
+    const response = await api.get('/notifications', { params });
+    return response.data;
+  },
+  
+  getUnreadCount: async () => {
+    const response = await api.get('/notifications/unread-count');
+    return response.data;
+  },
+  
+  markAsRead: async (id: string) => {
+    const response = await api.put(`/notifications/${id}/read`);
+    return response.data;
+  },
+  
+  markAllAsRead: async () => {
+    const response = await api.put('/notifications/mark-all-read');
+    return response.data;
+  },
+  
+  deleteNotification: async (id: string) => {
+    const response = await api.delete(`/notifications/${id}`);
+    return response.data;
+  },
+  
+  clearRead: async () => {
+    const response = await api.delete('/notifications/clear-read');
+    return response.data;
   },
 };
 

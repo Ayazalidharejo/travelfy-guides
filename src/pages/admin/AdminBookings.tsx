@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { adminAPI } from '@/lib/api';
+import { adminAPI, bookingsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -57,12 +57,20 @@ const AdminBookings = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await adminAPI.getBookings();
+      console.log('📥 Admin fetching bookings...');
+      const response = await bookingsAPI.getAllBookings();
+      console.log('📦 Admin bookings response:', response);
       if (response.success) {
         setBookings(response.data || []);
+        console.log('✅ Admin bookings loaded:', response.data?.length || 0);
+        // Debug: Check image data
+        if (response.data && response.data.length > 0) {
+          console.log('🖼️ First booking post data:', response.data[0]?.post);
+          console.log('🖼️ First booking mainImage:', response.data[0]?.post?.mainImage);
+        }
       }
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error('❌ Error fetching admin bookings:', error);
       toast({
         title: "Error",
         description: "Failed to load bookings.",
@@ -77,11 +85,20 @@ const AdminBookings = () => {
     try {
       setUpdating(true);
       await adminAPI.updateBookingStatus(bookingId, newStatus);
+      
+      // Close details dialog if open
+      setDetailsOpen(false);
+      
+      // Show success message
       toast({
         title: "Status Updated",
-        description: `Booking status updated to ${newStatus}.`,
+        description: newStatus === 'completed' 
+          ? `Booking marked as ${newStatus}. Revenue updated!` 
+          : `Booking status updated to ${newStatus}.`,
       });
-      fetchBookings();
+      
+      // Refresh bookings to update stats
+      await fetchBookings();
     } catch (error) {
       console.error('Error updating booking status:', error);
       toast({
@@ -129,7 +146,7 @@ const AdminBookings = () => {
       booking.post?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.bookingReference?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = !statusFilter || booking.status === statusFilter;
+    const matchesStatus = !statusFilter || statusFilter === 'all' || booking.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -149,6 +166,20 @@ const AdminBookings = () => {
     );
   }
 
+  // Calculate stats from bookings
+  const confirmedCount = bookings.filter((b: any) => b.status === 'confirmed').length;
+  const cancelledCount = bookings.filter((b: any) => b.status === 'cancelled').length;
+  const completedCount = bookings.filter((b: any) => b.status === 'completed').length;
+  const pendingCount = bookings.filter((b: any) => b.status === 'pending').length;
+  
+  const totalRevenue = bookings
+    .filter((b: any) => b.payment?.status === 'succeeded')
+    .reduce((sum: number, b: any) => sum + (b.payment?.amount || 0), 0);
+  
+  const completedRevenue = bookings
+    .filter((b: any) => b.status === 'completed' && b.payment?.status === 'succeeded')
+    .reduce((sum: number, b: any) => sum + (b.payment?.amount || 0), 0);
+
   return (
     <div className="min-h-screen bg-gradient-card">
       <div className="container px-4 py-8">
@@ -158,6 +189,70 @@ const AdminBookings = () => {
           <p className="text-muted-foreground">
             Monitor and manage all tour bookings
           </p>
+        </div>
+
+        {/* Stats Cards - Clickable Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <Card 
+            className={`border-green-200 bg-green-50 cursor-pointer hover:shadow-lg transition-shadow ${statusFilter === 'confirmed' ? 'ring-2 ring-green-500' : ''}`}
+            onClick={() => setStatusFilter(statusFilter === 'confirmed' ? 'all' : 'confirmed')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-700">Confirmed</p>
+                  <p className="text-3xl font-bold text-green-600">{confirmedCount}</p>
+                  <p className="text-xs text-green-600 mt-1">Click to filter</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`border-red-200 bg-red-50 cursor-pointer hover:shadow-lg transition-shadow ${statusFilter === 'cancelled' ? 'ring-2 ring-red-500' : ''}`}
+            onClick={() => setStatusFilter(statusFilter === 'cancelled' ? 'all' : 'cancelled')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-red-700">Cancelled</p>
+                  <p className="text-3xl font-bold text-red-600">{cancelledCount}</p>
+                  <p className="text-xs text-red-600 mt-1">Click to filter</p>
+                </div>
+                <XCircle className="h-8 w-8 text-red-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`border-blue-200 bg-blue-50 cursor-pointer hover:shadow-lg transition-shadow ${statusFilter === 'completed' ? 'ring-2 ring-blue-500' : ''}`}
+            onClick={() => setStatusFilter(statusFilter === 'completed' ? 'all' : 'completed')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-700">Completed</p>
+                  <p className="text-3xl font-bold text-blue-600">{completedCount}</p>
+                  <p className="text-xs text-blue-600 mt-1">Click to filter</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-purple-700">Total Revenue</p>
+                  <p className="text-2xl font-bold text-purple-600">${totalRevenue.toLocaleString()}</p>
+                  <p className="text-xs text-purple-600 mt-1">Completed: ${completedRevenue.toLocaleString()}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Search and Filters */}
@@ -185,8 +280,17 @@ const AdminBookings = () => {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Total: {filteredBookings.length}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Showing: {filteredBookings.length}</span>
+                {statusFilter && statusFilter !== 'all' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setStatusFilter('all')}
+                  >
+                    Show All
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -219,9 +323,21 @@ const AdminBookings = () => {
                     {/* Tour Image */}
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                       <img
-                        src={booking.post?.imageUrl || booking.post?.images?.[0] || '/placeholder.svg'}
-                        alt={booking.post?.title}
+                        src={
+                          booking.post?.mainImage?.url || 
+                          booking.post?.mainImage || 
+                          booking.post?.additionalImages?.[0]?.url ||
+                          booking.post?.additionalImages?.[0] ||
+                          'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop'
+                        }
+                        alt={booking.post?.title || 'Tour image'}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.log('🖼️ Image load error for:', booking.post?.title);
+                          console.log('🖼️ Attempted URL:', e.currentTarget.src);
+                          console.log('🖼️ Post data:', booking.post);
+                          e.currentTarget.src = 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+                        }}
                       />
                     </div>
 
@@ -363,6 +479,20 @@ const AdminBookings = () => {
                         </div>
                       </div>
                     </div>
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+                      {selectedBooking.selectedDay && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Day</label>
+                          <p className="font-medium">{selectedBooking.selectedDay}</p>
+                        </div>
+                      )}
+                      {selectedBooking.selectedTimeSlot && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Time Slot</label>
+                          <p className="font-medium">{selectedBooking.selectedTimeSlot}</p>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -391,31 +521,111 @@ const AdminBookings = () => {
                           <p>{selectedBooking.contactInfo?.phone}</p>
                         </div>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Participants</label>
-                        <p>
-                          Adults: {selectedBooking.participants.adults}, 
-                          Children: {selectedBooking.participants.children}, 
-                          Seniors: {selectedBooking.participants.seniors}
-                        </p>
-                      </div>
+                      {selectedBooking.contactInfo?.language && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Preferred Language</label>
+                          <p className="font-medium">{selectedBooking.contactInfo.language}</p>
+                        </div>
+                      )}
+                      {selectedBooking.contactInfo?.pickupLocation && (
+                        <div className="col-span-2">
+                          <label className="text-sm font-medium text-muted-foreground">Pickup Location</label>
+                          <p className="font-medium">{selectedBooking.contactInfo.pickupLocation}</p>
+                        </div>
+                      )}
                     </div>
-                    
-                    {selectedBooking.contactInfo?.specialRequirements && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Special Requirements</label>
-                        <p className="text-sm">{selectedBooking.contactInfo.specialRequirements}</p>
-                      </div>
-                    )}
-                    
-                    {selectedBooking.specialRequests && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Special Requests</label>
-                        <p className="text-sm">{selectedBooking.specialRequests}</p>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
+
+                {/* Participants */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Participants</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-2xl font-bold">{selectedBooking.participants.adults}</div>
+                        <div className="text-sm text-muted-foreground">Adults</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-2xl font-bold">{selectedBooking.participants.children}</div>
+                        <div className="text-sm text-muted-foreground">Children</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-2xl font-bold">{selectedBooking.participants.seniors}</div>
+                        <div className="text-sm text-muted-foreground">Seniors</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-center p-2 bg-primary/10 rounded-lg">
+                      <span className="font-semibold">Total: {selectedBooking.participants.adults + selectedBooking.participants.children + selectedBooking.participants.seniors} Participants</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Vehicle & Additional Options */}
+                {(selectedBooking.selectedVehicle || (selectedBooking.additionalOptions && Object.values(selectedBooking.additionalOptions).some((val: any) => val === true))) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Vehicle & Additional Services</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedBooking.selectedVehicle && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Selected Vehicle</label>
+                          <p className="font-medium">{selectedBooking.selectedVehicle.makeVariant || 'Selected vehicle'}</p>
+                          {selectedBooking.selectedVehicle.capacity && (
+                            <p className="text-sm text-muted-foreground">Capacity: {selectedBooking.selectedVehicle.capacity} passengers</p>
+                          )}
+                          {selectedBooking.selectedVehicle.price && (
+                            <p className="text-sm text-muted-foreground">Price: ${selectedBooking.selectedVehicle.price}</p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {selectedBooking.additionalOptions && Object.values(selectedBooking.additionalOptions).some((val: any) => val === true) && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Additional Options</label>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {selectedBooking.additionalOptions.stroller && (
+                              <Badge variant="outline">🍼 Baby Stroller (+$10)</Badge>
+                            )}
+                            {selectedBooking.additionalOptions.wheelchair && (
+                              <Badge variant="outline">♿ Wheelchair Accessible (+$15)</Badge>
+                            )}
+                            {selectedBooking.additionalOptions.extraLuggage && (
+                              <Badge variant="outline">🧳 Extra Luggage (+$12)</Badge>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Special Requirements */}
+                {(selectedBooking.contactInfo?.specialRequirements || selectedBooking.specialRequests) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Special Requirements & Requests</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedBooking.contactInfo?.specialRequirements && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Special Requirements</label>
+                          <p className="text-sm p-3 bg-muted rounded-lg">{selectedBooking.contactInfo.specialRequirements}</p>
+                        </div>
+                      )}
+                      
+                      {selectedBooking.specialRequests && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Special Requests</label>
+                          <p className="text-sm p-3 bg-muted rounded-lg">{selectedBooking.specialRequests}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Payment & Status */}
                 <Card>
@@ -447,6 +657,44 @@ const AdminBookings = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Cancellation Details */}
+                {selectedBooking.status === 'cancelled' && selectedBooking.cancellation?.reason && (
+                  <Card className="border-red-200 bg-red-50">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-red-700 flex items-center gap-2">
+                        <XCircle className="h-5 w-5" />
+                        Cancellation Details
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-red-600">Cancellation Reason:</label>
+                        <div className="mt-2 p-3 bg-white border border-red-200 rounded-lg">
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedBooking.cancellation.reason}</p>
+                        </div>
+                      </div>
+                      {selectedBooking.cancellation.refundStatus && selectedBooking.cancellation.refundStatus !== 'none' && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Refund Status:</label>
+                          <Badge className="ml-2" variant={
+                            selectedBooking.cancellation.refundStatus === 'processed' ? 'default' : 
+                            selectedBooking.cancellation.refundStatus === 'pending' ? 'secondary' : 
+                            'destructive'
+                          }>
+                            {selectedBooking.cancellation.refundStatus}
+                          </Badge>
+                        </div>
+                      )}
+                      {selectedBooking.cancellation.refundAmount && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Refund Amount:</label>
+                          <p className="text-lg font-semibold text-green-600">${selectedBooking.cancellation.refundAmount}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
           </DialogContent>

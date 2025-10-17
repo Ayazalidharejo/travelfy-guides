@@ -16,10 +16,12 @@ import {
   Star,
   Clock,
   BarChart3,
-  Activity
+  Activity,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import AdminPostDashboard from './AdminPostDashboard';
-// import AdminChatManager from './AdminChatManager'; // Temporarily disabled - causing blink
+import NotificationBell from '@/components/admin/NotificationBell';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState<any>(null);
@@ -104,11 +106,14 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gradient-card">
       <div className="container px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.name}! Here's what's happening with your tours.
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome back, {user?.name}! Here's what's happening with your tours.
+            </p>
+          </div>
+          <NotificationBell />
         </div>
 
         {/* Stats Cards */}
@@ -153,9 +158,9 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+                  <p className="text-sm font-medium text-muted-foreground">Completed Revenue</p>
                   <p className="text-3xl font-bold text-secondary">
-                    ${(stats?.totalRevenue || 0).toLocaleString()}
+                    ${(stats?.completedRevenue || 0).toLocaleString()}
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-secondary" />
@@ -163,6 +168,9 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Booking Status Cards */}
+       
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Recent Bookings */}
@@ -294,12 +302,6 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Live Chat Manager - Temporarily disabled */}
-        {/* <div className="mt-8">
-          <AdminChatManager />
-        </div> */}
-
         <AdminPostDashboard onTourChange={fetchStats} />
       </div>
     </div>
