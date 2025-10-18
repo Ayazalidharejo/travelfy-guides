@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-// import image from "@/../public/images"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
+import UserChat from '@/pages/UserChat';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Phone, Calendar, MessageCircle } from 'lucide-react';
 
 const ConsultationSection = () => {
+  const [chatOpen, setChatOpen] = useState(false);
+  const { user, isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChatClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (isAdmin) {
+      // Admins should use admin dashboard chat
+      return;
+    }
+    setChatOpen(true);
+  };
+
   return (
     <section className="py-12 ">
       <div className="container mx-auto px-4">
@@ -56,7 +80,11 @@ const ConsultationSection = () => {
               {/* Contact Cards */}
               <div className="space-y-3">
                 {/* Live Chat */}
-                <div className="bg-white rounded-xl p-3 shadow-sm" style={{ minWidth: '200px' }}>
+                <div 
+                  className="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md transition-all" 
+                  style={{ minWidth: '200px' }}
+                  onClick={handleChatClick}
+                >
                   <div className="flex items-center gap-3">
                     <div className="bg-orange-100 p-2 rounded-lg">
                       <MessageCircle className="h-4 w-4 text-orange-600" />
@@ -112,6 +140,33 @@ const ConsultationSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Live Chat Modal - Only for authenticated users who are NOT admins */}
+      {isAuthenticated && !isAdmin && (
+        <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+          <DialogContent className="max-w-lg h-[650px] p-0 overflow-hidden">
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                Live Chat Support
+              </DialogTitle>
+            </DialogHeader>
+            <div className="h-full">
+              <UserChat
+                token={localStorage.getItem('token') || ''}
+                currentUser={{
+                  id: user?._id || user?.id || '',
+                  name: user?.name || '',
+                  email: user?.email || '',
+                  avatar: user?.photoURL || user?.avatar || undefined
+                }}
+                isOpen={chatOpen}
+                onClose={() => setChatOpen(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </section>
   );
 };

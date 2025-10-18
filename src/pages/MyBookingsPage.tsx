@@ -166,62 +166,96 @@ const MyBookingsPage = () => {
   };
 
   const BookingCard = ({ booking }: { booking: any }) => (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <CardTitle className="text-lg">{booking.post?.title || 'Tour'}</CardTitle>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>{new Date(booking.tourDate).toLocaleDateString()}</span>
-                {booking.selectedDay && <span className="text-xs text-gray-500">({booking.selectedDay})</span>}
-              </div>
-              {booking.selectedTimeSlot && (
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{booking.selectedTimeSlot}</span>
-                </div>
-              )}
+    <Card className="hover:shadow-lg transition-all duration-300 overflow-hidden border-2">
+      {/* Tour Image Header */}
+      <div className="relative h-48 bg-gradient-to-br from-blue-100 to-purple-100">
+        <img
+          src={
+            booking.post?.mainImage?.url || 
+            booking.post?.mainImage || 
+            booking.post?.imageUrl || 
+            booking.post?.additionalImages?.[0]?.url ||
+            booking.post?.additionalImages?.[0] ||
+            'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop'
+          }
+          alt={booking.post?.title || 'Tour'}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop';
+          }}
+        />
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          <Badge className={getStatusColor(booking.status) + " shadow-lg"}>
+            {booking.status}
+          </Badge>
+          <Badge className={getPaymentStatusColor(booking.payment?.status) + " shadow-lg"}>
+            {booking.payment?.method === 'pay-later' ? 'Pay Later' : booking.payment?.status}
+          </Badge>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+          <h3 className="text-white font-bold text-xl mb-1">{booking.post?.title || 'Tour'}</h3>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-white/90">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-4 w-4" />
+              <span>{new Date(booking.tourDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
-          </div>
-          <div className="text-right space-y-2">
-            <Badge className={getStatusColor(booking.status)}>
-              {booking.status}
-            </Badge>
-            <Badge className={getPaymentStatusColor(booking.payment?.status)}>
-              {booking.payment?.method === 'pay-later' ? 'Pay Later' : booking.payment?.status}
-            </Badge>
+            {booking.selectedTimeSlot && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>{booking.selectedTimeSlot}</span>
+              </div>
+            )}
           </div>
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-6">
         {/* Participants & Amount */}
-        <div className="grid grid-cols-2 gap-4 text-sm border-b pb-3">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-500 p-2 rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <div className="font-medium">
-                  {(booking.participants?.adults || 0) + (booking.participants?.children || 0) + (booking.participants?.seniors || 0)} Total
+                <div className="text-2xl font-bold text-blue-900">
+                  {(booking.participants?.adults || 0) + (booking.participants?.children || 0) + (booking.participants?.seniors || 0)}
                 </div>
-                <div className="text-xs text-gray-500">
-                  Adults: {booking.participants?.adults || 0}, Children: {booking.participants?.children || 0}, Seniors: {booking.participants?.seniors || 0}
+                <div className="text-sm text-blue-700 font-medium">Total Participants</div>
+                <div className="text-xs text-blue-600 mt-1">
+                  Adults: {booking.participants?.adults || 0} • Children: {booking.participants?.children || 0} • Seniors: {booking.participants?.seniors || 0}
                 </div>
               </div>
             </div>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-gray-500" />
+          <div className={`rounded-lg p-4 border ${
+            booking.payment?.method === 'pay-later' 
+              ? 'bg-yellow-50 border-yellow-200' 
+              : 'bg-green-50 border-green-200'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${
+                booking.payment?.method === 'pay-later' 
+                  ? 'bg-yellow-500' 
+                  : 'bg-green-500'
+              }`}>
+                <DollarSign className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <div className="font-semibold text-green-600 text-lg">
+                <div className={`text-2xl font-bold ${
+                  booking.payment?.method === 'pay-later' 
+                    ? 'text-yellow-900' 
+                    : 'text-green-900'
+                }`}>
                   ${booking.payment?.amount || 0}
                 </div>
-                <div className="text-xs text-gray-500">
-                  {booking.payment?.method === 'pay-later' ? 'Payment Due' : 'Paid'}
+                <div className={`text-sm font-medium ${
+                  booking.payment?.method === 'pay-later' 
+                    ? 'text-yellow-700' 
+                    : 'text-green-700'
+                }`}>
+                  {booking.payment?.method === 'pay-later' ? 'Payment Due' : 'Payment Completed'}
                 </div>
               </div>
             </div>
@@ -229,29 +263,37 @@ const MyBookingsPage = () => {
         </div>
 
         {/* Contact Information */}
-        <div className="border-b pb-3">
-          <div className="font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <Mail className="h-4 w-4" />
+        <div className="bg-gray-50 rounded-lg p-4 border">
+          <div className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Mail className="h-5 w-5 text-gray-600" />
             Contact Details
           </div>
-          <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-            <div>
-              <span className="font-medium">Name:</span> {booking.contactInfo?.fullName}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-gray-600 min-w-[60px]">Name:</span>
+              <span className="text-gray-900">{booking.contactInfo?.fullName}</span>
             </div>
-            <div>
-              <span className="font-medium">Email:</span> {booking.contactInfo?.email}
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-gray-600 min-w-[60px]">Email:</span>
+              <span className="text-gray-900 break-all">{booking.contactInfo?.email}</span>
             </div>
-            <div>
-              <span className="font-medium">Phone:</span> {booking.contactInfo?.phone}
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-gray-600 min-w-[60px]">Phone:</span>
+              <span className="text-gray-900">{booking.contactInfo?.phone}</span>
             </div>
             {booking.contactInfo?.language && (
-              <div>
-                <span className="font-medium">Language:</span> {booking.contactInfo?.language}
+              <div className="flex items-start gap-2">
+                <span className="font-medium text-gray-600 min-w-[60px]">Language:</span>
+                <span className="text-gray-900">{booking.contactInfo?.language}</span>
               </div>
             )}
             {booking.contactInfo?.pickupLocation && (
-              <div className="col-span-2">
-                <span className="font-medium">Pickup:</span> {booking.contactInfo?.pickupLocation}
+              <div className="md:col-span-2 flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <span className="font-medium text-gray-600">Pickup Location:</span>
+                  <span className="text-gray-900 ml-2">{booking.contactInfo?.pickupLocation}</span>
+                </div>
               </div>
             )}
           </div>
@@ -259,16 +301,16 @@ const MyBookingsPage = () => {
 
         {/* Vehicle Information */}
         {booking.selectedVehicle && (
-          <div className="border-b pb-3">
-            <div className="font-medium text-gray-700 mb-2">Vehicle Selected</div>
-            <div className="text-sm text-gray-600">
+          <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+            <div className="font-semibold text-orange-900 mb-2">🚗 Vehicle Selected</div>
+            <div className="text-sm text-orange-800 font-medium">
               {booking.selectedVehicle.makeVariant || 'Selected vehicle'}
-              {booking.selectedVehicle.capacity && (
-                <span className="text-xs text-gray-500 ml-2">
-                  (Capacity: {booking.selectedVehicle.capacity})
-                </span>
-              )}
             </div>
+            {booking.selectedVehicle.capacity && (
+              <div className="text-xs text-orange-600 mt-1">
+                Capacity: Up to {booking.selectedVehicle.capacity} passengers
+              </div>
+            )}
           </div>
         )}
 
@@ -309,26 +351,29 @@ const MyBookingsPage = () => {
         )}
 
         {/* Booking Reference */}
-        <div className="text-xs text-gray-500 space-y-1">
-          <div>Booking ID: <span className="font-mono font-semibold">{booking.bookingReference}</span></div>
-          <div>Booked on: {new Date(booking.createdAt).toLocaleDateString()} at {new Date(booking.createdAt).toLocaleTimeString()}</div>
+        <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+          <div className="text-sm text-purple-700 mb-2">Booking Reference</div>
+          <div className="font-mono font-bold text-lg text-purple-900 mb-2">{booking.bookingReference}</div>
+          <div className="text-xs text-purple-600">
+            Booked on {new Date(booking.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {new Date(booking.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
         
-        <div className="border-t pt-3">
+        <div className="border-t pt-4">
           <div className="flex flex-wrap gap-2">
             {booking.post?._id && (
-              <Link to={`/tours/${booking.post._id}`}>
-                <Button variant="outline" size="sm">
-                  <Eye className="h-4 w-4 mr-1" />
+              <Link to={`/tours/${booking.post._id}`} className="flex-1 sm:flex-initial">
+                <Button variant="outline" size="sm" className="w-full border-2 hover:bg-blue-50">
+                  <Eye className="h-4 w-4 mr-2" />
                   View Tour
                 </Button>
               </Link>
             )}
             
             {booking.payment?.receiptUrl && (
-              <a href={booking.payment.receiptUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1" />
+              <a href={booking.payment.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-initial">
+                <Button variant="outline" size="sm" className="w-full border-2 hover:bg-green-50">
+                  <Download className="h-4 w-4 mr-2" />
                   Receipt
                 </Button>
               </a>
@@ -338,13 +383,14 @@ const MyBookingsPage = () => {
               <Button 
                 variant="destructive" 
                 size="sm"
+                className="flex-1 sm:flex-initial"
                 onClick={() => {
                   setSelectedBookingId(booking._id);
                   setCancelDialogOpen(true);
                 }}
               >
-                <XCircle className="h-4 w-4 mr-1" />
-                Cancel
+                <XCircle className="h-4 w-4 mr-2" />
+                Cancel Booking
               </Button>
             )}
           </div>

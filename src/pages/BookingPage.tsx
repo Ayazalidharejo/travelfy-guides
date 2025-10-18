@@ -2026,6 +2026,8 @@ const BookingPage = () => {
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
+  const [bookingReference, setBookingReference] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -2283,23 +2285,17 @@ const BookingPage = () => {
       console.log('📥 Booking response:', response);
       
       if (response.success) {
-        // Show success toast
-        toast({
-          title: "🎉 Thank You!",
-          description: paymentMethod === 'pay-later' 
-            ? "Your booking is reserved. Payment will be collected later."
-            : "Payment successful! Your booking is confirmed.",
-        });
+        // Store booking reference
+        setBookingReference(response.data.bookingReference || 'Generated');
         
-        // Show detailed thank you message
-        toast({
-          title: "✅ Booking Confirmed!",
-          description: `Booking Reference: ${response.data.bookingReference || 'Generated'}\nYou will receive a confirmation email shortly.`,
-        });
+        // Show Thank You modal
+        setShowThankYouModal(true);
         
+        // Hide modal and redirect after 4 seconds
         setTimeout(() => {
+          setShowThankYouModal(false);
           navigate('/bookings');
-        }, 2500);
+        }, 4000);
       }
     } catch (error) {
       console.error('❌ Booking error:', error);
@@ -2923,6 +2919,63 @@ const BookingPage = () => {
               >
                 Close
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Thank You Modal */}
+        <Dialog open={showThankYouModal} onOpenChange={() => {}}>
+          <DialogContent className="max-w-md">
+            <div className="text-center py-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 mb-6 animate-bounce">
+                <CheckCircle className="h-12 w-12 text-white" />
+              </div>
+              
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Thank You! 🎉
+              </h2>
+              
+              <p className="text-lg text-gray-700 mb-4">
+                Your booking has been confirmed!
+              </p>
+              
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200 mb-6">
+                <div className="text-sm text-gray-600 mb-2">Booking Reference</div>
+                <div className="text-2xl font-bold text-green-600 font-mono">
+                  {bookingReference}
+                </div>
+              </div>
+              
+              <div className="space-y-3 text-left bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    Confirmation email sent to your inbox
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    Tour guide and driver details included
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    24/7 customer support available
+                  </p>
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-6">
+                Redirecting to your bookings...
+              </p>
+              
+              <div className="flex gap-2 justify-center mt-2">
+                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse delay-75"></div>
+                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse delay-150"></div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

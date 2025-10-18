@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,24 +18,30 @@ import {
   BarChart3,
   Activity,
   CheckCircle,
-  XCircle
+  XCircle,
+  MessageSquare
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import AdminPostDashboard from './AdminPostDashboard';
 import NotificationBell from '@/components/admin/NotificationBell';
+import AdminChat from '@/components/AdminChat';
 
-const AdminDashboard = () => {
+const AdminDashboard = React.memo(() => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMounted, setChatMounted] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchStats();
-    }
-  }, [isAdmin]);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getStats();
@@ -52,7 +58,67 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  // Fetch unread messages count
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const headers: any = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      // For Google Auth
+      if (token === 'google-auth-token') {
+        const userDataStr = localStorage.getItem('user');
+        if (userDataStr) {
+          headers['x-user-data'] = encodeURIComponent(userDataStr);
+        }
+      }
+
+      const response = await fetch('http://localhost:5000/api/chat/admin/unread-count', {
+        headers: headers
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setUnreadMessages(data.unreadCount || 0);
+        console.log('📊 Unread messages count:', data.unreadCount);
+      }
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchStats();
+      fetchUnreadCount();
+    }
+  }, [isAdmin, fetchStats, fetchUnreadCount]);
+
+  // Delay AdminChat mounting to prevent blink
+  useEffect(() => {
+    if (chatOpen) {
+      // Mount AdminChat after dialog animation
+      const timer = setTimeout(() => {
+        setChatMounted(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      // Immediately unmount when closing
+      setChatMounted(false);
+    }
+  }, [chatOpen]);
+
+  // Memoize currentUser to prevent recreation
+  const currentUserMemo = useMemo(() => ({
+    id: user?._id || user?.id || '',
+    name: user?.name || '',
+    email: user?.email || ''
+  }), [user?._id, user?.id, user?.name, user?.email]);
 
   if (!isAdmin) {
     return (
@@ -113,7 +179,23 @@ const AdminDashboard = () => {
               Welcome back, {user?.name}! Here's what's happening with your tours.
             </p>
           </div>
-          <NotificationBell />
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setChatOpen(true)}
+              className="relative hover:bg-primary hover:text-white transition-all"
+            >
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Live Chat
+              {unreadMessages > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center animate-pulse font-bold">
+                  {unreadMessages}
+                </span>
+              )}
+            </Button>
+            <NotificationBell />
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -303,9 +385,43 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         <AdminPostDashboard onTourChange={fetchStats} />
+
+        {/* Live Chat Modal - Only render when open */}
+        {chatOpen && (
+          <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+            <DialogContent className="max-w-6xl h-[85vh] p-0 overflow-hidden">
+              <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/10 to-secondary/10">
+                <DialogTitle className="flex items-center gap-3 text-2xl">
+                  <div className="p-2 bg-primary/20 rounded-lg">
+                    <MessageSquare className="h-6 w-6 text-primary" />
+                  </div>
+                  Live Chat Support
+                </DialogTitle>
+                <DialogDescription>
+                  Chat with users in real-time • Respond to inquiries and provide support
+                </DialogDescription>
+              </DialogHeader>
+              <div className="h-[calc(85vh-100px)]">
+                {chatMounted ? (
+                  <AdminChat
+                    token={localStorage.getItem('token') || ''}
+                    currentUser={currentUserMemo}
+                    onUnreadCountChange={setUnreadMessages}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );
-};
+});
+
+AdminDashboard.displayName = 'AdminDashboard';
 
 export default AdminDashboard;

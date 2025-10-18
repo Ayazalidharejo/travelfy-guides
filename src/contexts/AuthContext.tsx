@@ -125,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, [logout]);
 
-  const login = async (credentials: { email: string; password: string }) => {
+  const login = useCallback(async (credentials: { email: string; password: string }) => {
     try {
       setLoading(true);
       const response = await authAPI.login(credentials);
@@ -161,9 +161,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = useCallback(async () => {
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
@@ -205,9 +205,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const register = async (userData: { name: string; email: string; password: string; phone?: string }) => {
+  const register = useCallback(async (userData: { name: string; email: string; password: string; phone?: string }) => {
     try {
       setLoading(true);
       const response = await authAPI.register(userData);
@@ -243,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   const updateUser = useCallback((updatedUserData: Partial<User>) => {
     setUser(prev => {

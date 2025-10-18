@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -16,20 +16,14 @@ import {
   User as UserIcon
 } from 'lucide-react';
 
-const AdminUsers = () => {
+const AdminUsers = React.memo(() => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const { isAdmin } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchUsers();
-    }
-  }, [isAdmin]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getUsers();
@@ -46,7 +40,13 @@ const AdminUsers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchUsers();
+    }
+  }, [isAdmin, fetchUsers]);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -291,6 +291,8 @@ const AdminUsers = () => {
       </div>
     </div>
   );
-};
+});
+
+AdminUsers.displayName = 'AdminUsers';
 
 export default AdminUsers;

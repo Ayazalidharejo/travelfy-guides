@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const AdminBookings = () => {
+const AdminBookings = React.memo(() => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,13 +48,7 @@ const AdminBookings = () => {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchBookings();
-    }
-  }, [isAdmin]);
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       setLoading(true);
       console.log('📥 Admin fetching bookings...');
@@ -79,7 +73,13 @@ const AdminBookings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchBookings();
+    }
+  }, [isAdmin, fetchBookings]);
 
   const handleStatusUpdate = async (bookingId: string, newStatus: string) => {
     try {
@@ -461,9 +461,19 @@ const AdminBookings = () => {
                   <CardContent className="space-y-3">
                     <div className="flex gap-4">
                       <img
-                        src={selectedBooking.post?.imageUrl || selectedBooking.post?.images?.[0] || '/placeholder.svg'}
+                        src={
+                          selectedBooking.post?.mainImage?.url || 
+                          selectedBooking.post?.mainImage || 
+                          selectedBooking.post?.imageUrl || 
+                          selectedBooking.post?.additionalImages?.[0]?.url ||
+                          selectedBooking.post?.additionalImages?.[0] ||
+                          'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop'
+                        }
                         alt={selectedBooking.post?.title}
                         className="w-20 h-20 rounded-lg object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+                        }}
                       />
                       <div className="flex-1">
                         <h4 className="font-semibold">{selectedBooking.post?.title}</h4>
@@ -702,6 +712,8 @@ const AdminBookings = () => {
       </div>
     </div>
   );
-};
+});
+
+AdminBookings.displayName = 'AdminBookings';
 
 export default AdminBookings;

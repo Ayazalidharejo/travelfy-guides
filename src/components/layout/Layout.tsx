@@ -8,7 +8,7 @@ interface LayoutProps {
   showFooter?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => {
+const Layout = React.memo<LayoutProps>(({ children, showFooter = true }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -19,6 +19,8 @@ const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => {
       <StickyChatButton />
     </div>
   );
-};
+});
+
+Layout.displayName = 'Layout';
 
 export default Layout;

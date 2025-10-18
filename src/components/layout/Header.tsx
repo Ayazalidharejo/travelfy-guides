@@ -16,14 +16,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, LogOut, Menu } from 'lucide-react';
+import { User, Settings, LogOut, Menu, MessageCircle } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useState } from 'react';
+import UserChat from '@/pages/UserChat';
 
 const Header = React.memo(() => {
   const { user, logout, isAuthenticated, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   // Memoized avatar URL - handles both Cloudinary, local URLs, and Google photoURL
   const avatarUrl = useMemo(() => {
@@ -185,6 +193,13 @@ const Header = React.memo(() => {
                   <Settings className="mr-2 h-4 w-4" />
                   My Bookings
                 </DropdownMenuItem>
+                {/* Live Chat - Only for Users, NOT Admins */}
+                {!isAdmin && (
+                  <DropdownMenuItem onClick={() => setChatOpen(true)}>
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Live Chat Support
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -250,6 +265,33 @@ const Header = React.memo(() => {
           </Sheet>
         </div>
       </div>
+
+      {/* Live Chat Modal - Only for Users */}
+      {isAuthenticated && !isAdmin && (
+        <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+          <DialogContent className="max-w-lg h-[650px] p-0 overflow-hidden">
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                Live Chat Support
+              </DialogTitle>
+            </DialogHeader>
+            <div className="h-full">
+              <UserChat
+                token={localStorage.getItem('token') || ''}
+                currentUser={{
+                  id: user?._id || user?.id || '',
+                  name: user?.name || '',
+                  email: user?.email || '',
+                  avatar: avatarUrl || undefined
+                }}
+                isOpen={chatOpen}
+                onClose={() => setChatOpen(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </header>
   );
 });

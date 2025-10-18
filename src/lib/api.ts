@@ -15,6 +15,19 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    
+    // ✅ For Google Auth users, send user data in headers
+    if (token === 'google-auth-token') {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          config.headers['x-user-data'] = encodeURIComponent(JSON.stringify(user));
+        } catch (error) {
+          console.error('Error encoding user data:', error);
+        }
+      }
+    }
   }
   return config;
 });
