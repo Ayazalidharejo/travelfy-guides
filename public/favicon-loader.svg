@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#307172;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#204f4f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="url(#grad)"/>
+  
+  <!-- Animated spinner -->
+  <circle cx="16" cy="16" r="10" fill="none" stroke="white" stroke-width="3" 
+          stroke-dasharray="31.4 31.4" stroke-linecap="round">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 16 16"
+      to="360 16 16"
+      dur="1s"
+      repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Center dot -->
+  <circle cx="16" cy="16" r="3" fill="white">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { postsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
-// Exact Design Components
+// ✅ Critical - Load immediately (above the fold)
 import HeroFinal from '@/components/home/HeroFinal';
-import ToursSectionExact from '@/components/home/ToursSectionExact';
-import StatsSectionExact from '@/components/home/StatsSectionExact';
-import ConsultationSection from '@/components/home/ConsultationSection';
-import NewsletterSection from '@/components/home/NewsletterSection';
-import FooterSection from '@/components/home/FooterSection';
-
-// Existing Components
-import IntroductionSection from '@/components/IntroductionSection';
-import WhyChooseUs from '@/components/WhyChooseUs';
-import Testimonials from '@/components/Testimonials';
-import FAQ from '@/components/FAQ';
-import Gallery from '@/components/Gallery';
-import VerticalItinerary from '@/components/VerticalItinerary';
-import HappyTravelers from '@/components/HappyTravelers';
-import RatingComponent from '@/components/RatingComponent';
 import TourCard from '@/components/tour/TourCard';
+
+// 🚀 Lazy load - Load on scroll (below the fold)
+const IntroductionSection = lazy(() => import('@/components/IntroductionSection'));
+const WhyChooseUs = lazy(() => import('@/components/WhyChooseUs'));
+const Gallery = lazy(() => import('@/components/Gallery'));
+const ConsultationSection = lazy(() => import('@/components/home/ConsultationSection'));
+const StatsSectionExact = lazy(() => import('@/components/home/StatsSectionExact'));
+const Testimonials = lazy(() => import('@/components/Testimonials'));
+const FAQ = lazy(() => import('@/components/FAQ'));
+const RatingComponent = lazy(() => import('@/components/RatingComponent'));
+
+// Lightweight loading placeholder
+const SectionLoader = () => (
+  <div className="flex justify-center items-center py-12">
+    <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+  </div>
+);
 
 const HomePage = () => {
   const [featuredTours, setFeaturedTours] = useState<any[]>([]);
@@ -165,10 +167,17 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section - EXACT Design */}
+      {/* Hero Section - EXACT Design - Loads immediately */}
       <HeroFinal />
-      <IntroductionSection/>
-<WhyChooseUs />
+      
+      {/* Below the fold - Lazy loaded on scroll */}
+      <Suspense fallback={<SectionLoader />}>
+        <IntroductionSection/>
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoader />}>
+        <WhyChooseUs />
+      </Suspense>
       {/* Explore Our Tours - Cards Design like ToursPage */}
       {featuredTours.length > 0 && (
         <section className="container mx-auto px-4 py-10">
@@ -210,15 +219,26 @@ const HomePage = () => {
      
 
       {/* Gallery */}
-      <Gallery />
-    <ConsultationSection />
-      {/* Itinerary */}
-      {/* <VerticalItinerary /> */}
+      <Suspense fallback={<SectionLoader />}>
+        <Gallery />
+      </Suspense>
       
-<StatsSectionExact />
+      <Suspense fallback={<SectionLoader />}>
+        <ConsultationSection />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoader />}>
+        <StatsSectionExact />
+      </Suspense>
+      
       {/* FAQ */}
-       <Testimonials />
-      <FAQ />
+      <Suspense fallback={<SectionLoader />}>
+        <Testimonials />
+      </Suspense>
+      
+      <Suspense fallback={<SectionLoader />}>
+        <FAQ />
+      </Suspense>
 
       {/* Reviews */}
       {featuredTours.length > 0 && (
@@ -243,10 +263,12 @@ const HomePage = () => {
                 </p>
               </div>
               
-              <RatingComponent 
-                tourId={featuredTours[0]._id} 
-                tourTitle={featuredTours[0].title}
-              />
+              <Suspense fallback={<SectionLoader />}>
+                <RatingComponent 
+                  tourId={featuredTours[0]._id} 
+                  tourTitle={featuredTours[0].title}
+                />
+              </Suspense>
             </div>
           </div>
         </section>

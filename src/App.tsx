@@ -1,43 +1,70 @@
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import Scroll from "@/components/Scroll";
+
+// ✅ Keep critical components as regular imports
 import Layout from "@/components/layout/Layout";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import AdminLoginPage from "./pages/AdminLoginPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import TermsPage from "./pages/TermsPage";
-import ToursPage from "./pages/ToursPage";
-import TourDetailPage from "./pages/TourDetailPage";
-import BookingPage from "./pages/BookingPage";
-import ProfilePage from "./pages/ProfilePage";
-import MyBookingsPage from "./pages/MyBookingsPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminTours from "./pages/admin/AdminTours";
-import AdminBookings from "./pages/admin/AdminBookings";
-import AdminUsers from "./pages/admin/AdminUsers";
-import NotFound from "./pages/NotFound";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import FeaturedTours from "./components/FeaturedTours";
-import ExpertGuidesPage from "./pages/ExpertGuidesPage";
-import CustomizedToursPage from "./pages/CustomizedToursPage";
-import FreeCancellationPage from "./pages/FreeCancellationPage";
-import ReliableTransportationPage from "./pages/ReliableTransportationPage";
-import CustomerSupportPage from "./pages/CustomerSupportPage";
-import TrustedTravelersPage from "./pages/TrustedTravelersPage";
-import CancellationPolicyPage from "./pages/CancellationPolicyPage";
-import RefundPolicyPage from "./pages/RefundPolicyPage";
-import TransportPage from "./pages/TransportPage";
-import FAQPage from "./pages/FAQPage";
-import HelpSupportPage from "./pages/HelpSupportPage";
-import Scroll from "@/components/Scroll"
+
+// 🚀 Lazy load all pages for better performance
+const HomePage = lazy(() => import("./pages/HomePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+
+// Tours pages
+const ToursPage = lazy(() => import("./pages/ToursPage"));
+const TourDetailPage = lazy(() => import("./pages/TourDetailPage"));
+const BookingPage = lazy(() => import("./pages/BookingPage"));
+
+// Info pages
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const TransportPage = lazy(() => import("./pages/TransportPage"));
+const CancellationPolicyPage = lazy(() => import("./pages/CancellationPolicyPage"));
+const RefundPolicyPage = lazy(() => import("./pages/RefundPolicyPage"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
+const HelpSupportPage = lazy(() => import("./pages/HelpSupportPage"));
+
+// User pages
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
+
+// Admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminTours = lazy(() => import("./pages/admin/AdminTours"));
+const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+
+// Feature pages
+const ExpertGuidesPage = lazy(() => import("./pages/ExpertGuidesPage"));
+const CustomizedToursPage = lazy(() => import("./pages/CustomizedToursPage"));
+const FreeCancellationPage = lazy(() => import("./pages/FreeCancellationPage"));
+const ReliableTransportationPage = lazy(() => import("./pages/ReliableTransportationPage"));
+const CustomerSupportPage = lazy(() => import("./pages/CustomerSupportPage"));
+const TrustedTravelersPage = lazy(() => import("./pages/TrustedTravelersPage"));
+
+// Other
+const FeaturedTours = lazy(() => import("./components/FeaturedTours"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-lg text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+)
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,6 +75,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
          <Scroll />
+         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="//test" element={<FeaturedTours />} />
@@ -93,6 +121,7 @@ const App = () => (
             {/* 404 route */}
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </Routes>
+         </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

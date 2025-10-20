@@ -3,22 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Karvaan Tours</title>
-  <meta name="description" content="Explore breathtaking destinations, immerse in local cultures, and create unforgettable memories with our curated travel experiences." />
-  <meta name="author" content="Travel Tours" />
+    
+    <!-- 🎯 Dynamic Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon-loader.svg" id="favicon" />
+    
+    <!-- 🚀 Performance Optimization -->
+    <link rel="preconnect" href="http://localhost:5000" />
+    <link rel="dns-prefetch" href="http://localhost:5000" />
+    
+    <!-- 🎯 Page Info -->
+    <title>Karvaan Tours - Discover Amazing Destinations</title>
+    <meta name="description" content="Explore breathtaking destinations, immerse in local cultures, and create unforgettable memories with our curated travel experiences." />
+    <meta name="author" content="Karvaan Tours" />
+    <meta name="theme-color" content="#307172" />
+    
+    <!-- 📱 Social Media Meta Tags -->
+    <meta property="og:title" content="Karvaan Tours - Discover Amazing Destinations" />
+    <meta property="og:description" content="Explore breathtaking destinations, immerse in local cultures, and create unforgettable memories with our curated travel experiences." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
-  <meta property="og:title" content="Travel Tours - Discover Amazing Destinations" />
-  <meta property="og:description" content="Explore breathtaking destinations, immerse in local cultures, and create unforgettable memories with our curated travel experiences." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@traveltours" />
-  <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@karvaantours" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- 🎨 Loading Styles -->
+    <style>
+      /* Prevent flash of unstyled content */
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Initial loading indicator */
+      .app-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #307172 0%, #204f4f 100%);
+      }
+      
+      .app-loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Initial Loading Screen -->
+      <div class="app-loading">
+        <div class="app-loading-spinner"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
