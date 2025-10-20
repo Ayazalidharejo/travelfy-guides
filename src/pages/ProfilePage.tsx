@@ -30,14 +30,21 @@ const ProfilePage = () => {
     }
 
     // For relative paths, use local backend URL
-    const baseURL = 'https://tour-backend-eight.vercel.app';
+    // const baseURL = 'https://tour-backend-eight.vercel.app';
+    const baseURL = 'http://localhost:5000';
     return `${baseURL}${avatarPath}`;
   }, []);
 
   // State to preview avatar image
-  const [previewAvatar, setPreviewAvatar] = useState(() =>
-    user?.avatar ? getImageURL(user.avatar) : ''
-  );
+  // ✅ Prioritize custom avatar over Google photoURL
+  const [previewAvatar, setPreviewAvatar] = useState(() => {
+    // If user has custom avatar different from photoURL, use it
+    if (user?.avatar && user.avatar !== user?.photoURL) {
+      return getImageURL(user.avatar);
+    }
+    // Otherwise fall back to photoURL or empty
+    return user?.photoURL || '';
+  });
 
   // Profile form data state
   const [profileData, setProfileData] = useState({
@@ -69,7 +76,16 @@ const ProfilePage = () => {
         avatar: user.avatar || '',
       });
 
-      const newAvatarURL = getImageURL(user.avatar);
+      // ✅ Prioritize custom avatar over Google photoURL
+      let newAvatarURL = '';
+      if (user.avatar && user.avatar !== user.photoURL) {
+        // User has custom avatar, use it
+        newAvatarURL = getImageURL(user.avatar);
+      } else if (user.photoURL) {
+        // Fall back to Google photo
+        newAvatarURL = user.photoURL;
+      }
+      
       if (previewAvatar !== newAvatarURL) {
         setPreviewAvatar(newAvatarURL);
       }
@@ -493,13 +509,7 @@ const ProfilePage = () => {
             </TabsContent>
           </Tabs>
 
-          {/* ✅ FIX: UserChat component with proper props */}
-          <UserChat 
-            token={token} 
-            currentUser={user}
-            isOpen={showChat}
-            onClose={handleCloseChat}
-          />
+       
         </div>
       </div>
     </div>

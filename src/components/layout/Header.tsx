@@ -27,30 +27,50 @@ import {
 import { useState } from 'react';
 import UserChat from '@/pages/UserChat';
 
-const Header = React.memo(() => {
+// ✅ Removed React.memo to ensure Header re-renders when user context changes
+const Header = () => {
   const { user, logout, isAuthenticated, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
-  // Memoized avatar URL - handles both Cloudinary, local URLs, and Google photoURL
-  const avatarUrl = useMemo(() => {
-    // Priority 1: Google photoURL (for Google authenticated users)
+  // Avatar URL - handles both Cloudinary, local URLs, and Google photoURL
+  // ✅ Priority: Custom avatar first, then Google photoURL
+  const avatarUrl = (() => {
+    console.log('🎯 Header - Calculating avatarUrl');
+    console.log('👤 Header - Current user:', user);
+    console.log('🖼️ Header - user.avatar:', user?.avatar);
+    console.log('📷 Header - user.photoURL:', user?.photoURL);
+    
+    // Priority 1: Custom uploaded avatar (highest priority)
+    if (user?.avatar && user.avatar !== user?.photoURL) {
+      // User has uploaded a custom avatar, use it
+      
+      // If already a full URL (Cloudinary, data URI, etc.), return as is
+      if (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) {
+        // Add timestamp to prevent browser caching
+        const separator = user.avatar.includes('?') ? '&' : '?';
+        const finalUrl = `${user.avatar}${separator}t=${Date.now()}`;
+        console.log('✅ Header - Using custom uploaded avatar:', finalUrl);
+        return finalUrl;
+      }
+      
+      // For relative paths, use local backend URL with cache-busting timestamp
+      const finalUrl = `http://localhost:5000${user.avatar}?t=${Date.now()}`;
+      console.log('✅ Header - Using custom local avatar:', finalUrl);
+      return finalUrl;
+    }
+    
+    // Priority 2: Google photoURL (fallback if no custom avatar)
     if (user?.photoURL) {
+      console.log('✅ Header - Using Google photoURL (no custom avatar):', user.photoURL);
       return user.photoURL;
     }
     
-    // Priority 2: Regular avatar field
-    if (!user?.avatar) return null;
-    
-    // If already a full URL (Cloudinary, data URI, etc.), return as is
-    if (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) {
-      return user.avatar;
-    }
-    
-    // For relative paths, use local backend URL
-    return `http://localhost:5000${user.avatar}`;
-  }, [user?.avatar, user?.photoURL]);
+    // Priority 3: No avatar at all
+    console.log('❌ Header - No avatar found, returning null');
+    return null;
+  })();
 
   // Optimized logout handler
   const handleLogout = useCallback(() => {
@@ -157,9 +177,9 @@ const Header = React.memo(() => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8" key={avatarUrl || 'no-avatar'}>
                     {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt={user?.name} />
+                      <AvatarImage src={avatarUrl} alt={user?.name} key={avatarUrl} />
                     ) : null}
                     <AvatarFallback className="bg-gradient-primary text-white">
                       {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -169,9 +189,9 @@ const Header = React.memo(() => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <div className="flex items-center justify-start gap-2 p-2">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8" key={avatarUrl || 'no-avatar-dropdown'}>
                     {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt={user?.name} />
+                      <AvatarImage src={avatarUrl} alt={user?.name} key={avatarUrl} />
                     ) : null}
                     <AvatarFallback className="bg-gradient-primary text-white">
                       {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -294,8 +314,6 @@ const Header = React.memo(() => {
       )}
     </header>
   );
-});
-
-Header.displayName = 'Header';
+};
 
 export default Header;

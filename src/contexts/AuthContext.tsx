@@ -246,6 +246,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [toast]);
 
   const updateUser = useCallback((updatedUserData: Partial<User>) => {
+    console.log('🔄 AuthContext - updateUser called with:', updatedUserData);
     setUser(prev => {
       if (!prev) return prev;
       
@@ -253,6 +254,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...prev,
         ...updatedUserData
       };
+      
+      console.log('📝 AuthContext - Previous user:', prev);
+      console.log('✅ AuthContext - Updated user:', updatedUser);
+      console.log('🖼️ AuthContext - Avatar changed from:', prev.avatar, 'to:', updatedUser.avatar);
       
       localStorage.setItem('user', JSON.stringify(updatedUser));
       return updatedUser;

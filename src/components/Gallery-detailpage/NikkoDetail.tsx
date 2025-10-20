@@ -54,84 +54,84 @@ const NikkoDetail = ({ onClose }) => {
       items: [
         { 
           id: 1, day: 1, name: "Tobu Nikko Station", icon: Building, color: "text-blue-600", 
-          location: "Tobu Nikko Station, Nikko City", time: "08:30 AM", duration: "30 minutes", 
+          location: "Tobu Nikko Station, Nikko City",  duration: "30 minutes", 
           description: "Arrive at Nikko Station from Tokyo. Pick up tourist maps and purchase World Heritage Pass for unlimited bus access.", 
           activities: ["Station arrival", "Pass purchase", "Information gathering"], 
           cost: "¥2000 2-day pass" 
         },
         { 
           id: 2, day: 1, name: "Shinkyo Bridge", icon: Building, color: "text-red-500", 
-          location: "Shinkyo Bridge, 2307 Sannai, Nikko", time: "09:00 AM", duration: "30 minutes", 
+          location: "Shinkyo Bridge, 2307 Sannai, Nikko",  duration: "30 minutes", 
           description: "Sacred vermillion bridge spanning Daiya River. Built in 1636, one of Japan's three most beautiful bridges. Symbol of Nikko.", 
           activities: ["Bridge viewing", "Photography", "River walk"], 
           cost: "¥300 to cross" 
         },
         { 
           id: 3, day: 1, name: "Rinnoji Temple", icon: Church, color: "text-purple-600", 
-          location: "Rinnoji Temple, 2300 Sannai, Nikko", time: "09:45 AM", duration: "1 hour", 
+          location: "Rinnoji Temple, 2300 Sannai, Nikko", duration: "1 hour", 
           description: "Important Buddhist temple founded in 766 AD. Houses three giant golden Buddha statues and beautiful Shoyo-en Garden.", 
           activities: ["Temple visit", "Garden stroll", "Buddha viewing"], 
           cost: "¥400" 
         },
         { 
           id: 4, day: 1, name: "Toshogu Shrine", icon: Church, color: "text-orange-600", 
-          location: "Toshogu Shrine, 2301 Sannai, Nikko", time: "11:00 AM", duration: "2.5 hours", 
+          location: "Toshogu Shrine, 2301 Sannai, Nikko",  duration: "2.5 hours", 
           description: "Ornate UNESCO World Heritage shrine dedicated to Tokugawa Ieyasu. Famous for Three Wise Monkeys, Sleeping Cat, and elaborate gold decorations.", 
           activities: ["Shrine exploration", "Carving viewing", "Five-story pagoda visit"], 
           cost: "¥1300" 
         },
         { 
           id: 5, day: 1, name: "Taiyuin Temple", icon: Church, color: "text-gold-600", 
-          location: "Taiyuin Temple, 2300 Sannai, Nikko", time: "02:00 PM", duration: "1 hour", 
+          location: "Taiyuin Temple, 2300 Sannai, Nikko",  duration: "1 hour", 
           description: "Stunning mausoleum of Tokugawa Iemitsu. Beautiful lacquerwork, intricate carvings, and peaceful moss garden.", 
           activities: ["Temple tour", "Architecture viewing", "Garden walk"], 
           cost: "¥550" 
         },
         { 
           id: 6, day: 1, name: "Futarasan Shrine", icon: Church, color: "text-green-600", 
-          location: "Futarasan Shrine, 2307 Sannai, Nikko", time: "03:30 PM", duration: "45 minutes", 
+          location: "Futarasan Shrine, 2307 Sannai, Nikko",  duration: "45 minutes", 
           description: "Ancient shrine founded in 782 AD, dedicated to mountain deities. Beautiful vermillion buildings and sacred trees.", 
           activities: ["Shrine visit", "Fortune drawing", "Sacred tree viewing"], 
           cost: "¥200" 
         },
         { 
           id: 7, day: 1, name: "Kanmangafuchi Abyss", icon: Mountain, color: "text-gray-600", 
-          location: "Kanmangafuchi Abyss, Nikko", time: "04:30 PM", duration: "1 hour", 
+          location: "Kanmangafuchi Abyss, Nikko",  duration: "1 hour", 
           description: "Mysterious ravine with 70 Jizo statues along the path. Legend says the number of statues changes each time you count.", 
           activities: ["Scenic walk", "Jizo statues viewing", "Photography"], 
           cost: "Free" 
         },
         { 
           id: 8, day: 2, name: "Akechidaira Ropeway", icon: Cable, color: "text-blue-500", 
-          location: "Akechidaira Ropeway, Nikko", time: "08:30 AM", duration: "1 hour", 
+          location: "Akechidaira Ropeway, Nikko",  duration: "1 hour", 
           description: "Cable car ride to observation deck at 1,373m. Spectacular views of Lake Chuzenji, Kegon Falls, and surrounding mountains.", 
           activities: ["Ropeway ride", "Observation deck", "Mountain photography"], 
           cost: "¥800 round trip" 
         },
         { 
           id: 9, day: 2, name: "Lake Chuzenji", icon: Waves, color: "text-blue-500", 
-          location: "Lake Chuzenji, Nikko", time: "10:00 AM", duration: "1.5 hours", 
+          location: "Lake Chuzenji, Nikko",  duration: "1.5 hours", 
           description: "Beautiful mountain lake at 1,269m elevation formed 20,000 years ago by volcanic eruption. Surrounded by mountains and hiking trails.", 
           activities: ["Lake cruise", "Lakeside walk", "Scenic photography"], 
           cost: "¥1250 cruise" 
         },
         { 
           id: 10, day: 2, name: "Kegon Falls", icon: Mountain, color: "text-cyan-500", 
-          location: "Kegon Falls, Chugushi, Nikko", time: "12:00 PM", duration: "1 hour", 
+          location: "Kegon Falls, Chugushi, Nikko",  duration: "1 hour", 
           description: "Spectacular 97-meter waterfall, one of Japan's three most beautiful falls. Elevator descends to viewing platform at the base.", 
           activities: ["Waterfall viewing", "Elevator ride to base", "Nature photography"], 
           cost: "¥570" 
         },
         { 
           id: 11, day: 2, name: "Ryuzu Falls", icon: Waves, color: "text-teal-500", 
-          location: "Ryuzu Falls, Nikko", time: "01:30 PM", duration: "45 minutes", 
+          location: "Ryuzu Falls, Nikko", duration: "45 minutes", 
           description: "Beautiful two-pronged waterfall resembling dragon's head. Tea house with viewing deck overlooking the falls.", 
           activities: ["Waterfall viewing", "Tea house break", "Nature walk"], 
           cost: "Free (tea ¥500)" 
         },
         { 
           id: 12, day: 2, name: "Yumoto Onsen", icon: Waves, color: "text-orange-500", 
-          location: "Yumoto Onsen, Nikko", time: "03:00 PM", duration: "2 hours", 
+          location: "Yumoto Onsen, Nikko",  duration: "2 hours", 
           description: "Traditional hot spring village at 1,500m elevation. Sulfurous waters with healing properties. Public foot baths available.", 
           activities: ["Onsen bathing", "Foot bath", "Mountain village stroll"], 
           cost: "¥700 public bath" 

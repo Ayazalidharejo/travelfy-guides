@@ -54,84 +54,84 @@ const NaganoDetail = ({ onClose }) => {
       items: [
         { 
           id: 1, day: 1, name: "Nagano Station", icon: Building, color: "text-blue-600", 
-          location: "Nagano Station, Nagano City", time: "08:00 AM", duration: "30 minutes", 
+          location: "Nagano Station, Nagano City",  duration: "30 minutes", 
           description: "Start your journey at Nagano Station, gateway to the Japanese Alps. Modern station with tourist information and local specialties.", 
           activities: ["Information gathering", "Breakfast", "Transportation planning"], 
           cost: "Free" 
         },
         { 
           id: 2, day: 1, name: "Zenko-ji Temple", icon: Church, color: "text-red-500", 
-          location: "Zenko-ji Temple, 491 Motoyoshicho, Nagano", time: "09:00 AM", duration: "2 hours", 
+          location: "Zenko-ji Temple, 491 Motoyoshicho, Nagano",  duration: "2 hours", 
           description: "One of Japan's most important Buddhist temples, founded in 642 AD. Houses the first Buddhist statue brought to Japan.", 
           activities: ["Temple visit", "Morning prayer ceremony", "Underground passage walk"], 
           cost: "¥500" 
         },
         { 
           id: 3, day: 1, name: "Nakamise Shopping Street", icon: Store, color: "text-purple-600", 
-          location: "Nakamise-dori, Nagano City", time: "11:00 AM", duration: "1 hour", 
+          location: "Nakamise-dori, Nagano City",  duration: "1 hour", 
           description: "Traditional shopping street with 50+ shops selling local crafts, oyaki dumplings, and Buddhist souvenirs.", 
           activities: ["Shopping", "Oyaki tasting", "Souvenir hunting"], 
           cost: "¥1000-2000" 
         },
         { 
           id: 4, day: 1, name: "Togakushi Shrine", icon: Church, color: "text-green-600", 
-          location: "Togakushi, Nagano City", time: "01:00 PM", duration: "2 hours", 
+          location: "Togakushi, Nagano City",  duration: "2 hours", 
           description: "Ancient shrine complex in mystical cedar forests. Walk the 2km path lined with 350-year-old Japanese cedar trees.", 
           activities: ["Shrine visit", "Cedar forest walk", "Nature photography"], 
           cost: "Free" 
         },
         { 
           id: 5, day: 1, name: "Togakushi Soba Restaurant", icon: Utensils, color: "text-orange-600", 
-          location: "Togakushi Village, Nagano", time: "03:30 PM", duration: "1 hour", 
+          location: "Togakushi Village, Nagano",  duration: "1 hour", 
           description: "Try Togakushi's famous handmade soba noodles - one of Japan's top three soba producing regions.", 
           activities: ["Soba tasting", "Traditional lunch", "Local specialty"], 
           cost: "¥1200-1800" 
         },
         { 
           id: 6, day: 1, name: "Jigokudani Monkey Park", icon: Mountain, color: "text-blue-600", 
-          location: "Jigokudani Yaenkoen, Yamanouchi Town", time: "05:00 PM", duration: "2.5 hours", 
+          location: "Jigokudani Yaenkoen, Yamanouchi Town",  duration: "2.5 hours", 
           description: "World-famous wild Japanese macaques bathing in natural hot springs. Only place in the world where monkeys bathe in onsen.", 
           activities: ["Monkey watching", "Forest trail", "Wildlife photography"], 
           cost: "¥800" 
         },
         { 
           id: 7, day: 1, name: "Shibu Onsen", icon: Waves, color: "text-orange-500", 
-          location: "Shibu Onsen, Yamanouchi Town", time: "08:00 PM", duration: "Evening", 
+          location: "Shibu Onsen, Yamanouchi Town", duration: "Evening", 
           description: "Historic hot spring town with 1,300 years history. Nine public bathhouses, cobblestone streets.", 
           activities: ["Onsen bathing tour", "Night stroll", "Traditional atmosphere"], 
           cost: "¥500-1500" 
         },
         { 
           id: 8, day: 2, name: "Matsumoto Castle", icon: Building, color: "text-gray-700", 
-          location: "4-1 Marunouchi, Matsumoto City", time: "09:00 AM", duration: "2 hours", 
+          location: "4-1 Marunouchi, Matsumoto City",  duration: "2 hours", 
           description: "One of Japan's premier historic castles and national treasure. Beautiful original black castle built in 1592.", 
           activities: ["Castle interior tour", "Historical exhibits", "Castle grounds walk"], 
           cost: "¥700" 
         },
         { 
           id: 9, day: 2, name: "Nawate Street", icon: Store, color: "text-pink-600", 
-          location: "Nawate-dori, Matsumoto City", time: "11:30 AM", duration: "1 hour", 
+          location: "Nawate-dori, Matsumoto City",  duration: "1 hour", 
           description: "Charming frog-themed shopping street along the river. Traditional shops, cafes, and the frog mascot Kaeru.", 
           activities: ["Street walking", "Shopping", "Local snacks"], 
           cost: "¥1000-2000" 
         },
         { 
           id: 10, day: 2, name: "Kamikochi Valley", icon: Mountain, color: "text-green-500", 
-          location: "Kamikochi, Azumi, Matsumoto", time: "02:00 PM", duration: "3 hours", 
+          location: "Kamikochi, Azumi, Matsumoto", duration: "3 hours", 
           description: "Pristine alpine valley at 1,500m elevation in the Northern Japan Alps. Crystal-clear Azusa River, stunning peaks.", 
           activities: ["Valley hiking", "Taisho Pond visit", "Mountain photography"], 
           cost: "¥2000 bus + ¥100 fee" 
         },
         { 
           id: 11, day: 2, name: "Kappa Bridge", icon: Camera, color: "text-cyan-500", 
-          location: "Kappabashi, Kamikochi", time: "05:00 PM", duration: "30 minutes", 
+          location: "Kappabashi, Kamikochi", duration: "30 minutes", 
           description: "Iconic 37m wooden suspension bridge crossing Azusa River. Spectacular views of Mt. Hotaka-dake.", 
           activities: ["Photography", "Bridge crossing", "Mountain viewing"], 
           cost: "Free" 
         },
         { 
           id: 12, day: 2, name: "Kamikochi Bus Terminal Cafe", icon: Coffee, color: "text-brown-600", 
-          location: "Kamikochi Bus Terminal", time: "05:45 PM", duration: "45 minutes", 
+          location: "Kamikochi Bus Terminal",  duration: "45 minutes", 
           description: "Relax with coffee and local sweets while enjoying the last views of the Northern Alps.", 
           activities: ["Coffee break", "Mountain views", "Souvenir shopping"], 
           cost: "¥500-800" 

@@ -180,7 +180,7 @@ const ConsultationSection = () => {
                 </div>
 
                 {/* Call Us */}
-                <div className="bg-white rounded-xl p-3 shadow-sm" style={{ minWidth: '200px' }}>
+                {/* <div className="bg-white rounded-xl p-3 shadow-sm" style={{ minWidth: '200px' }}>
                   <div className="flex items-center gap-3">
                     <div className="bg-orange-100 p-2 rounded-lg">
                       <Phone className="h-4 w-4 text-orange-600" />
@@ -190,7 +190,27 @@ const ConsultationSection = () => {
                       <p className="text-[10px] text-gray-600">+81 80-7480-1156</p>
                     </div>
                   </div>
-                </div>
+                </div> */}
+
+                <div 
+  className="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+  style={{ minWidth: '200px' }}
+  onClick={() => {
+    const phoneNumber = '818074801156'; 
+    const message = encodeURIComponent('Hello, I would like to inquire about your tour packages.');
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+  }}
+>
+  <div className="flex items-center gap-3">
+    <div className="bg-orange-100 p-2 rounded-lg">
+      <Phone className="h-4 w-4 text-orange-600" />
+    </div>
+    <div>
+      <h3 className="font-bold text-gray-900 text-xs">Call Us</h3>
+      <p className="text-[10px] text-gray-600">+81 80-7480-1156</p>
+    </div>
+  </div>
+</div>
 
                 {/* Schedule a Call */}
                 <div 
