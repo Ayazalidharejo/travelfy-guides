@@ -417,15 +417,18 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
               );
             })}
             {isTyping && (
-              <div className="flex justify-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                  CS
+              <div className="flex justify-start gap-3 animate-fade-in">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                  🎧
                 </div>
-                <div className="bg-white dark:bg-slate-800 rounded-2xl px-5 py-4 shadow-md border border-slate-200 dark:border-slate-700">
-                  <div className="flex gap-1.5">
-                    <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
-                    <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></span>
-                    <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></span>
+                <div className="bg-white dark:bg-slate-800 rounded-2xl px-5 py-3 shadow-md border border-emerald-200 dark:border-slate-700">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
+                      <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></span>
+                      <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></span>
+                    </div>
+                    <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Agent is typing...</span>
                   </div>
                 </div>
               </div>

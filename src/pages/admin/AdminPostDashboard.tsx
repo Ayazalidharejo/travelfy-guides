@@ -192,7 +192,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const sellingPointOptions = [
     'Hiking', 'Adventure', 'Experience', 'Tour', 'Cultural',
     'Historical', 'Nature', 'Wildlife', 'Photography', 'Food',
-    'Luxury', 'Budget', 'Family', 'Romantic', 'Educational'
+    'Luxury', 'Budget', 'Family', 'Romantic', 'Educational',  'private'
   ];
 
   const thingsToBringOptions = [
@@ -1571,7 +1571,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <div className="mb-3">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">{tour.title}</h3>
                         <div className="flex gap-2 flex-wrap">
-                          <span className="px-2 py-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 text-xs rounded-full">
+                          <span className="px-2 py-1  text-blue-800 text-xs rounded-full">
                             {tour.category || 'Tour'}
                           </span>
                           {tour.city && (
@@ -1713,16 +1713,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             <form onSubmit={handleSubmit} className="space-y-6">
               
               {/* Helper Instructions */}
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h3 className="font-semibold text-blue-900 mb-2">📝 Quick Guide:</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>✅ <strong>Required:</strong> Title*, Category*, Description*</li>
-                  <li>💰 <strong>Price:</strong> Fill "Pricing Schedule" section → Price auto-populates</li>
-                  <li>📸 <strong>Images:</strong> Scroll to "Images" section → Upload OR paste URL</li>
-                  <li>⏱️ <strong>Duration:</strong> Optional but recommended for cards</li>
-                  <li>🔽 <strong>Tip:</strong> Click section headers to expand/collapse</li>
-                </ul>
-              </div>
+       
 
               {/* Product Management Section */}
               <div>
@@ -1814,7 +1805,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       {formData.taglinesList.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {formData.taglinesList.map((tagline, index) => (
-                            <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
+                            <div key={index} className="flex items-center gap-1  text-blue-800 px-3 py-1 rounded-full text-sm">
                               {tagline}
                               <button 
                                 type="button" 
@@ -1847,7 +1838,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         {formData.selectedSellingPoints.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-2">
                             {formData.selectedSellingPoints.map((point, index) => (
-                              <div key={index} className="flex items-center gap-1 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-sm">
+                              <div key={index} className="flex items-center gap-1  text-blue-800 px-3 py-1 rounded-full text-sm">
                                 {point}
                                 <button 
                                   type="button" 
@@ -2616,7 +2607,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     }`}>
                       <div className="flex items-center justify-between mb-4 pb-3 border-b">
                         <h3 className="text-xl font-semibold text-gray-800">Pricing Schedule</h3>
-                        <div className="bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <div className=" text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
                           📅 Shared Schedule for All Vehicles
                         </div>
                       </div>
@@ -2625,7 +2616,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         {/* Schedule Explanation */}
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-[#5C7AC0]  hover:bg-[#284078] rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8  rounded-full flex items-center justify-center flex-shrink-0">
                               <span className="text-blue-600 text-sm font-bold">ℹ️</span>
                             </div>
                             <div>
@@ -2794,7 +2785,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                                     {schedule.days.map((day: string) => (
                                       <span
                                         key={day}
-                                        className="inline-block bg-[#5C7AC0]  hover:bg-[#284078] text-blue-700 text-xs px-2 py-1 rounded-full mr-1 mb-1"
+                                        className="inline-block  text-blue-700 text-xs px-2 py-1 rounded-full mr-1 mb-1"
                                       >
                                         {day}
                                       </span>

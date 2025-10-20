@@ -26,6 +26,8 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const [totalUnread, setTotalUnread] = useState(0);
   const messagesEndRef = useRef(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isTypingRef = useRef(false);
 
   // Notification sound
   useEffect(() => {
@@ -262,9 +264,25 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     scrollToBottom();
   }, [messages]);
 
+  // Cleanup typing timeout on unmount or user change
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      handleTypingStop();
+    };
+  }, [selectedUser]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedUser || !socket) return;
+
+    // Clear typing timeout and stop typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    handleTypingStop();
 
     socket.emit('sendMessageToUser', {
       userId: selectedUser._id,
@@ -275,15 +293,36 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   };
 
   const handleTypingStart = () => {
-    if (socket && selectedUser) {
+    if (socket && selectedUser && !isTypingRef.current) {
+      isTypingRef.current = true;
       socket.emit('adminTypingStart', { userId: selectedUser._id });
+      console.log('⌨️ Admin started typing to user:', selectedUser._id);
     }
   };
 
   const handleTypingStop = () => {
-    if (socket && selectedUser) {
+    if (socket && selectedUser && isTypingRef.current) {
+      isTypingRef.current = false;
       socket.emit('adminTypingStop', { userId: selectedUser._id });
+      console.log('⏹️ Admin stopped typing to user:', selectedUser._id);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    
+    // Start typing indicator
+    handleTypingStart();
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set new timeout to stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      handleTypingStop();
+    }, 2000);
   };
 
   const isUserOnline = (userId) => {
@@ -571,8 +610,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
                   <input
                     type="text"
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onFocus={handleTypingStart}
+                    onChange={handleInputChange}
                     onBlur={handleTypingStop}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {

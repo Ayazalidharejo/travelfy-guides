@@ -163,7 +163,7 @@ const Testimonials: React.FC = () => {
                 style={{ flex: `0 0 ${100 / cardsToShow}%` }}
               >
                 <div className="bg-gray-50 p-6 rounded-xl shadow text-left h-full flex flex-col justify-between">
-                  <div className="flex items-center mb-4">
+                  {/* <div className="flex items-center mb-4">
                     <img
                       src={review.userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.userName)}&background=random`}
                       alt={review.userName}
@@ -181,9 +181,31 @@ const Testimonials: React.FC = () => {
                         })}
                       </p>
                     </div>
-                  </div>
-                  <p className="text-gray-700 mb-4 flex-grow line-clamp-4">"{review.comment}"</p>
-                  
+                  </div> */}
+                  {/* <p className="text-gray-700 mb-4 flex-grow line-clamp-4">"{review.comment}"</p> */}
+                  <div className="flex items-center mb-4">
+  <img
+    src={review.userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.userName)}&background=random`}
+    alt={review.userName}
+    className="w-12 h-12 rounded-full mr-4 object-cover"
+    onError={(e) => {
+      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review.userName)}&background=random`;
+    }}
+  />
+  <div>
+    <h3 className="text-lg font-semibold">{review.userName}</h3>
+    <p className="text-sm text-gray-500">
+      {new Date(review.createdAt).toLocaleDateString('en-US', { 
+        month: 'short', 
+        year: 'numeric' 
+      })}
+    </p>
+  </div>
+</div>
+<p className="text-gray-700 mb-4 flex-grow line-clamp-4 font-serif">
+  {review.comment.charAt(0).toUpperCase() + review.comment.slice(1)}
+</p>
+
                   {/* Review Image */}
                   {review.reviewImage && (
                     <div className="mb-4">

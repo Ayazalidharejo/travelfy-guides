@@ -413,6 +413,11 @@ const AdminBookings = React.memo(() => {
                           <Badge className={getPaymentStatusColor(booking.payment.status)}>
                             Payment: {booking.payment.status}
                           </Badge>
+                          {booking.scheduleRequest && (
+                            <Badge className="bg-orange-500 text-white hover:bg-orange-600">
+                              📞 Call Scheduled
+                            </Badge>
+                          )}
                           <span className="text-sm text-muted-foreground">
                             {booking.participants.adults + booking.participants.children + booking.participants.seniors} participants
                           </span>
@@ -423,6 +428,31 @@ const AdminBookings = React.memo(() => {
                           <span>{booking.payment.amount}</span>
                         </div>
                       </div>
+
+                      {/* Schedule Request Highlight */}
+                      {booking.scheduleRequest && (
+                        <div className="mt-3 p-3 bg-orange-50 border-l-4 border-orange-500 rounded-r">
+                          <div className="flex items-start gap-2">
+                            <Phone className="h-4 w-4 text-orange-600 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold text-orange-900">
+                                Customer Requested Call
+                              </p>
+                              <p className="text-xs text-orange-700 mt-1">
+                                📅 {new Date(booking.scheduleRequest.date).toLocaleDateString()} at {booking.scheduleRequest.time}
+                              </p>
+                              {booking.scheduleRequest.message && (
+                                <p className="text-xs text-orange-800 mt-1 italic">
+                                  "{booking.scheduleRequest.message}"
+                                </p>
+                              )}
+                            </div>
+                            <Badge variant="outline" className="text-orange-700 border-orange-300">
+                              {booking.scheduleRequest.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -633,6 +663,62 @@ const AdminBookings = React.memo(() => {
                           <p className="text-sm p-3 bg-muted rounded-lg">{selectedBooking.specialRequests}</p>
                         </div>
                       )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Schedule Request - Highlighted Section */}
+                {selectedBooking.scheduleRequest && (
+                  <Card className="border-orange-300 bg-orange-50 shadow-lg">
+                    <CardHeader className="bg-orange-100 border-b border-orange-200">
+                      <CardTitle className="text-lg text-orange-900 flex items-center gap-2">
+                        <Phone className="h-5 w-5" />
+                        📞 Customer Requested Call
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-orange-700">Preferred Date</label>
+                          <p className="font-semibold text-orange-900">
+                            {new Date(selectedBooking.scheduleRequest.date).toLocaleDateString('en-US', {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-orange-700">Preferred Time</label>
+                          <p className="font-semibold text-orange-900">{selectedBooking.scheduleRequest.time}</p>
+                        </div>
+                      </div>
+                      
+                      {selectedBooking.scheduleRequest.message && (
+                        <div>
+                          <label className="text-sm font-medium text-orange-700">Customer Message</label>
+                          <div className="p-3 bg-white border-2 border-orange-200 rounded-lg">
+                            <p className="text-sm text-orange-900 italic">
+                              "{selectedBooking.scheduleRequest.message}"
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between pt-2">
+                        <div>
+                          <label className="text-sm font-medium text-orange-700">Request Status</label>
+                          <div className="mt-1">
+                            <Badge variant="outline" className="text-orange-800 border-orange-400">
+                              {selectedBooking.scheduleRequest.status}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="text-xs text-orange-600">
+                          Requested: {new Date(selectedBooking.scheduleRequest.requestedAt).toLocaleString()}
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 )}

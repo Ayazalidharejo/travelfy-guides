@@ -351,6 +351,11 @@ export const bookingsAPI = {
     const response = await api.put(`/bookings/${id}/cancel`, { reason });
     return response.data;
   },
+  
+  scheduleCall: async (scheduleData: { date: string; time: string; message: string }) => {
+    const response = await api.post('/bookings/schedule-call', scheduleData);
+    return response.data;
+  },
 };
 
 // Notifications API calls

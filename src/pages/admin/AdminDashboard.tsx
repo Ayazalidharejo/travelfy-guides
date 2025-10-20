@@ -301,15 +301,16 @@ const AdminDashboard = React.memo(() => {
 
           {/* Popular Tours */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
+               <CardTitle className="flex items-center gap-2 py-3">
+                <TrendingUp className="h-5 w-5 px-3 py-4" />
                 Popular Tours
               </CardTitle>
+            {/* <CardHeader className="flex flex-row items-center justify-between">
+           
               <Link to="/admin/tours">
                 <Button variant="outline" size="sm">Manage Tours</Button>
               </Link>
-            </CardHeader>
+            </CardHeader> */}
             <CardContent>
               {stats?.popularPosts?.length > 0 ? (
                 <div className="space-y-4">
