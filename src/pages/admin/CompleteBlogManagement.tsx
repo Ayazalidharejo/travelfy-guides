@@ -54,7 +54,7 @@ const CompleteBlogManagement = () => {
   });
 
   const api = axios.create({
-    baseURL: 'https://tour-backend-eight.vercel.app/api',
+    baseURL: 'http://localhost:5000/api',
     headers: { 'Content-Type': 'application/json' }
   });
 

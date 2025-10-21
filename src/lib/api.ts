@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api';
-const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
+const API_BASE_URL = 'https://tour-backend-production-7311.up.railway.app/api';
+// const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,

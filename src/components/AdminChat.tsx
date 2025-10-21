@@ -58,7 +58,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
         }
       }
       
-      const response = await fetch('https://tour-backend-eight.vercel.app/api/chat/admin/conversations', {
+      const response = await fetch('http://localhost:5000/api/chat/admin/conversations', {
         headers: headers
       });
       const data = await response.json();
@@ -93,7 +93,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
         }
       }
       
-      const response = await fetch(`https://tour-backend-eight.vercel.app/api/chat/admin/conversation/${userId}`, {
+      const response = await fetch(`http://localhost:5000/api/chat/admin/conversation/${userId}`, {
         headers: headers
       });
       const data = await response.json();
