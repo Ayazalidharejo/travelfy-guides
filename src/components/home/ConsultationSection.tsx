@@ -326,7 +326,7 @@ const ConsultationSection = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/consultations/schedule', {
+      const response = await fetch('https://tour-backend-eight.vercel.app/api/consultations/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

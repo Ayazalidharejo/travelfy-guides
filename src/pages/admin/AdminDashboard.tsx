@@ -79,7 +79,7 @@ const AdminDashboard = React.memo(() => {
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/chat/admin/unread-count', {
+      const response = await fetch('https://tour-backend-eight.vercel.app/api/chat/admin/unread-count', {
         headers: headers
       });
       

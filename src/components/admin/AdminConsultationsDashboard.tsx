@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Phone, Mail, User, Clock, CheckCircle, XCircle, AlertCircle, Search, Filter, X } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api';
 
 export default function AdminConsultationsButton() {
   const [isOpen, setIsOpen] = useState(false);
