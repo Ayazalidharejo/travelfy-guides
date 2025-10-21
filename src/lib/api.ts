@@ -352,10 +352,17 @@ export const bookingsAPI = {
     return response.data;
   },
   
-  scheduleCall: async (scheduleData: { date: string; time: string; message: string }) => {
-    const response = await api.post('/bookings/schedule-call', scheduleData);
-    return response.data;
-  },
+ scheduleConsultation: async (consultationData: { 
+  fullName: string; 
+  email: string; 
+  phone: string; 
+  date: string; 
+  time: string; 
+  travelPlans?: string 
+}) => {
+  const response = await api.post('/consultations/schedule', consultationData);
+  return response.data;
+},
 };
 
 // Notifications API calls

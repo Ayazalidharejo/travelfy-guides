@@ -31,6 +31,7 @@ import {
 import AdminPostDashboard from './AdminPostDashboard';
 import NotificationBell from '@/components/admin/NotificationBell';
 import AdminChat from '@/components/AdminChat';
+import AdminConsultationsDashboard from '@/components/admin/AdminConsultationsDashboard';
 
 const AdminDashboard = React.memo(() => {
   const [stats, setStats] = useState<any>(null);
@@ -180,6 +181,10 @@ const AdminDashboard = React.memo(() => {
             </p>
           </div>
           <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
+             <AdminConsultationsDashboard/>
+        
+          </div>
             <Button
               variant="outline"
               size="lg"
@@ -196,6 +201,7 @@ const AdminDashboard = React.memo(() => {
             </Button>
             <NotificationBell />
           </div>
+          
         </div>
 
         {/* Stats Cards */}
@@ -419,6 +425,7 @@ const AdminDashboard = React.memo(() => {
           </Dialog>
         )}
       </div>
+     
     </div>
   );
 });

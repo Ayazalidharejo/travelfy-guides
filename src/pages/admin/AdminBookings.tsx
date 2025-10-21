@@ -413,11 +413,11 @@ const AdminBookings = React.memo(() => {
                           <Badge className={getPaymentStatusColor(booking.payment.status)}>
                             Payment: {booking.payment.status}
                           </Badge>
-                          {booking.scheduleRequest && (
+                          {/* {booking.scheduleRequest && (
                             <Badge className="bg-orange-500 text-white hover:bg-orange-600">
                               📞 Call Scheduled
                             </Badge>
-                          )}
+                          )} */}
                           <span className="text-sm text-muted-foreground">
                             {booking.participants.adults + booking.participants.children + booking.participants.seniors} participants
                           </span>
@@ -430,7 +430,7 @@ const AdminBookings = React.memo(() => {
                       </div>
 
                       {/* Schedule Request Highlight */}
-                      {booking.scheduleRequest && (
+                      {/* {booking.scheduleRequest && (
                         <div className="mt-3 p-3 bg-orange-50 border-l-4 border-orange-500 rounded-r">
                           <div className="flex items-start gap-2">
                             <Phone className="h-4 w-4 text-orange-600 mt-0.5" />
@@ -452,7 +452,7 @@ const AdminBookings = React.memo(() => {
                             </Badge>
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </CardContent>
