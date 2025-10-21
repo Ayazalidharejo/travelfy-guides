@@ -42,7 +42,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
 
   // ✅ FIX: Vite compatible environment variable
   // const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'https://travelfy-guides.vercel.app';
+  const SERVER_URL ='https://travelfy-guides.vercel.app';
 
   // Notification sound
   useEffect(() => {
