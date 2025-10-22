@@ -10,6 +10,7 @@ import { postsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import ShareModal from '@/components/ShareModal';
+import { getDisplayPrice } from '@/lib/priceUtils';
 import {
   Clock,
   MapPin,
@@ -115,23 +116,20 @@ const TourDetailPage = () => {
   const mainImage = (tour && (allImages[activeImageIndex] || tour.mainImageUrl)) || '';
   const thumbnailImages = allImages.slice(0, 3);
 
-  // Price - Memoized to prevent re-calculation (BEFORE early returns)
-  const { originalPrice, discountedPrice, discountPercent } = useMemo(() => {
-    if (!tour) return { originalPrice: 0, discountedPrice: 0, discountPercent: 0 };
+  // *** FIX: Use same price logic as TourCard (getDisplayPrice utility) ***
+  const priceInfo = useMemo(() => {
+    if (!tour) return { price: 0, isStartingFrom: false, hasDiscount: false, originalPrice: 0 };
     
-    const actualPrice = tour.pricingSchedule?.[0]?.actualPrice || tour.priceNumber || 0;
-    const netPrice = tour.pricingSchedule?.[0]?.netPrice || tour.priceNumber || 0;
-    const discountPct = tour.discount?.percentage || tour.discountPercentage || 0;
+    console.log('💰 TOUR DETAIL PAGE - Using getDisplayPrice utility');
+    const info = getDisplayPrice(tour);
+    console.log('💰 Price Info:', info);
     
-    const original = actualPrice || tour.priceNumber || 0;
-    const discounted = netPrice || (original - (original * discountPct / 100));
-    
-    return {
-      originalPrice: original,
-      discountedPrice: discounted,
-      discountPercent: discountPct
-    };
+    return info;
   }, [tour]);
+  
+  const discountedPrice = priceInfo.price;
+  const originalPrice = priceInfo.originalPrice || 0;
+  const discountPercent = tour?.discountPercentage || tour?.discount?.percentage || 0;
 
   // Parse arrays - Memoized (BEFORE early returns)
   const includesArray = useMemo(() => {
@@ -766,14 +764,14 @@ const TourDetailPage = () => {
           {/* RIGHT - Booking Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-6 shadow-lg border sticky top-24">
-              {/* Price */}
+              {/* Price - Matches TourCard Display */}
               <div className="mb-6">
                 <div className="space-y-2">
-                  {/* Actual Price */}
-                  {discountPercent > 0 && (
+                  {/* Show discount badge if discount exists */}
+                  {priceInfo.hasDiscount && priceInfo.originalPrice && (
                     <div className="flex items-center gap-2">
                       <span className="text-lg text-gray-500 line-through">
-                        Actual Price: ${originalPrice.toFixed(0)}
+                        ${priceInfo.originalPrice.toFixed(2)}
                       </span>
                       <Badge className="bg-red-500 text-white">
                         {discountPercent}% OFF
@@ -781,14 +779,15 @@ const TourDetailPage = () => {
                     </div>
                   )}
 
-                  {/* Net Price */}
+                  {/* Final Price */}
                   <div>
-                    <span className="text-sm text-gray-600 block mb-1">Total</span>
+                    <span className="text-sm text-gray-600 block mb-1">
+                      {priceInfo.isStartingFrom ? 'Starting from' : 'Total'}
+                    </span>
                     <div className="flex items-baseline gap-3">
-                      <span className="text-5xl font-bold text-green-600">
-                        ${discountedPrice.toFixed(0)}
+                      <span className="text-5xl font-bold text-[#5C7AC0] hover:text-[#284078]">
+                        ${priceInfo.price.toFixed(2)}
                       </span>
-                      {/* <span className="text-lg text-gray-500">Per Person</span> */}
                     </div>
                   </div>
                 </div>

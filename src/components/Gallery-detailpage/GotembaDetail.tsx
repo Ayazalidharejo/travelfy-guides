@@ -34,23 +34,30 @@ const GotembaDetail = ({ onClose }) => {
       "Combine with Hakone (30 min bus) for hot springs experience",
       "Bring layers - elevation makes it cooler than Tokyo, even in summer"
     ],
-    gallery: [
-      "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&h=800&fit=crop", // Shopping mall
-      "https://images.unsplash.com/photo-1583319414569-a8f88a7f35e6?w=800&h=800&fit=crop", // City view
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800&h=800&fit=crop", // Mt. Fuji
-      "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800&h=800&fit=crop", // Mt. Fuji view
-      "https://images.unsplash.com/photo-1568849676085-51415703900f?w=800&h=800&fit=crop", // Japanese landscape
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&h=800&fit=crop", // Mountain scenery
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=800&fit=crop", // Nature
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop", // Landscape
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop", // Temple
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop", // Japanese shrine
-      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=800&h=800&fit=crop", // Mt. Fuji
-      "https://images.unsplash.com/photo-1578271887552-5ac3a72752bc?w=800&h=800&fit=crop"  // Mt. Fuji landscape
-    ],
+
+ 
+  gallery: [
+    "https://images.unsplash.com/photo-1731736176703-df630e52781e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEdvdGVtYmElMjBTdGF0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Gotemba Station
+    "https://images.unsplash.com/photo-1745696333441-0ac675af0726?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8TXQuJTIwRnVqaSUyME9ic2VydmF0aW9uJTIwRGVja3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Gotemba Premium Outlets
+    "https://images.unsplash.com/photo-1723375860841-33c26cc54349?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8UGVhY2UlMjBQYXJrJTIwKEhlaXdhJTIwS29lbil8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Mt. Fuji Observation Deck
+    "https://media.istockphoto.com/id/1321885433/photo/kameido-central-park-koto-ku-tokyo.webp?a=1&b=1&s=612x612&w=0&k=20&c=blRDiI_e4mZ3LNAkVJIRGgu7rO7YQKWsppv_XD5aikQ=", // Peace Park
+    "https://media.istockphoto.com/id/1253583676/photo/countryside-near-gotemba-with-mt-fuji.webp?a=1&b=1&s=612x612&w=0&k=20&c=QtUUKH9JtyyHXtqDawuWkwyuobyN_Q-3dr6CLXwszGk=", // Chichibunomiya Memorial Park
+    "https://media.istockphoto.com/id/1813244208/photo/mt-fuji-and-autumn-foliage-in-fuji-five-lakes-region-japan-lake-shojiko-lake-shoji.webp?a=1&b=1&s=612x612&w=0&k=20&c=bxwbr-zI8N1fFtyrd9uA2gwn8SgW0cAmu43lKhUcMGA=", // Gotemba Kogen Brewing
+    "https://media.istockphoto.com/id/1827975389/photo/mt-fuji-climbing-at-station-8th-on-yoshida-trailhead.webp?a=1&b=1&s=612x612&w=0&k=20&c=aSyxjir1nRVrqGTg0hgaMZh-aMfsXVck3C-FEgtI1a8=", // Subashiri 5th Station
+    "https://media.istockphoto.com/id/1417843940/photo/scenery-of-mt-norikuradake-in-summer-japan.webp?a=1&b=1&s=612x612&w=0&k=20&c=Icrzne_OCrzvueupyUHJuMGjmG2E0lUYv9VyQkYJiPA=", // Fuji Safari Park
+    "https://images.unsplash.com/photo-1713067783167-cc48bebd44b4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8TWlzaGltYSUyMFRhaXNoYSUyMFNocmluZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Otome Toge Pass
+    "https://plus.unsplash.com/premium_photo-1723983556753-1eef0b499e15?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzd8fE1pc2hpbWElMjBTa3l3YWxrfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Mishima Taisha Shrine
+   
+  ]
+
+
+
+
+,
+
     itinerary: {
       tripName: "Gotemba Mt. Fuji Shopping & Nature Tour",
-      tripDuration: "2 Days • 11 Destinations",
+      // tripDuration: "2 Days • 11 Destinations",
       items: [
         { 
           id: 1, day: 1, name: "Gotemba Station", icon: Building, color: "text-blue-600", 

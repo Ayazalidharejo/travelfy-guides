@@ -35,22 +35,22 @@ const NikkoDetail = ({ onClose }) => {
       "Wear comfortable walking shoes - lots of stairs at shrines and temples"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop", // Nikko shrine
-      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&h=800&fit=crop", // Japanese temple
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop", // Temple architecture
-      "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=800&h=800&fit=crop", // Japanese landscape
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&h=800&fit=crop", // Mt Fuji/mountains
-      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=800&fit=crop", // Japanese garden
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&h=800&fit=crop", // Kyoto temple
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800&h=800&fit=crop", // Japanese mountains
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop", // Nature scenery
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=800&fit=crop", // Mountain landscape
-      "https://images.unsplash.com/photo-1605536421908-6c0f5c45a39e?w=800&h=800&fit=crop", // Hot spring
-      "https://images.unsplash.com/photo-1580537659466-0a9bfa916a54?w=800&h=800&fit=crop"  // Traditional village
+      "https://plus.unsplash.com/premium_photo-1754578763138-35c3961038e2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8VG9idSUyME5pa2tvJTIwU3RhdGlvbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Nikko shrine
+      "https://plus.unsplash.com/premium_photo-1694475015396-04415449ebf0?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8U2hpbmt5byUyMEJyaWRnZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Japanese temple
+      "https://images.unsplash.com/photo-1720331991913-c00e0f6b2e86?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Umlubm9qaSUyMFRlbXBsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Temple architecture
+      "https://images.unsplash.com/photo-1696252302905-eccf37382f9c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8VG9zaG9ndSUyMFNocmluZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Japanese landscape
+      "https://images.unsplash.com/photo-1747484948678-2c3c5aa6c56a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFpeXVpbiUyMFRlbXBsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Mt Fuji/mountains
+      "https://images.unsplash.com/photo-1677742332081-69bdd9c5f233?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEZ1dGFyYXNhbiUyMFNocmluZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Japanese garden
+      "https://images.unsplash.com/photo-1709739321071-6658c37f22d4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8S2FubWFuZ2FmdWNoaSUyMEFieXNzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Kyoto temple
+      "https://images.unsplash.com/photo-1756621608435-0c593f2932c2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTMzfHxBa2VjaGlkYWlyYSUyMFJvcGV3YXl8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Japanese mountains
+      "https://images.unsplash.com/photo-1592127635407-630b340b8fcc?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8TGFrZSUyMENodXplbmppfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Nature scenery
+      "https://media.istockphoto.com/id/1130059712/photo/kegon-falls-in-nikko-japan.webp?a=1&b=1&s=612x612&w=0&k=20&c=oy3JAhgcszh1JBY01FBrUBB5-XGhKH7SVksKXVXckcU=", // Mountain landscape
+      "https://images.unsplash.com/photo-1683341960939-84c4e7095875?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Unl1enUlMjBGYWxsc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Hot spring
+      "https://images.unsplash.com/photo-1690251670795-8f74a1037c23?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8WXVtb3RvJTIwT25zZW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500"  // Traditional village
     ],
     itinerary: {
-      tripName: "Nikko UNESCO Heritage & Nature Tour",
-      tripDuration: "2 Days • 12 Destinations",
+      tripName: " Best visit places in Nikko UNESCO Heritage & Nature Tour",
+      
       items: [
         { 
           id: 1, day: 1, name: "Tobu Nikko Station", icon: Building, color: "text-blue-600", 

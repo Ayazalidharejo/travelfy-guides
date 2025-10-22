@@ -35,22 +35,24 @@ const TokyoDetail = ({ onClose }) => {
       "Download Japan Transit Planner app for easy navigation on complex train system"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=800&fit=crop", // Tokyo skyline night
-      "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=800&h=800&fit=crop", // Shibuya crossing
-      "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&h=800&fit=crop", // Tokyo street
-      "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800&h=800&fit=crop", // Tokyo tower night
-      "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&h=800&fit=crop", // Tokyo buildings
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop", // Japanese temple
-      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&h=800&fit=crop", // Temple architecture
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop", // Japanese shrine
-      "https://images.unsplash.com/photo-1566404791232-af9fe0ae8f8b?w=800&h=800&fit=crop", // Tokyo city view
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&h=800&fit=crop", // Mt Fuji from Tokyo
-      "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800&h=800&fit=crop", // Tokyo neon lights
-      "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=800&h=800&fit=crop"  // Cherry blossoms Tokyo
+      "https://images.unsplash.com/photo-1646649806488-6ecec62f03e9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fFRzdWtpamklMjBPdXRlciUyME1hcmtldHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Tokyo skyline night
+      "https://images.unsplash.com/photo-1684224511966-09c5d5b6f3d4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U2Vuc28tamklMjBUZW1wbGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Shibuya crossing
+      "https://images.unsplash.com/photo-1706813253696-10ee6332edd3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8U2Vuc28tamklMjBUZW1wbGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Tokyo street
+      "https://plus.unsplash.com/premium_photo-1666700698920-d2d2bba589f8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8QWtpaGFiYXJhJTIwRWxlY3RyaWMlMjBUb3dufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Tokyo tower night
+      "https://plus.unsplash.com/premium_photo-1715106090962-9def47b4d8bc?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8VG9reW8lMjBJbXBlcmlhbCUyMFBhbGFjZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Tokyo buildings
+      "https://plus.unsplash.com/premium_photo-1661902398022-762e88ff3f82?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8U2hpYnV5YSUyMENyb3NzaW5nfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Japanese temple
+      "https://media.istockphoto.com/id/1219843172/photo/takeshite-street.webp?a=1&b=1&s=612x612&w=0&k=20&c=bGa1RBnxugKAu_mg_r558OLHs4s3ATlzsk0PHb8UvHM=", // Temple architecture
+      "https://images.unsplash.com/photo-1703443371292-0d9081cc4787?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8TWVpamklMjBTaHJpbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Japanese shrine
+      "https://images.unsplash.com/photo-1618478344639-5d934b25a0f4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFlveW9naSUyMFBhcmt8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Tokyo city view
+      "https://images.unsplash.com/photo-1705695373213-115c102714fd?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8U2hpbmp1a3UlMjBHeW9lbiUyMEdhcmRlbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Mt Fuji from Tokyo
+      "https://images.unsplash.com/photo-1707141249703-41ea35e7a4a4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fFNoaW5qdWt1JTIwR29sZGVuJTIwR2FpfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Tokyo neon lights
+      "https://media.istockphoto.com/id/1222684349/photo/tokyo-metropolitan-government-illuminated-by-blue.webp?a=1&b=1&s=612x612&w=0&k=20&c=9Ug0CoAhNI6R9W462P2RW-Y1lqneH37EMJQ_L1G32XE=",  // Cherry blossoms Tokyo
+      "https://images.unsplash.com/photo-1584202257553-4c07e497b675?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8VGVhbUxhYiUyMEJvcmRlcmxlc3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",  // Cherry blossoms Tokyo
+      "https://images.unsplash.com/photo-1612486701496-b6ce3f27aba2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Um9wcG9uZ2klMjBIaWxsc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500",  // Cherry blossoms Tokyo
     ],
     itinerary: {
-      tripName: "Tokyo City Highlights & Culture Tour",
-      tripDuration: "2 Days • 14 Destinations",
+      tripName: " Best visit places in Tokyo City Highlights & Culture Tour",
+      // tripDuration: "2 Days • 14 Destinations",
       items: [
         { 
           id: 1, day: 1, name: "Tsukiji Outer Market", icon: Store, color: "text-orange-600", 

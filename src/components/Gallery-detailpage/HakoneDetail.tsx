@@ -35,22 +35,23 @@ const HakoneDetail = ({ onClose }) => {
       "Try black eggs (kuro-tamago) boiled in sulfur springs - said to add 7 years to life!"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&h=800&fit=crop", // Hakone torii gate
-      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=800&fit=crop", // Mt Fuji view
-      "https://images.unsplash.com/photo-1578469550956-0e16b69c6a3d?w=800&h=800&fit=crop", // Lake scenery
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop", // Japanese temple
-      "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=800&h=800&fit=crop", // Mountain landscape
-      "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&h=800&fit=crop", // Mt Fuji
-      "https://images.unsplash.com/photo-1605536421908-6c0f5c45a39e?w=800&h=800&fit=crop", // Hot spring
-      "https://images.unsplash.com/photo-1580537659466-0a9bfa916a54?w=800&h=800&fit=crop", // Traditional village
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop", // Shrine
-      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&h=800&fit=crop", // Temple architecture
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800&h=800&fit=crop", // Mountain view
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=800&fit=crop"  // Japanese landscape
+      "https://images.unsplash.com/photo-1750137666716-1fb31a9a9b09?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDB8fEhha29uZS1ZdW1vdG8lMjBTdGF0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Hakone torii gate
+      "https://images.unsplash.com/photo-1723829361220-6d93f36ebe72?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8SGFrb25lJTIwVG96YW4lMjBSYWlsd2F5fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Mt Fuji view
+      "https://images.unsplash.com/photo-1560156798-20ca50dee3b2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8SGFrb25lJTIwT3Blbi1BaXIlMjBNdXNldW18ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Lake scenery
+      "https://plus.unsplash.com/premium_photo-1733266867792-946b3758ed5a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8R29yYSUyMFBhcmt8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Japanese temple
+      "https://images.unsplash.com/photo-1631069615023-f78f564420d9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8SGFrb25lJTIwUm9wZXdheXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Mountain landscape
+      "https://images.unsplash.com/photo-1688268963227-a045cea1272d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fE93YWt1ZGFuaSUyMFZhbGxleXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Mt Fuji
+      "https://images.unsplash.com/photo-1611494584979-1312c7c6bee5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fExha2UlMjBBc2hpJTIwQ3J1aXNlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Hot spring
+      "https://images.unsplash.com/photo-1707989921992-239ea6cf9553?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fE93YWt1ZGFuaSUyMFZhbGxleXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Traditional village
+      "https://images.unsplash.com/photo-1583901362846-13c55e045708?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGFrb25lfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Shrine
+      "https://images.unsplash.com/photo-1652969209299-25c19cf42cad?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fE93YWt1ZGFuaSUyMFZhbGxleXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Temple architecture
+      "https://images.unsplash.com/photo-1752438851027-39d2ac0748c1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fExha2UlMjBBc2hpJTIwQ3J1aXNlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Mountain view
+      "https://images.unsplash.com/photo-1698498828264-923451a3f9e7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8SGFrb25lJTIwQ2hlY2twb2ludCUyME11c2V1bXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500",  // Japanese landscape
+      "https://images.unsplash.com/photo-1696436392889-d6520968a826?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8UG9sYSUyME11c2V1bSUyMG9mJTIwQXJ0fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",  // Japanese landscape
     ],
     itinerary: {
-      tripName: "Hakone Onsen & Art Circuit",
-      tripDuration: "2 Days • 12 Destinations",
+      tripName: " Best place to visit Hakone Onsen & Art Circuit",
+      // tripDuration: "2 Days • 12 Destinations",
       items: [
         { 
           id: 1, day: 1, name: "Hakone-Yumoto Station", icon: Train, color: "text-blue-600", 

@@ -26,8 +26,8 @@ const NaganoDetail = ({ onClose }) => {
     rating: 4.7,
     activities: ["Skiing", "Temple Visits", "Wildlife Watching", "Hiking", "Hot Springs", "Mountain Climbing"],
     cuisine: ["Soba Noodles", "Oyaki", "Shinshu Beef", "Wild Vegetables", "Chestnuts", "Sake", "Apple Pie"],
-    transportation: "Shinkansen from Tokyo to Nagano (90 minutes), local buses available",
-    accommodation: "Ski resorts, onsen ryokans, city hotels, mountain lodges, traditional inns",
+   
+   
     tips: [
       "Visit snow monkeys early morning for best experience - they're most active then",
       "Try authentic handmade soba at local restaurants - Nagano is famous for it",
@@ -35,22 +35,22 @@ const NaganoDetail = ({ onClose }) => {
       "Dress in layers - mountain weather changes quickly even in summer"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1583725094311-ee8f5c85d63b?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1578469645742-46cae010e5d4?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1605536421908-6c0f5c45a39e?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1580537659466-0a9bfa916a54?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1735197679215-d3b2ff6c5734?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fE5hZ2FubyUyMFN0YXRpb258ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1596534633455-a2e1c12a8e76?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fFplbmtvLWppJTIwVGVtcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1601376754000-117ee1af7db2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8TmFrYW1pc2UlMjBTaG9wcGluZyUyMFN0cmVldHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500",
+      "https://plus.unsplash.com/premium_photo-1677829178071-1d8375486dd8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8VG9nYWt1c2hpJTIwU2hyaW5lfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1636357725329-c7dc984f3587?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8VG9nYWt1c2hpJTIwU29iYSUyMFJlc3RhdXJhbnR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1546840440-597c7a209382?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzl8fEppZ29rdWRhbmklMjBNb25rZXklMjBQYXJrfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1690251670795-8f74a1037c23?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8NyUyMFNoaWJ1JTIwT25zZW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1655740394704-2ebf2a9987a9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8TWF0c3Vtb3RvJTIwQ2FzdGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",
+      "https://plus.unsplash.com/premium_photo-1748894837513-e52e18135365?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8TmF3YXRlJTIwU3RyZWV0fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1731897510082-e5f28ed72e34?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEthbWlrb2NoaSUyMFZhbGxleXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1696956261813-c8da5298a96d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8S2FwcGElMjBCcmlkZ2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",
+      "https://images.unsplash.com/photo-1734977057021-3ad76b10dec2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8S2FtaWtvY2hpJTIwQnVzJTIwVGVybWluYWwlMjBDYWZlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500"
     ],
     itinerary: {
-      tripName: "Nagano Snow Monkeys & Alpine Adventure",
-      tripDuration: "2 Days • 12 Destinations",
+      tripName: " Best places to visit in Nagano Snow Monkeys & Alpine Adventure",
+     
       items: [
         { 
           id: 1, day: 1, name: "Nagano Station", icon: Building, color: "text-blue-600", 

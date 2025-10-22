@@ -531,7 +531,7 @@ const ConsultationSection = () => {
             onClick={() => setScheduleOpen(false)}
             className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors z-10"
           >
-            <X className="h-5 w-5" />
+          
           </button>
 
           <div className="p-7">

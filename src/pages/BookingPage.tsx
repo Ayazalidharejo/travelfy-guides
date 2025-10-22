@@ -404,19 +404,33 @@ const BookingPage = () => {
 
   if (!tour) return null;
 
-  // Prepare vehicles array
+  // Prepare vehicles array with discount calculation
   let vehicles = [];
+  const tourDiscount = tour?.discountPercentage || tour?.discount?.percentage || 0;
+  
   if (tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0) {
     console.log('✅ Using transportVehicles array:', tour.transportVehicles);
-    vehicles = tour.transportVehicles.map((vehicle) => ({
-      id: vehicle.id,
-      transportType: vehicle.transportType || '',
-      transportModal: vehicle.transportModal || '',
-      makeVariant: vehicle.makeVariant || '',
-      capacity: parseInt(vehicle.capacity) || 4,
-      price: vehicle.price || '',
-      isPopular: vehicle.isPopular || false
-    }));
+    console.log('💰 Tour discount:', tourDiscount);
+    
+    vehicles = tour.transportVehicles.map((vehicle) => {
+      const originalPrice = parseFloat(vehicle.price) || 0;
+      const discountedPrice = tourDiscount > 0 
+        ? originalPrice - (originalPrice * tourDiscount / 100)
+        : originalPrice;
+      
+      console.log(`🚗 Vehicle ${vehicle.makeVariant}: Original $${originalPrice}, Discounted $${discountedPrice.toFixed(2)}`);
+      
+      return {
+        id: vehicle.id,
+        transportType: vehicle.transportType || '',
+        transportModal: vehicle.transportModal || '',
+        makeVariant: vehicle.makeVariant || '',
+        capacity: parseInt(vehicle.capacity) || 4,
+        price: discountedPrice.toFixed(2), // Use discounted price
+        originalPrice: tourDiscount > 0 ? originalPrice.toFixed(2) : null, // Store original if discount exists
+        isPopular: vehicle.isPopular || false
+      };
+    });
   } else if (tour.makeVariant || tour.transportType || tour.transportModal) {
     console.log('⚠️ Falling back to old logic');
     const variants = tour.makeVariant ? tour.makeVariant.split(',').map(v => v.trim()) : [''];
@@ -572,6 +586,18 @@ const BookingPage = () => {
                     )}
 
                     <div className="pt-4 border-t">
+                      {/* Show discount badge and original price if discount exists */}
+                      {vehicle.originalPrice && tourDiscount > 0 && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg text-gray-500 line-through">
+                            ${parseFloat(vehicle.originalPrice).toFixed(2)}
+                          </span>
+                          <Badge className="bg-red-500 text-white">
+                            {tourDiscount}% OFF
+                          </Badge>
+                        </div>
+                      )}
+                      
                       <div className="text-2xl font-bold text-gray-900">
                         Total ${parseFloat(vehicle.price || 0).toFixed(2)}
                       </div>

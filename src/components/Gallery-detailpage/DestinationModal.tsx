@@ -31,7 +31,7 @@ const DestinationModal = ({ data, onClose, expandedItems, toggleExpand, openInGo
               
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 text-base">{item.name}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{item.time} • {item.duration}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{item.time} </p>
               </div>
               
               <div className="flex items-center gap-2">
@@ -201,49 +201,21 @@ const DestinationModal = ({ data, onClose, expandedItems, toggleExpand, openInGo
               <div>
                 <h3 className="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-2">
                   <Users className="w-7 h-7 text-blue-600" />
-                  Activities
+                  Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {data.activities.map((activity, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-[#5C7AC0]  hover:bg-[#284078] text-blue-800 rounded-full text-sm font-medium">
+                    <span key={idx} className="px-4 py-2 bg-[#5C7AC0] text-white  hover:bg-[#284078] text-blue-800 rounded-full text-sm font-medium">
                       {activity}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-2">
-                  <Utensils className="w-7 h-7 text-orange-600" />
-                  Cuisine
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {data.cuisine.map((food, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-                      {food}
-                    </span>
-                  ))}
-                </div>
-              </div>
+            
             </div>
 
-            {/* Transportation & Accommodation */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-purple-50 p-6 rounded-lg border border-purple-100">
-                <h3 className="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-                  <Train className="w-6 h-6 text-purple-600" />
-                  Transportation
-                </h3>
-                <p className="text-gray-700">{data.transportation}</p>
-              </div>
-              <div className="bg-pink-50 p-6 rounded-lg border border-pink-100">
-                <h3 className="text-xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-                  <Hotel className="w-6 h-6 text-pink-600" />
-                  Accommodation
-                </h3>
-                <p className="text-gray-700">{data.accommodation}</p>
-              </div>
-            </div>
+           
 
             {/* Travel Tips */}
             <div className="mb-8 bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-lg border border-indigo-100">
@@ -274,9 +246,9 @@ const DestinationModal = ({ data, onClose, expandedItems, toggleExpand, openInGo
                     {/* Day 1 */}
                     <div className="space-y-0">
                       <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
-                        <Calendar className="w-5 h-5 text-pink-500" />
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          Day 1 Locations ({data.itinerary.items.filter(i => i.day === 1).length} stops)
+                        
+                        <h3 className="text-lg font-semibold text-gray-800 flex hidden">
+                           ({data.itinerary.items.filter(i => i.day === 1).length} )
                         </h3>
                       </div>
                       {renderItineraryColumn(data.itinerary.items.filter(i => i.day === 1))}
@@ -286,9 +258,9 @@ const DestinationModal = ({ data, onClose, expandedItems, toggleExpand, openInGo
                     {data.itinerary.items.some(i => i.day === 2) && (
                       <div className="space-y-0">
                         <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-pink-200">
-                          <Calendar className="w-5 h-5 text-pink-500" />
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            Day 2 Locations ({data.itinerary.items.filter(i => i.day === 2).length} stops)
+                         
+                          <h3 className="text-lg font-semibold text-gray-800 flex hidden">
+                             ({data.itinerary.items.filter(i => i.day === 2).length} )
                           </h3>
                         </div>
                         {renderItineraryColumn(data.itinerary.items.filter(i => i.day === 2))}
