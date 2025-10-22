@@ -1,14 +1,52 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# robots.txt for karvaantours.com
+# SEO Optimized for Japan Tours (Mount Fuji, Hakone, Tokyo, Nikko)
 
 User-agent: *
 Allow: /
+
+# Allow all tour pages (High Priority for SEO)
+Allow: /tours
+Allow: /tours?destination=mount-fuji
+Allow: /tours?destination=hakone
+Allow: /tours?destination=tokyo
+Allow: /tours?destination=nikko
+Allow: /tours?destination=nagano
+Allow: /tours?destination=gotemba
+
+# Allow access to assets
+Allow: /assets/
+Allow: /images/
+Allow: /*.css
+Allow: /*.js
+
+# Allow favicon files
+Allow: /favicon.ico
+Allow: /favicon-*.png
+Allow: /apple-touch-icon.png
+Allow: /android-chrome-*.png
+
+# Block admin routes from being indexed
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/
+
+# Block user-specific pages
+Disallow: /my-bookings
+Disallow: /login
+Disallow: /register
+
+# Sitemap location (IMPORTANT for Google indexing)
+Sitemap: https://karvaantours.com/sitemap.xml
+
+# Crawl-delay for bots
+Crawl-delay: 1
+
+# Google-specific directives
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing-specific directives
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
