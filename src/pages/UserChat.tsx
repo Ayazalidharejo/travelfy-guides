@@ -43,7 +43,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const audioContextRef = useRef<any>(null);
 
   // ✅ FIX: Vite compatible environment variable
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const SERVER_URL = import.meta.env.VITE_API_URL || 'tour-backend-production-7311.up.railway.app';
 
   // Notification sound - pleasant chimes (primary + alternate)
   useEffect(() => {
