@@ -107,67 +107,43 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const loadConversations = useCallback(async () => {
     if (!token) return;
     try {
-     
-      
       const headers: any = {
         'Authorization': `Bearer ${token}`
       };
-
-      // ✅ For Google Auth, add user data
       if (token === 'google-auth-token') {
         const userDataStr = localStorage.getItem('user');
-        if (userDataStr) {
-          headers['x-user-data'] = encodeURIComponent(userDataStr);
-        }
+        if (userDataStr) headers['x-user-data'] = encodeURIComponent(userDataStr);
       }
-      
-      const response = await fetch('http://localhost:5000/api/chat/admin/conversations', {
-        headers: headers
-      });
+      const response = await fetch(`${SERVER_URL}/api/chat/admin/conversations`, { headers });
       const data = await response.json();
-
       if (data.success) {
         setConversations(data.conversations);
-        // Calculate total unread messages
         const total = data.conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
         setTotalUnread(total);
         onUnreadCountChange?.(total);
-   
       }
     } catch (error) {
       console.error('❌ Error loading conversations:', error);
     }
-  }, [token]);
+  }, [token, SERVER_URL]);
 
   const loadUserMessages = useCallback(async (userId: string) => {
     if (!token) return;
     try {
-      userId;
-      
       const headers: any = {
         'Authorization': `Bearer ${token}`
       };
-
-      // ✅ For Google Auth, add user data
       if (token === 'google-auth-token') {
         const userDataStr = localStorage.getItem('user');
-        if (userDataStr) {
-          headers['x-user-data'] = encodeURIComponent(userDataStr);
-        }
+        if (userDataStr) headers['x-user-data'] = encodeURIComponent(userDataStr);
       }
-      
-      const response = await fetch(`http://localhost:5000/api/chat/admin/conversation/${userId}`, {
-        headers: headers
-      });
+      const response = await fetch(`${SERVER_URL}/api/chat/admin/conversation/${userId}`, { headers });
       const data = await response.json();
-   
-      if (data.success) {
-        setMessages(data.messages);
-      }
+      if (data.success) setMessages(data.messages);
     } catch (error) {
       console.error('❌ Error loading user messages:', error);
     }
-  }, [token]);
+  }, [token, SERVER_URL]);
 
   useEffect(() => {
     if (!token) return;
@@ -213,37 +189,24 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     });
 
     newSocket.on('newMessageFromUser', (data) => {
-    
       const { message, user } = data;
-      
       // Play notification sound
       playNotificationSound();
-      
       // Update conversations list and total unread count
       setConversations(prev => {
-        const filtered = prev.filter(conv => conv._id._id !== user._id);
-        const existingConv = prev.find(conv => conv._id._id === user._id);
+        const filtered = prev.filter(conv => String(conv._id._id) !== String(user._id));
+        const existingConv = prev.find(conv => String(conv._id._id) === String(user._id));
         const newUnreadCount = (existingConv?.unreadCount || 0) + 1;
-        
-        // Update total unread count
         setTotalUnread(prevTotal => {
           const newTotal = prevTotal + 1;
           onUnreadCountChange?.(newTotal);
           return newTotal;
         });
-        
         return [{ _id: { _id: user._id, ...user }, lastMessage: message, unreadCount: newUnreadCount }, ...filtered];
       });
-
       // If this user is selected, add message to current chat
-      if (selectedUser?._id === user._id) {
-        setMessages(prev => {
-          // Check if message already exists
-          if (prev.some(m => m._id === message._id)) {
-            return prev;
-          }
-          return [...prev, message];
-        });
+      if (selectedUser && String(selectedUser._id) === String(user._id)) {
+        setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
       }
     });
 
@@ -301,7 +264,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
       
       // Update unread count - reduce by the conversation's unread count
       setConversations(prev => {
-        const conv = prev.find(c => c._id._id === selectedUser._id);
+        const conv = prev.find(c => String(c._id._id) === String(selectedUser._id));
         if (conv && conv.unreadCount > 0) {
           // Reduce total unread count
           setTotalUnread(prevTotal => {
@@ -311,7 +274,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
           });
           // Set this conversation's unread to 0
           return prev.map(c =>
-            c._id._id === selectedUser._id ? { ...c, unreadCount: 0 } : c
+            String(c._id._id) === String(selectedUser._id) ? { ...c, unreadCount: 0 } : c
           );
         }
         return prev;

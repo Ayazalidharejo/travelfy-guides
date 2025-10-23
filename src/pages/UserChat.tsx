@@ -333,7 +333,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
         ) : (
           <>
             {messages.map((message) => {
-              const isUserMessage = message.sender._id === currentUser.id;
+              const isUserMessage = String(message.sender._id) === String(currentUser.id);
               return (
                 <div
                   key={message._id}
