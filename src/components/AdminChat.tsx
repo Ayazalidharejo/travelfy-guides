@@ -29,8 +29,22 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const audioContextRef = useRef<any>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
+  const selectedUserRef = useRef<any>(null);
 
   const SERVER_URL = import.meta.env.VITE_API_URL || 'https://tour-backend-production-7311.up.railway.app';
+
+  // Helpers to normalize IDs and shapes
+  const normalizeId = (val: any): string => {
+    if (!val) return '';
+    if (typeof val === 'string' || typeof val === 'number') return String(val);
+    return String(val._id || val.id || val.userId || '');
+  };
+  const getConvId = (conv: any): string => {
+    if (!conv) return '';
+    // conversation structure may be { _id: { _id: userId, ... }, ... } or { _id: userId, ... }
+    return normalizeId((conv._id && (conv._id as any)._id) ?? conv._id ?? conv.id);
+  };
+  const sameId = (a: any, b: any): boolean => normalizeId(a) === normalizeId(b);
 
   // Initialize notification sound
   useEffect(() => {
@@ -184,29 +198,39 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     newSocket.off('newMessageFromUser');
     newSocket.on('newMessageFromUser', (data) => {
       const { message, user } = data;
+      const incomingUserId = normalizeId(user?._id ?? user?.id ?? user);
+      const isForSelected = sameId(selectedUserRef.current?._id, incomingUserId);
       // Play notification sound
       playNotificationSound();
       // Update conversations list and total unread count
       setConversations(prev => {
-        const filtered = prev.filter(conv => String(conv._id._id) !== String(user._id));
-        const existingConv = prev.find(conv => String(conv._id._id) === String(user._id));
-        const newUnreadCount = (existingConv?.unreadCount || 0) + 1;
-        setTotalUnread(prevTotal => {
-          const newTotal = prevTotal + 1;
-          onUnreadCountChange?.(newTotal);
-          return newTotal;
+        let updated = prev.map(conv => {
+          const cid = getConvId(conv);
+          if (cid === incomingUserId) {
+            return {
+              ...conv,
+              lastMessage: message,
+              unreadCount: (conv.unreadCount || 0) + (isForSelected ? 0 : 1)
+            };
+          }
+          return conv;
         });
-        return [{ _id: { _id: user._id, ...user }, lastMessage: message, unreadCount: newUnreadCount }, ...filtered];
+        const exists = updated.some(conv => getConvId(conv) === incomingUserId);
+        if (!exists) {
+          updated = [{ _id: { _id: incomingUserId, ...user }, lastMessage: message, unreadCount: isForSelected ? 0 : 1 }, ...updated];
+        }
+        if (!isForSelected) {
+          setTotalUnread(prevTotal => {
+            const newTotal = prevTotal + 1;
+            onUnreadCountChange?.(newTotal);
+            return newTotal;
+          });
+        }
+        return updated;
       });
       // If this user is selected, add message to current chat
-      if (selectedUser && String(selectedUser._id) === String(user._id)) {
-        setMessages(prev => {
-          // Check if message already exists
-          if (prev.some(m => m._id === message._id)) {
-            return prev;
-          }
-          return [...prev, message];
-        });
+      if (isForSelected) {
+        setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
       }
     });
 
@@ -224,6 +248,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     newSocket.on('userOffline', (data) => { setOnlineUsers(prev => prev.filter(user => user.userId !== data.userId)); });
 
     // Handle admin's own message confirmation
+    newSocket.off('messageSentToUser');
     newSocket.on('messageSentToUser', (message) => {
    
       setMessages(prev => {
@@ -279,6 +304,11 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
       });
     }
   }, [selectedUser?._id, socket, loadUserMessages]);
+
+  // Keep a live ref of selectedUser for socket handlers
+  useEffect(() => {
+    selectedUserRef.current = selectedUser;
+  }, [selectedUser]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -519,7 +549,8 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
               ) : (
                 <>
                   {messages.map((message) => {
-                    const isAdminMessage = message.sender._id === currentUser.id;
+                    const senderId = normalizeId((message as any)?.sender?._id ?? (message as any)?.sender);
+                    const isAdminMessage = sameId(senderId, currentUser.id) || ((message as any)?.sender?.email || '').toLowerCase() === (currentUser.email || '').toLowerCase();
                     return (
                       <div
                         key={message._id}
