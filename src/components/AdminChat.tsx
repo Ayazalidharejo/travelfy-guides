@@ -30,7 +30,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'tour-backend-production-7311.up.railway.app';
+  const SERVER_URL = import.meta.env.VITE_API_URL || 'https://tour-backend-production-7311.up.railway.app';
 
   // Initialize notification sound
   useEffect(() => {
