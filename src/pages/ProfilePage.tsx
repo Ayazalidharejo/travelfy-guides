@@ -277,12 +277,12 @@ const ProfilePage = () => {
 
   // Chat handlers
   const handleOpenChat = useCallback(() => {
-    console.log('Opening chat...');
+    
     setShowChat(true);
   }, []);
 
   const handleCloseChat = useCallback(() => {
-    console.log('Closing chat...');
+    
     setShowChat(false);
   }, []);
 

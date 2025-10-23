@@ -24,27 +24,90 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const [typingUsers, setTypingUsers] = useState({});
   const [isMuted, setIsMuted] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<any>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
 
-  // Notification sound
+  const SERVER_URL = import.meta.env.VITE_API_URL || 'tour-backend-production-7311.up.railway.app';
+
+  // Initialize notification sound
   useEffect(() => {
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjWN0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZ');
+    const chimeUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3';
+    const audio = new Audio(chimeUrl);
+    (audio as any).crossOrigin = 'anonymous';
+    audio.preload = 'auto';
+    audio.volume = 0.45;
+    audioRef.current = audio;
+  }, []);
+
+  // Unlock audio on first interaction (admin view)
+  useEffect(() => {
+    const unlock = async () => {
+      try {
+        const AC: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (AC && !audioContextRef.current) {
+          audioContextRef.current = new AC();
+          if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+        }
+        if (audioRef.current) {
+          const prev = audioRef.current.volume;
+          audioRef.current.volume = 0.001;
+          await audioRef.current.play().catch(() => {});
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = prev;
+        }
+      } catch {}
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
   }, []);
 
   // Play notification sound
   const playNotificationSound = useCallback(() => {
-    if (!isMuted && audioRef.current) {
-      audioRef.current.play().catch(err => console.log('Audio play failed:', err));
+    if (isMuted) return;
+
+    const fallbackBeep = async () => {
+      try {
+        const AC: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (!AC) return;
+        if (!audioContextRef.current) audioContextRef.current = new AC();
+        if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+        const ctx = audioContextRef.current;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 880;
+        g.gain.value = 0.0001;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.05, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        o.start(now);
+        o.stop(now + 0.2);
+      } catch {}
+    };
+
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => fallbackBeep());
+    } else {
+      fallbackBeep();
     }
   }, [isMuted]);
 
   const loadConversations = useCallback(async () => {
     if (!token) return;
     try {
-      console.log('📥 Loading conversations...');
+     
       
       const headers: any = {
         'Authorization': `Bearer ${token}`
@@ -62,14 +125,14 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
         headers: headers
       });
       const data = await response.json();
-      console.log('✅ Conversations response:', data);
+
       if (data.success) {
         setConversations(data.conversations);
         // Calculate total unread messages
         const total = data.conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
         setTotalUnread(total);
         onUnreadCountChange?.(total);
-        console.log('📊 Total unread messages:', total);
+   
       }
     } catch (error) {
       console.error('❌ Error loading conversations:', error);
@@ -79,7 +142,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const loadUserMessages = useCallback(async (userId: string) => {
     if (!token) return;
     try {
-      console.log('📥 Loading messages for user:', userId);
+      userId;
       
       const headers: any = {
         'Authorization': `Bearer ${token}`
@@ -97,7 +160,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
         headers: headers
       });
       const data = await response.json();
-      console.log('✅ Messages response:', data);
+   
       if (data.success) {
         setMessages(data.messages);
       }
@@ -109,7 +172,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   useEffect(() => {
     if (!token) return;
 
-    console.log('🚀 Admin connecting to socket...');
+    
 
     // ✅ Prepare socket options with proper auth
     const socketOptions: any = {
@@ -126,7 +189,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
             token: 'google-auth-token',
             userData: userData
           };
-          console.log('✅ Admin Google Auth - sending user data:', userData.email);
+          
         } catch (e) {
           console.error('❌ Failed to parse admin user data:', e);
           socketOptions.auth = { token: token };
@@ -139,10 +202,10 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
       socketOptions.auth = { token: token };
     }
 
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', socketOptions);
+    const newSocket = io(SERVER_URL, socketOptions);
 
     newSocket.on('connect', () => {
-      console.log('Admin connected to chat server');
+     
     });
 
     newSocket.on('onlineUsers', (users) => {
@@ -150,7 +213,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     });
 
     newSocket.on('newMessageFromUser', (data) => {
-      console.log(`📨 Admin received message: "${data.message.message}" from ${data.user.name}`);
+    
       const { message, user } = data;
       
       // Play notification sound
@@ -201,7 +264,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
 
     // Handle admin's own message confirmation
     newSocket.on('messageSentToUser', (message) => {
-      console.log('✅ Admin message sent confirmation:', message);
+   
       setMessages(prev => {
         // Check if message already exists
         if (prev.some(m => m._id === message._id)) {
@@ -218,7 +281,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     setSocket(newSocket);
 
     return () => {
-      console.log('Cleaning up socket connection');
+    
       newSocket.close();
     };
   }, [token, playNotificationSound]);
@@ -296,7 +359,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     if (socket && selectedUser && !isTypingRef.current) {
       isTypingRef.current = true;
       socket.emit('adminTypingStart', { userId: selectedUser._id });
-      console.log('⌨️ Admin started typing to user:', selectedUser._id);
+   
     }
   };
 
@@ -304,7 +367,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     if (socket && selectedUser && isTypingRef.current) {
       isTypingRef.current = false;
       socket.emit('adminTypingStop', { userId: selectedUser._id });
-      console.log('⏹️ Admin stopped typing to user:', selectedUser._id);
+   
     }
   };
 

@@ -95,9 +95,9 @@ deleteAvatar: async () => {
 export const postsAPI = {
   getPosts: async (params?: any) => {
     try {
-      console.log('🔄 Fetching posts with params:', params);
+     
       const response = await api.get('/posts', { params });
-      console.log('📊 Posts response:', response.data);
+ 
       return response.data;
     } catch (error: any) {
       console.error('❌ Error fetching posts:', error);
@@ -122,21 +122,8 @@ export const postsAPI = {
   
   createPost: async (postData: any) => {
     try {
-      console.log('🚀 Sending data to API:', {
-        title: postData.title,
-        category: postData.category,
-        price: postData.price,
-        priceNumber: postData.priceNumber,
-        pricingSchedule: postData.pricingSchedule,
-        transportVehicles: postData.transportVehicles  // *** ADDED: transportVehicles logging ***
-      });
-      
-      console.log('🚀 Complete postData keys:', Object.keys(postData));  // *** ADDED: All keys ***
-      console.log('🚀 transportVehicles in postData:', postData.transportVehicles);  // *** ADDED: transportVehicles check ***
-      console.log('🚀 transportVehicles type:', typeof postData.transportVehicles);  // *** ADDED: type check ***
-      console.log('🚀 transportVehicles length:', postData.transportVehicles?.length);  // *** ADDED: length check ***
-      
-      // *** FIX: Add required fields to bypass backend validation ***
+   
+     
       const enhancedPostData = {
         ...postData,
         // Ensure required fields are present for backend validation
@@ -154,27 +141,13 @@ export const postsAPI = {
       // *** FIX: Remove price field completely to avoid backend validation error ***
       delete enhancedPostData.price;
       
-      console.log('🚀 Enhanced data for backend:', {
-        title: enhancedPostData.title,
-        category: enhancedPostData.category,
-        description: enhancedPostData.description,
-        priceNumber: enhancedPostData.priceNumber,
-        priceRemoved: !enhancedPostData.price, // Should be true
-        transportVehicles: enhancedPostData.transportVehicles  // *** ADDED: transportVehicles check ***
-      });
-      
-      console.log('🚀 Enhanced data transportVehicles:', enhancedPostData.transportVehicles);  // *** ADDED: transportVehicles logging ***
-      console.log('🚀 Enhanced data transportVehicles type:', typeof enhancedPostData.transportVehicles);  // *** ADDED: type check ***
-      console.log('🚀 Enhanced data transportVehicles length:', enhancedPostData.transportVehicles?.length);  // *** ADDED: length check ***
-      console.log('🚀 Enhanced data keys:', Object.keys(enhancedPostData));  // *** ADDED: all keys ***
+  
       
       const response = await api.post('/posts', enhancedPostData);
-      console.log('✅ API Response:', response.data);
+      
       return response.data;
     } catch (error: any) {
-      console.error('❌ API Error:', error.response?.data);
-      console.error('❌ API Error Message:', error.response?.data?.message);
-      console.error('❌ API Error Details:', error.response?.data?.errors);
+
       
       // *** FIX: Log exact validation errors ***
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
@@ -184,7 +157,7 @@ export const postsAPI = {
       }
       
       // *** FIX: Always return success even on error ***
-      console.log('✅ Returning fake success response despite error');
+  
       return { 
         success: true, 
         data: {
@@ -202,21 +175,16 @@ export const postsAPI = {
   
   updatePost: async (id: string, postData: any) => {
     try {
-      console.log('🚀 Updating tour:', id, postData.title);
-      console.log('🚀 Update data transportVehicles:', postData.transportVehicles);  // *** ADDED: transportVehicles logging ***
-      console.log('🚀 Update data transportVehicles type:', typeof postData.transportVehicles);  // *** ADDED: type check ***
-      console.log('🚀 Update data transportVehicles length:', postData.transportVehicles?.length);  // *** ADDED: length check ***
-      console.log('🚀 Update data keys:', Object.keys(postData));  // *** ADDED: all keys ***
+    
       
       const response = await api.put(`/posts/${id}`, postData);
-      console.log('✅ Update API Response:', response.data);
-      console.log('✅ Update API Response transportVehicles:', response.data?.data?.transportVehicles);  // *** ADDED: check response ***
+    ;  // *** ADDED: check response ***
       return response.data;
     } catch (error: any) {
       console.error('❌ Update API Error:', error.response?.data);
       
       // *** FIX: Always return success even on error ***
-      console.log('✅ Returning fake success response for update despite error');
+    
       return { 
         success: true, 
         data: {
@@ -428,6 +396,16 @@ export const adminAPI = {
   
   adminLogin: async (adminKey: string) => {
     const response = await api.post('/admin/login', { adminKey });
+    return response.data;
+  },
+  
+  // Refund approval workflow (routes are protected in bookings router)
+  approveRefund: async (bookingId: string) => {
+    const response = await api.put(`/bookings/${bookingId}/refund/approve`);
+    return response.data;
+  },
+  denyRefund: async (bookingId: string) => {
+    const response = await api.put(`/bookings/${bookingId}/refund/deny`);
     return response.data;
   },
   

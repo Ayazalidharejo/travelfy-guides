@@ -52,7 +52,11 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
 
   // Initialize notification sound
   useEffect(() => {
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjWN0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZ');
+    const chimeUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3';
+    const audio = new Audio(chimeUrl);
+    audio.preload = 'auto';
+    audio.volume = 0.45;
+    audioRef.current = audio;
   }, []);
 
   const playNotificationSound = useCallback(() => {
@@ -71,7 +75,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
         }
       });
       const data = await response.json();
-      console.log('✅ Conversations:', data);
+   
       if (data.success) {
         setConversations(data.conversations);
       }
@@ -83,49 +87,49 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   const loadUserMessages = useCallback(async (userId: string) => {
     if (!token) return;
     try {
-      console.log('📥 Loading messages for user:', userId);
+   
       const response = await fetch(`${SERVER_URL}/api/chat/admin/conversation/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       const data = await response.json();
-      console.log('✅ Messages:', data);
+ 
       if (data.success) {
         setMessages(data.messages);
       }
     } catch (error) {
-      console.error('❌ Error loading messages:', error);
+     
     }
   }, [token, SERVER_URL]);
 
   useEffect(() => {
     if (!token) return;
 
-    console.log('🚀 Admin connecting to socket');
+
     const newSocket = io(SERVER_URL, {
       auth: { token },
       transports: ['websocket', 'polling']
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Admin socket connected');
+   
       setIsConnected(true);
       loadConversations();
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Admin socket disconnected');
+   
       setIsConnected(false);
     });
 
     newSocket.on('onlineUsers', (users) => {
-      console.log('👥 Online users:', users);
+     
       setOnlineUsers(users);
     });
 
     newSocket.on('newMessageFromUser', (data) => {
-      console.log('📨 NEW MESSAGE FROM USER:', data);
+    
       const { message, user } = data;
       
       playNotificationSound();
@@ -151,7 +155,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
     });
 
     newSocket.on('userTyping', (data) => {
-      console.log('⌨️ User typing:', data);
+   
       setTypingUsers(prev => ({
         ...prev,
         [data.userId]: data.typing
@@ -169,8 +173,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
     setSocket(newSocket);
 
     return () => {
-      console.log('🧹 Cleaning up admin socket');
-      newSocket.close();
+ newSocket.close();
     };
   }, [token, SERVER_URL, playNotificationSound, loadConversations, selectedUser]);
 
@@ -193,6 +196,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   };
 
   useEffect(() => {
+    
     scrollToBottom();
   }, [messages]);
 

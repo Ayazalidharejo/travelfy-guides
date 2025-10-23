@@ -10,29 +10,26 @@ const HeroFinal = () => {
   const navigate = useNavigate();
 
   const handleFind = () => {
-    console.log('🎯 Hero Find Button Clicked!');
-    console.log('📝 Search Query:', searchQuery);
-    console.log('📅 Check-In Date:', checkInDate);
+
     
     // Build query parameters
     const params = new URLSearchParams();
     
     if (searchQuery && searchQuery.trim()) {
       params.append('search', searchQuery.trim());
-      console.log('✅ Added search param:', searchQuery.trim());
+   
     }
     
     if (checkInDate) {
       params.append('date', checkInDate);
-      console.log('✅ Added date param:', checkInDate);
+   
     }
     
     // Navigate to tours page with parameters
     const queryString = params.toString();
     const finalUrl = `/tours${queryString ? '?' + queryString : ''}`;
     
-    console.log('🚀 Final URL:', finalUrl);
-    console.log('🔗 Full Path:', window.location.origin + finalUrl);
+   
     
     navigate(finalUrl);
   };

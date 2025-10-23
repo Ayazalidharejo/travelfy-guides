@@ -38,12 +38,15 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const SERVER_URL = import.meta.env.VITE_API_URL || 'tour-backend-production-7311.up.railway.app';
 
   // Initialize notification sound
   useEffect(() => {
-    // Simple beep sound
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjWN0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZ');
+    const chimeUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3';
+    const audio = new Audio(chimeUrl);
+    audio.preload = 'auto';
+    audio.volume = 0.45;
+    audioRef.current = audio;
   }, []);
 
   const playNotificationSound = useCallback(() => {
@@ -65,7 +68,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
       });
       
       const data = await response.json();
-      console.log('📨 Loaded messages:', data);
+   
       
       if (data.success && Array.isArray(data.messages)) {
         setMessages(data.messages);

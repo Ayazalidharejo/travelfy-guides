@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDisplayPrice } from '../../lib/priceUtils';
 import { Plus, Trash2, ChevronDown, ChevronUp, X, Edit2, Eye, Search, Upload, Clock, MapPin } from 'lucide-react';
-import { postsAPI, uploadAPI } from '@/lib/api';
+import { postsAPI, uploadAPI, adminAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -161,7 +161,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     itinerary: false,
     faqs: false,
     activities: false,
-    destinations: false
+    destinations: false,
+    refunds: true
   });
 
   // Options
@@ -1501,6 +1502,14 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+            </div>
+
+            {/* Refund Requests Section */}
+            <div className="bg-white rounded-xl shadow-2xl p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Refund Requests (Admin)</h2>
+              </div>
+              <RefundRequestsPanel />
             </div>
 
             {/* Loading State */}
@@ -3259,3 +3268,75 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 };
 
 export default TourManagementApp;
+
+// --- Admin-only panel to approve/deny refunds ---
+function RefundRequestsPanel() {
+  const [loading, setLoading] = useState(true);
+  const [refunds, setRefunds] = useState<any[]>([]);
+  const { toast } = useToast();
+
+  const fetchRefunds = async () => {
+    try {
+      setLoading(true);
+      // Reuse admin bookings listing and filter client-side for refund requests
+      const resp = await adminAPI.getBookings();
+      const items = (resp.data || []).filter((b: any) => b?.cancellation?.requiresAdminApproval && b?.cancellation?.refundStatus === 'pending');
+      setRefunds(items);
+    } catch (e) {
+      setRefunds([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRefunds();
+  }, []);
+
+  const approve = async (bookingId: string) => {
+    try {
+      await adminAPI.approveRefund(bookingId);
+      toast({ title: 'Refund Approved', description: 'Stripe refund processed.' });
+      fetchRefunds();
+    } catch (e: any) {
+      toast({ title: 'Error', description: e?.response?.data?.message || 'Failed to approve refund', variant: 'destructive' });
+    }
+  };
+
+  const deny = async (bookingId: string) => {
+    try {
+      await adminAPI.denyRefund(bookingId);
+      toast({ title: 'Refund Denied' });
+      fetchRefunds();
+    } catch (e: any) {
+      toast({ title: 'Error', description: e?.response?.data?.message || 'Failed to deny refund', variant: 'destructive' });
+    }
+  };
+
+  if (loading) {
+    return <div className="text-gray-500">Loading refund requests...</div>;
+  }
+
+  if (refunds.length === 0) {
+    return <div className="text-gray-500">No pending refund requests.</div>;
+  }
+
+  return (
+    <div className="space-y-3">
+      {refunds.map((r: any) => (
+        <div key={r._id} className="flex flex-col md:flex-row md:items-center md:justify-between p-4 border rounded-lg bg-gray-50">
+          <div className="space-y-1">
+            <div className="font-semibold text-gray-800">{r.post?.title || 'Tour'}</div>
+            <div className="text-sm text-gray-600">Booking: {r.bookingReference}</div>
+            <div className="text-sm text-gray-600">Customer: {r.contactInfo?.fullName} ({r.contactInfo?.email})</div>
+            <div className="text-sm text-gray-600">Refund Amount: ${Number(r.cancellation?.refundAmount || 0).toFixed(2)} | Fee: ${Number(r.cancellation?.refundFee || 0).toFixed(2)}</div>
+          </div>
+          <div className="mt-3 md:mt-0 flex gap-2">
+            <button onClick={() => approve(r._id)} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
+            <button onClick={() => deny(r._id)} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Deny</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

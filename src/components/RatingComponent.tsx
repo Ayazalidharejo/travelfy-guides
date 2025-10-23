@@ -257,9 +257,8 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
         reviewImage: uploadedImageUrl
       };
 
-      console.log('✏️ Updating rating:', editingRating._id);
       const response = await postsAPI.updateRating(tourId, editingRating._id, updateData);
-      console.log('Update response:', response);
+     
       
       if (response.success) {
         setEditingRating(null);
@@ -275,7 +274,7 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
         
         // Refetch ratings from database to get fresh data
         await fetchRatings();
-        console.log('✅ Ratings refetched after update');
+  
         
         if (onRatingUpdated) {
           onRatingUpdated(response.data);
@@ -358,9 +357,9 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
     }
 
     try {
-      console.log('🗑️ Deleting rating:', ratingId);
+  
       const response = await postsAPI.deleteRating(tourId, ratingId);
-      console.log('Delete response:', response);
+     
       
       if (response.success) {
         toast({
@@ -370,7 +369,7 @@ const RatingComponent: React.FC<RatingComponentProps> = ({
         
         // Refetch ratings from database to get fresh data
         await fetchRatings();
-        console.log('✅ Ratings refetched after delete');
+   
         
         if (onRatingDeleted) {
           onRatingDeleted(ratingId);

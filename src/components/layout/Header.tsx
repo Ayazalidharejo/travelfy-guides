@@ -37,10 +37,7 @@ const Header = () => {
   // Avatar URL - handles both Cloudinary, local URLs, and Google photoURL
   // ✅ Priority: Custom avatar first, then Google photoURL
   const avatarUrl = (() => {
-    console.log('🎯 Header - Calculating avatarUrl');
-    console.log('👤 Header - Current user:', user);
-    console.log('🖼️ Header - user.avatar:', user?.avatar);
-    console.log('📷 Header - user.photoURL:', user?.photoURL);
+
     
     // Priority 1: Custom uploaded avatar (highest priority)
     if (user?.avatar && user.avatar !== user?.photoURL) {
@@ -51,24 +48,24 @@ const Header = () => {
         // Add timestamp to prevent browser caching
         const separator = user.avatar.includes('?') ? '&' : '?';
         const finalUrl = `${user.avatar}${separator}t=${Date.now()}`;
-        console.log('✅ Header - Using custom uploaded avatar:', finalUrl);
+      
         return finalUrl;
       }
       
       // For relative paths, use local backend URL with cache-busting timestamp
       const finalUrl = `http://localhost:5000${user.avatar}?t=${Date.now()}`;
-      console.log('✅ Header - Using custom local avatar:', finalUrl);
+     
       return finalUrl;
     }
     
     // Priority 2: Google photoURL (fallback if no custom avatar)
     if (user?.photoURL) {
-      console.log('✅ Header - Using Google photoURL (no custom avatar):', user.photoURL);
+ 
       return user.photoURL;
     }
     
     // Priority 3: No avatar at all
-    console.log('❌ Header - No avatar found, returning null');
+
     return null;
   })();
 
@@ -88,13 +85,7 @@ const Header = () => {
       >
         Home
       </Link>
-      {/* <Link 
-        to="/test" 
-        className="text-foreground hover:text-primary transition-smooth font-medium"
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        testing
-      </Link> */}
+      
       <Link 
         to="/tours" 
         className="text-foreground hover:text-primary transition-smooth font-medium"
@@ -132,15 +123,7 @@ const Header = () => {
           Admin
         </Link>
       )}
-      {/* {!user && (
-        <Link 
-          to="/admin-login" 
-          className="text-muted-foreground hover:text-primary transition-smooth font-medium text-sm"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          Admin Access
-        </Link>
-      )} */}
+     
     </>
   ), [isAdmin, user]);
 

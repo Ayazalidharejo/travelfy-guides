@@ -124,8 +124,7 @@ const BookingPage = () => {
       setLoading(true);
       const response = await postsAPI.getPost(tourId);
       if (response.success) {
-        console.log('🚗 TOUR DATA RECEIVED:', response.data);
-        console.log('🚗 Transport Vehicles:', response.data.transportVehicles);
+      
         setTour(response.data);
         
         if (response.data.pricingSchedule?.[0]?.timeSlots?.length > 0) {
@@ -348,9 +347,9 @@ const BookingPage = () => {
         totalAmount: totalAmount
       };
 
-      console.log('📤 Sending booking data:', bookingData);
+     
       const response = await bookingsAPI.createBooking(bookingData);
-      console.log('📥 Booking response:', response);
+   
       
       if (response.success) {
         // Store booking reference
@@ -409,8 +408,7 @@ const BookingPage = () => {
   const tourDiscount = tour?.discountPercentage || tour?.discount?.percentage || 0;
   
   if (tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0) {
-    console.log('✅ Using transportVehicles array:', tour.transportVehicles);
-    console.log('💰 Tour discount:', tourDiscount);
+  
     
     vehicles = tour.transportVehicles.map((vehicle) => {
       const originalPrice = parseFloat(vehicle.price) || 0;
@@ -418,7 +416,7 @@ const BookingPage = () => {
         ? originalPrice - (originalPrice * tourDiscount / 100)
         : originalPrice;
       
-      console.log(`🚗 Vehicle ${vehicle.makeVariant}: Original $${originalPrice}, Discounted $${discountedPrice.toFixed(2)}`);
+    
       
       return {
         id: vehicle.id,
@@ -432,7 +430,7 @@ const BookingPage = () => {
       };
     });
   } else if (tour.makeVariant || tour.transportType || tour.transportModal) {
-    console.log('⚠️ Falling back to old logic');
+
     const variants = tour.makeVariant ? tour.makeVariant.split(',').map(v => v.trim()) : [''];
     const types = tour.transportType ? tour.transportType.split(',').map(t => t.trim()) : [''];
     const models = tour.transportModal ? tour.transportModal.split(',').map(m => m.trim()) : [''];
@@ -1122,8 +1120,7 @@ const PaymentForm = ({ total, onSuccess, onCancel }) => {
         return;
       }
 
-      // Create payment intent on backend and confirm payment
-      console.log('💳 Created payment method:', paymentMethod.id);
+   
       
       toast({
         title: "Processing Payment...",

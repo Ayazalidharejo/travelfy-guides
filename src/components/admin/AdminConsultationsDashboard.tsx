@@ -29,10 +29,10 @@ export default function AdminConsultationsButton() {
       if (activeTab === 'today') endpoint = `${API_BASE_URL}/consultations/today/list`;
       if (activeTab === 'upcoming') endpoint = `${API_BASE_URL}/consultations/upcoming/list`;
 
-      console.log('📡 Fetching from:', endpoint);
+  
 
       const token = localStorage.getItem('token');
-      console.log('🔑 Token:', token ? 'Found' : 'Not Found');
+    
 
       if (!token) {
         console.error('❌ No token found');
@@ -49,19 +49,19 @@ export default function AdminConsultationsButton() {
         }
       });
       
-      console.log('📊 Response status:', response.status);
+   
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('✅ Data received:', data);
+ 
 
       if (data.success) {
         setConsultations(data.data || []);
         setFilteredData(data.data || []);
-        console.log('✅ Consultations loaded:', data.data?.length || 0);
+    
       } else {
         throw new Error(data.message || 'Failed to fetch consultations');
       }
@@ -101,7 +101,6 @@ export default function AdminConsultationsButton() {
         return;
       }
 
-      console.log('🔄 Updating status for:', id, 'to:', newStatus);
 
       const response = await fetch(`${API_BASE_URL}/consultations/${id}/status`, {
         method: 'PATCH',

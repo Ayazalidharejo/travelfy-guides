@@ -39,20 +39,96 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const altAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<any>(null);
 
   // ✅ FIX: Vite compatible environment variable
   const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  // Notification sound
+  // Notification sound - pleasant chimes (primary + alternate)
   useEffect(() => {
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjWN0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZSA0PVKno8LJZCQ1FmuDxv2wiBjGJ0fPTgjMGHm7A7+OZ');
+    const chime1 = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3');
+    (chime1 as any).crossOrigin = 'anonymous';
+    chime1.preload = 'auto';
+    chime1.volume = 0.45;
+
+    const chime2 = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-quick-win-video-game-notification-269.mp3');
+    (chime2 as any).crossOrigin = 'anonymous';
+    chime2.preload = 'auto';
+    chime2.volume = 0.45;
+
+    audioRef.current = chime1;
+    altAudioRef.current = chime2;
+  }, []);
+
+  // Unlock audio on first user interaction (required by some browsers)
+  useEffect(() => {
+    const unlock = async () => {
+      try {
+        const AC: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (AC && !audioContextRef.current) {
+          audioContextRef.current = new AC();
+          if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+          }
+        }
+        const prime = async (el: HTMLAudioElement | null) => {
+          if (!el) return;
+          const prev = el.volume;
+          el.volume = 0.001;
+          await el.play().catch(() => {});
+          el.pause();
+          el.currentTime = 0;
+          el.volume = prev;
+        };
+        await prime(audioRef.current);
+        await prime(altAudioRef.current);
+      } catch {}
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
   }, []);
 
   // Play notification sound
   const playNotificationSound = useCallback(() => {
-    if (!isMuted && audioRef.current) {
-      audioRef.current.play().catch(err => console.log('Audio play failed:', err));
-    }
+    if (isMuted) return;
+
+    const fallbackBeep = async () => {
+      try {
+        const AC: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (!AC) return;
+        if (!audioContextRef.current) audioContextRef.current = new AC();
+        if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+        const ctx = audioContextRef.current;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 880;
+        g.gain.value = 0.0001;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.05, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        o.start(now);
+        o.stop(now + 0.2);
+      } catch {}
+    };
+
+    const tryPlay = (el: HTMLAudioElement | null) => new Promise<void>((resolve, reject) => {
+      if (!el) return reject();
+      el.play().then(() => resolve()).catch(() => reject());
+    });
+
+    tryPlay(audioRef.current)
+      .catch(() => tryPlay(altAudioRef.current))
+      .catch(() => fallbackBeep());
   }, [isMuted]);
 
   // Reset unread count when chat is opened
@@ -65,190 +141,96 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const loadMessageHistory = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('📡 Loading message history from:', `${SERVER_URL}/api/chat/user/messages`);
-      
       const headers: any = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       };
-
-      // ✅ For Google Auth users, add user data in headers
       if (token === 'google-auth-token') {
         const userDataStr = localStorage.getItem('user');
         if (userDataStr) {
           headers['x-user-data'] = encodeURIComponent(userDataStr);
-          console.log('✅ Adding Google Auth user data to API headers');
         }
       }
-      
-      const response = await fetch(`${SERVER_URL}/api/chat/user/messages`, {
-        headers: headers
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      const response = await fetch(`${SERVER_URL}/api/chat/user/messages`, { headers });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      
       if (data.success && Array.isArray(data.messages)) {
-        console.log(`✅ Loaded ${data.messages.length} messages from API`);
-        
-        // Remove any duplicates by ID
-        const uniqueMessages = data.messages.filter((msg, index, self) =>
-          index === self.findIndex((m) => m._id === msg._id)
-        );
-        
-        if (uniqueMessages.length !== data.messages.length) {
-          console.log('⚠️ Found', data.messages.length - uniqueMessages.length, 'duplicate messages in API response');
-        }
-        
+        const uniqueMessages = data.messages.filter((msg: any, index: number, self: any[]) => index === self.findIndex((m: any) => m._id === msg._id));
         setMessages(uniqueMessages);
       } else {
-        console.log('⚠️ No messages found or invalid response');
         setMessages([]);
       }
     } catch (error) {
-      console.error('❌ Error loading message history:', error);
       setMessages([]);
     } finally {
       setIsLoading(false);
     }
   }, [SERVER_URL, token]);
 
+  // Background socket connection even when modal is closed
   useEffect(() => {
-    console.log('🔍 UserChat Debug:', { 
-      isOpen, 
-      hasToken: !!token, 
-      currentUser: currentUser?.name,
-      SERVER_URL 
-    });
-    
-    if (!isOpen || !token) {
-      console.log('❌ Chat not opening - conditions not met');
-      return;
-    }
+    if (!token) return;
 
-    console.log('🚀 Initializing socket connection to:', SERVER_URL);
-
-    // ✅ Prepare socket options with proper auth
-    const socketOptions: any = {
-      transports: ['websocket', 'polling']
-    };
-
-    // ✅ For Google Auth users, send user data in auth object
+    const socketOptions: any = { transports: ['websocket', 'polling'] };
     if (token === 'google-auth-token') {
       const userDataStr = localStorage.getItem('user');
       if (userDataStr) {
         try {
           const userData = JSON.parse(userDataStr);
-          socketOptions.auth = {
-            token: 'google-auth-token',
-            userData: userData  // Send as object, not string
-          };
-          console.log('✅ Google Auth user - sending user data:', userData.email);
-        } catch (e) {
-          console.error('❌ Failed to parse user data:', e);
-          socketOptions.auth = { token: token };
+          socketOptions.auth = { token: 'google-auth-token', userData };
+        } catch {
+          socketOptions.auth = { token };
         }
       } else {
-        console.error('❌ No user data in localStorage');
-        socketOptions.auth = { token: token };
+        socketOptions.auth = { token };
       }
     } else {
-      // Regular JWT auth
-      socketOptions.auth = { token: token };
+      socketOptions.auth = { token };
     }
 
     const newSocket = io(SERVER_URL, socketOptions);
 
     newSocket.on('connect', () => {
-      console.log('✅ Socket connected successfully');
       setIsConnected(true);
     });
 
-    newSocket.on('disconnect', (reason) => {
-      console.log('❌ Socket disconnected:', reason);
+    newSocket.on('disconnect', () => {
       setIsConnected(false);
     });
 
-    newSocket.on('connect_error', (error) => {
-      console.error('🚨 Socket connection error:', error);
-      setIsConnected(false);
-    });
-
+    // Receive message from admin (works even if chat modal is closed)
     newSocket.on('newMessageFromAdmin', (message: Message) => {
-      console.log(`📨 Received message from admin: "${message.message}"`);
-      setMessages(prev => {
-        // Check if message already exists by ID
-        const exists = prev.some(m => m._id === message._id);
-        if (exists) {
-          console.log('⚠️ Duplicate message detected, skipping');
-          return prev;
-        }
-        console.log('✅ Adding new message from admin');
-        return [...prev, message];
-      });
-      
-      // Play notification sound
+      setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
       playNotificationSound();
-      
-      // Increment unread count if chat is closed
       if (!isOpen) {
         setUnreadCount(prev => prev + 1);
       }
     });
 
+    // Sent confirmation
     newSocket.on('messageSent', (message: Message) => {
-      console.log(`📤 Message sent: "${message.message}"`);
-      setMessages(prev => {
-        // Check if message already exists by ID
-        const exists = prev.some(m => m._id === message._id);
-        if (exists) {
-          console.log('⚠️ Duplicate message detected, skipping');
-          return prev;
-        }
-        console.log('✅ Message added to chat');
-        return [...prev, message];
-      });
+      setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
     });
 
+    // Typing indicator
     newSocket.on('adminTyping', (data: { typing: boolean }) => {
-      console.log('⌨️ Admin typing:', data);
       setIsTyping(data.typing);
     });
 
-    newSocket.on('error', (error: any) => {
-      console.error('🚨 Socket error:', error);
-    });
-
     setSocket(newSocket);
-
     return () => {
-      console.log('🧹 Cleaning up socket connection');
-      if (newSocket) {
-        newSocket.close();
-      }
+      newSocket.close();
       setSocket(null);
       setIsConnected(false);
     };
-  }, [isOpen, token, SERVER_URL, loadMessageHistory]);
+  }, [token, SERVER_URL, playNotificationSound, isOpen]);
 
   // Load messages when socket connects OR when modal opens
   useEffect(() => {
-    if (isConnected && token) {
-      console.log('🔄 Socket connected - loading messages...');
+    if (isConnected && token && isOpen) {
       loadMessageHistory();
     }
-  }, [isConnected, token, loadMessageHistory]);
-
-  // Also load messages when modal opens (for cached messages)
-  useEffect(() => {
-    if (isOpen && token) {
-      console.log('📖 Modal opened - loading message history...');
-      loadMessageHistory();
-    }
-  }, [isOpen, token, loadMessageHistory]);
+  }, [isConnected, token, isOpen, loadMessageHistory]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

@@ -106,11 +106,7 @@ const BookingPage = () => {
       setLoading(true);
       const response = await postsAPI.getPost(tourId!);
       if (response.success) {
-        console.log('🚗 TOUR DATA RECEIVED:', response.data);
-        console.log('🚗 Transport Vehicles:', response.data.transportVehicles);
-        console.log('🚗 Transport Type:', response.data.transportType);
-        console.log('🚗 Transport Modal:', response.data.transportModal);
-        console.log('🚗 Make Variant:', response.data.makeVariant);
+      
         setTour(response.data);
       } else {
         navigate('/tours');
@@ -197,25 +193,20 @@ const BookingPage = () => {
   };
 
   const handleParticipantsConfirm = () => {
-    console.log('👥 Participants confirmed:', getTotalParticipants());
-    console.log('🚗 Tour transportVehicles:', tour.transportVehicles);
-    console.log('🚗 Tour makeVariant:', tour.makeVariant);
-    console.log('🚗 Tour transportType:', tour.transportType);
-    console.log('🚗 Tour transportModal:', tour.transportModal);
+   
     
     if (getTotalParticipants() > 0) {
       // Check if transport vehicles exist (new system) or old transport fields (backward compatibility)
       const hasTransportVehicles = tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0;
       const hasOldTransportFields = tour.makeVariant || tour.transportType || tour.transportModal;
       
-      console.log('🔍 Has transport vehicles:', hasTransportVehicles);
-      console.log('🔍 Has old transport fields:', hasOldTransportFields);
+     
       
       if (hasTransportVehicles || hasOldTransportFields) {
-        console.log('✅ Going to Step 4 - Vehicle selection');
+       
         setCurrentStep(4); // Go to vehicle selection
       } else {
-        console.log('⚠️ Skipping to Step 5 - No transport data');
+        
         setCurrentStep(5); // Skip to additional options
       }
     }
@@ -858,17 +849,13 @@ const BookingPage = () => {
   <div className="grid grid-cols-1 gap-4">
     {/* Use transportVehicles array from tour data */}
     {(() => {
-      console.log('🚗 RENDERING VEHICLES - Tour Data:', tour);
-      console.log('🚗 Transport Vehicles Array:', tour.transportVehicles);
-      console.log('🚗 Transport Type:', tour.transportType);
-      console.log('🚗 Transport Modal:', tour.transportModal);
-      console.log('🚗 Make Variant:', tour.makeVariant);
+    
       
       // Use transportVehicles array if available, otherwise fallback to old logic
       let vehicles = [];
       
       if (tour.transportVehicles && Array.isArray(tour.transportVehicles) && tour.transportVehicles.length > 0) {
-        console.log('✅ Using transportVehicles array:', tour.transportVehicles);
+       
         // Use the new transportVehicles array
         vehicles = tour.transportVehicles.map((vehicle: any) => ({
           id: vehicle.id,
@@ -880,13 +867,13 @@ const BookingPage = () => {
           image: '/placeholder-car.png'
         }));
       } else {
-        console.log('⚠️ Falling back to old logic');
+       
         // Fallback to old logic for backward compatibility
         const variants = tour.makeVariant ? tour.makeVariant.split(',').map((v: string) => v.trim()) : [''];
         const types = tour.transportType ? tour.transportType.split(',').map((t: string) => t.trim()) : [''];
         const models = tour.transportModal ? tour.transportModal.split(',').map((m: string) => m.trim()) : [''];
         
-        console.log('🔍 Fallback data:', { variants, types, models });
+        
         
         for (let i = 0; i < Math.max(variants.length, types.length, models.length); i++) {
           const vehicle = {
@@ -902,7 +889,7 @@ const BookingPage = () => {
         }
       }
       
-      console.log('🚗 Final vehicles array:', vehicles);
+    
       return vehicles.map((vehicle: any, idx: number) => {
         const isSelected = selectedVehicle && 
           selectedVehicle.id === vehicle.id;

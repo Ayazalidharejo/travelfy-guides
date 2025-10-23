@@ -39,6 +39,9 @@ const AdminDashboard = React.memo(() => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMounted, setChatMounted] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [refundsOpen, setRefundsOpen] = useState(false);
+  const [refundsLoading, setRefundsLoading] = useState(false);
+  const [refunds, setRefunds] = useState<any[]>([]);
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
 
@@ -60,6 +63,19 @@ const AdminDashboard = React.memo(() => {
       setLoading(false);
     }
   }, [toast]);
+
+  const fetchRefundRequests = useCallback(async () => {
+    try {
+      setRefundsLoading(true);
+      const resp = await adminAPI.getBookings();
+      const list = (resp.data || []).filter((b: any) => b?.cancellation?.requiresAdminApproval && b?.cancellation?.refundStatus === 'pending');
+      setRefunds(list);
+    } catch (e) {
+      setRefunds([]);
+    } finally {
+      setRefundsLoading(false);
+    }
+  }, []);
 
   // Fetch unread messages count
   const fetchUnreadCount = useCallback(async () => {
@@ -97,8 +113,9 @@ const AdminDashboard = React.memo(() => {
     if (isAdmin) {
       fetchStats();
       fetchUnreadCount();
+      fetchRefundRequests();
     }
-  }, [isAdmin, fetchStats, fetchUnreadCount]);
+  }, [isAdmin, fetchStats, fetchUnreadCount, fetchRefundRequests]);
 
   // Delay AdminChat mounting to prevent blink
   useEffect(() => {
@@ -185,6 +202,20 @@ const AdminDashboard = React.memo(() => {
              <AdminConsultationsDashboard/>
         
           </div>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setRefundsOpen(true)}
+              className="relative hover:bg-secondary hover:text-white transition-all"
+            >
+              <DollarSign className="h-5 w-5 mr-2" />
+              Refund Requests
+              {refunds.length > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center animate-pulse font-bold">
+                  {refunds.length}
+                </span>
+              )}
+            </Button>
             <Button
               variant="outline"
               size="lg"
@@ -392,6 +423,67 @@ const AdminDashboard = React.memo(() => {
           </CardContent>
         </Card>
         <AdminPostDashboard onTourChange={fetchStats} />
+
+        {/* Refund Requests Modal */}
+        <Dialog open={refundsOpen} onOpenChange={setRefundsOpen}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Refund Requests</DialogTitle>
+              <DialogDescription>
+                Approve or deny refund requests created after 24 hours cancellations.
+              </DialogDescription>
+            </DialogHeader>
+
+            {refundsLoading ? (
+              <div className="text-muted-foreground">Loading...</div>
+            ) : refunds.length === 0 ? (
+              <div className="text-muted-foreground">No pending refund requests.</div>
+            ) : (
+              <div className="space-y-3">
+                {refunds.map((r: any) => (
+                  <div key={r._id} className="flex flex-col md:flex-row md:items-center md:justify-between p-4 border rounded-lg bg-muted/30">
+                    <div className="space-y-1">
+                      <div className="font-semibold text-foreground">{r.post?.title || 'Tour'}</div>
+                      <div className="text-sm text-muted-foreground">Booking: {r.bookingReference}</div>
+                      <div className="text-sm text-muted-foreground">Customer: {r.contactInfo?.fullName} ({r.contactInfo?.email})</div>
+                      <div className="text-sm text-muted-foreground">Refund Amount: ${Number(r.cancellation?.refundAmount || 0).toFixed(2)} | Fee: ${Number(r.cancellation?.refundFee || 0).toFixed(2)}</div>
+                    </div>
+                    <div className="mt-3 md:mt-0 flex gap-2">
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await adminAPI.approveRefund(r._id);
+                            toast({ title: 'Refund Approved', description: 'Stripe refund processed.' });
+                            fetchRefundRequests();
+                          } catch (e: any) {
+                            toast({ title: 'Error', description: e?.response?.data?.message || 'Failed to approve refund', variant: 'destructive' });
+                          }
+                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await adminAPI.denyRefund(r._id);
+                            toast({ title: 'Refund Denied' });
+                            fetchRefundRequests();
+                          } catch (e: any) {
+                            toast({ title: 'Error', description: e?.response?.data?.message || 'Failed to deny refund', variant: 'destructive' });
+                          }
+                        }}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        Deny
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Live Chat Modal - Only render when open */}
         {chatOpen && (

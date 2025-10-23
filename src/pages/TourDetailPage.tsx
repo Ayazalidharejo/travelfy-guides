@@ -54,7 +54,7 @@ const TourDetailPage = () => {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [tour, setTour] = useState(null);
-  console.log(tour,"tourtourtour");
+
   
 
   const [loading, setLoading] = useState(true);
@@ -120,9 +120,9 @@ const TourDetailPage = () => {
   const priceInfo = useMemo(() => {
     if (!tour) return { price: 0, isStartingFrom: false, hasDiscount: false, originalPrice: 0 };
     
-    console.log('💰 TOUR DETAIL PAGE - Using getDisplayPrice utility');
+   
     const info = getDisplayPrice(tour);
-    console.log('💰 Price Info:', info);
+   
     
     return info;
   }, [tour]);

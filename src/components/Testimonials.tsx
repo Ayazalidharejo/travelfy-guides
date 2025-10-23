@@ -34,7 +34,7 @@ const Testimonials: React.FC = () => {
         const response = await postsAPI.getAllRatings();
         
         if (response.success) {
-          console.log('✅ Testimonials fetched:', response.data.length);
+      
           setTestimonials(response.data || []);
         }
       } catch (error) {
@@ -53,14 +53,14 @@ const Testimonials: React.FC = () => {
     
     // Auto-refresh every 10 seconds (silent refresh - no loading spinner)
     const intervalId = setInterval(() => {
-      console.log('🔄 Auto-refreshing testimonials...');
+ 
       fetchTestimonials(false);
     }, 10000); // 10 seconds
 
     // Also refresh when page becomes visible
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('👁️ Page visible - refreshing testimonials');
+      
         fetchTestimonials(false);
       }
     };

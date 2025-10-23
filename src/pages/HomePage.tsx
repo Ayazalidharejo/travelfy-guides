@@ -33,13 +33,13 @@ const HomePage = () => {
     const fetchTours = async () => {
       try {
         setLoading(true);
-        console.log("📡 Fetching Featured Tours...");
+      
         const featuredResponse = await postsAPI.getPosts({ 
           featured: true, 
           limit: 6,
           status: 'published' 
         });
-        console.log("✅ Featured Tours Data:", featuredResponse.data);
+      
         
         // Convert backend mainImage to frontend imageUrl
         const featuredData = (featuredResponse.data || []).map((tour: any) => ({
@@ -82,13 +82,9 @@ const HomePage = () => {
           maxGroup: tour.maxGroup || 0
         }));
         
-        console.log("✅ Featured Tours with images:", featuredData);
-        console.log("💰 First Featured Tour - Price:", featuredData[0]?.price);
-        console.log("💰 First Featured Tour - PriceNumber:", featuredData[0]?.priceNumber);
-        console.log("🔥 First Featured Tour - Discount:", featuredData[0]?.discountPercentage);
+      
         setFeaturedTours(featuredData);
 
-        console.log("📡 Fetching Popular Tours...");
         const popularResponse = await postsAPI.getPosts({ 
           sort: '-views',
           limit: 8,
