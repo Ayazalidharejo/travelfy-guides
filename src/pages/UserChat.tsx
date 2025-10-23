@@ -243,6 +243,24 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
     scrollToBottom();
   }, [messages]);
 
+  // Normalize IDs to handle different shapes from API/live
+  const getNormalizedId = (val: any): string => {
+    if (!val) return '';
+    if (typeof val === 'string' || typeof val === 'number') return String(val);
+    return String(val._id || val.id || val.userId || '');
+  };
+
+  const getMessageSenderId = (m: any): string => {
+    if (!m) return '';
+    const s = (m as any).sender;
+    if (!s) return getNormalizedId((m as any).senderId || (m as any).userId);
+    return getNormalizedId(s);
+  };
+
+  const getCurrentUserId = (): string => {
+    return getNormalizedId((currentUser as any)?.id || (currentUser as any)?._id || (currentUser as any)?.userId);
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !socket) {
@@ -336,7 +354,14 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
         ) : (
           <>
             {messages.map((message) => {
-              const isUserMessage = String(message.sender._id) === String(currentUser.id);
+              const senderId = getMessageSenderId(message);
+              const myId = getCurrentUserId();
+              const senderEmail = (typeof (message as any).sender === 'object' ? ((message as any).sender?.email || '') : '').toLowerCase();
+              const myEmail = (currentUser?.email || '').toLowerCase();
+              const isUserMessage = (!!senderId && !!myId && senderId === myId) || (!!senderEmail && !!myEmail && senderEmail === myEmail);
+
+              const senderName = (typeof (message as any).sender === 'object' && (message as any).sender?.name) || 'Support';
+              const senderAvatar = (typeof (message as any).sender === 'object' && (message as any).sender?.avatar) || '';
               return (
                 <div
                   key={message._id}
@@ -346,10 +371,10 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
                   {!isUserMessage && (
                     <div className="flex-shrink-0">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg border-2 border-white">
-                        {message.sender.avatar ? (
-                          <img src={message.sender.avatar} alt={message.sender.name} className="w-full h-full rounded-full object-cover" />
+                        {senderAvatar ? (
+                          <img src={senderAvatar} alt={senderName} className="w-full h-full rounded-full object-cover" />
                         ) : (
-                          message.sender.name.charAt(0).toUpperCase()
+                          (senderName || '?').charAt(0).toUpperCase()
                         )}
                       </div>
                     </div>
@@ -365,7 +390,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
                       {/* Sender Name for Admin Messages */}
                       {!isUserMessage && (
                         <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
-                          {message.sender.name}
+                          {senderName}
                         </p>
                       )}
                       <p className="text-sm leading-relaxed break-words">{message.message}</p>
