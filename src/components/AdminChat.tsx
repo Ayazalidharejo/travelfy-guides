@@ -107,9 +107,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const loadConversations = useCallback(async () => {
     if (!token) return;
     try {
-      const headers: any = {
-        'Authorization': `Bearer ${token}`
-      };
+      const headers: any = { 'Authorization': `Bearer ${token}` };
       if (token === 'google-auth-token') {
         const userDataStr = localStorage.getItem('user');
         if (userDataStr) headers['x-user-data'] = encodeURIComponent(userDataStr);
@@ -130,9 +128,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const loadUserMessages = useCallback(async (userId: string) => {
     if (!token) return;
     try {
-      const headers: any = {
-        'Authorization': `Bearer ${token}`
-      };
+      const headers: any = { 'Authorization': `Bearer ${token}` };
       if (token === 'google-auth-token') {
         const userDataStr = localStorage.getItem('user');
         if (userDataStr) headers['x-user-data'] = encodeURIComponent(userDataStr);
@@ -180,14 +176,12 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
 
     const newSocket = io(SERVER_URL, socketOptions);
 
-    newSocket.on('connect', () => {
-     
-    });
+    newSocket.on('connect', () => {});
 
-    newSocket.on('onlineUsers', (users) => {
-      setOnlineUsers(users);
-    });
+    newSocket.off('onlineUsers');
+    newSocket.on('onlineUsers', (users) => { setOnlineUsers(users); });
 
+    newSocket.off('newMessageFromUser');
     newSocket.on('newMessageFromUser', (data) => {
       const { message, user } = data;
       // Play notification sound
@@ -206,10 +200,17 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
       });
       // If this user is selected, add message to current chat
       if (selectedUser && String(selectedUser._id) === String(user._id)) {
-        setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
+        setMessages(prev => {
+          // Check if message already exists
+          if (prev.some(m => m._id === message._id)) {
+            return prev;
+          }
+          return [...prev, message];
+        });
       }
     });
 
+    newSocket.off('userTyping');
     newSocket.on('userTyping', (data) => {
       setTypingUsers(prev => ({
         ...prev,
@@ -217,13 +218,10 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
       }));
     });
 
-    newSocket.on('userOnline', (data) => {
-      setOnlineUsers(prev => [...prev, data]);
-    });
-
-    newSocket.on('userOffline', (data) => {
-      setOnlineUsers(prev => prev.filter(user => user.userId !== data.userId));
-    });
+    newSocket.off('userOnline');
+    newSocket.on('userOnline', (data) => { setOnlineUsers(prev => [...prev, data]); });
+    newSocket.off('userOffline');
+    newSocket.on('userOffline', (data) => { setOnlineUsers(prev => prev.filter(user => user.userId !== data.userId)); });
 
     // Handle admin's own message confirmation
     newSocket.on('messageSentToUser', (message) => {

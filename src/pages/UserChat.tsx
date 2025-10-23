@@ -199,6 +199,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
     });
 
     // Receive message from admin (works even if chat modal is closed)
+    newSocket.off('newMessageFromAdmin');
     newSocket.on('newMessageFromAdmin', (message: Message) => {
       setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
       playNotificationSound();
@@ -208,11 +209,13 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
     });
 
     // Sent confirmation
+    newSocket.off('messageSent');
     newSocket.on('messageSent', (message: Message) => {
       setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
     });
 
     // Typing indicator
+    newSocket.off('adminTyping');
     newSocket.on('adminTyping', (data: { typing: boolean }) => {
       setIsTyping(data.typing);
     });
