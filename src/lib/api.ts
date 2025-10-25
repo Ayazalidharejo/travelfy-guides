@@ -277,18 +277,11 @@ export const postsAPI = {
 
   // Get all ratings for homepage
   getAllRatings: async () => {
-    try {
-      const response = await api.get('/ratings');
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ API Error:', error.response?.data || error.message);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch all ratings',
-        data: [],
-        error: error.response?.data || error.message
-      };
-    }
+    return {
+      success: true,
+      data: [],
+      message: 'Ratings feature coming soon'
+    };
   },
 };
 
