@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 
-// const API_BASE_URL = 'http://localhost:5000/api';
-const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api';
+// Use centralized API instance from lib/api
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
@@ -39,8 +39,8 @@ const ResetPasswordPage = () => {
 
     try {
       setVerifying(true);
-      const response = await fetch(`${API_BASE_URL}/verify-token/${token}`);
-      const data = await response.json();
+      const response = await api.get(`/verify-token/${token}`);
+      const data = response.data;
 
       if (response.ok && data.success) {
         setTokenValid(true);
@@ -86,7 +86,7 @@ const ResetPasswordPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/reset/${token}`, { password });
+      const response = await api.post(`/reset/${token}`, { password });
 
       if (response.data.success) {
         setSuccess(true);

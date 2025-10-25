@@ -1,17 +1,11 @@
-const API_BASE_URL = 'http://localhost:3001/api/tours';
+import api from '@/lib/api';
 
 export const tourService = {
   // Create
   async createTour(tourData) {
     try {
-      const response = await fetch(API_BASE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tourData),
-      });
-      return await response.json();
+      const { data } = await api.post('/posts', tourData);
+      return data;
     } catch (error) {
       console.error('Error creating tour:', error);
       throw error;
@@ -21,8 +15,8 @@ export const tourService = {
   // Read All
   async getAllTours() {
     try {
-      const response = await fetch(API_BASE_URL);
-      return await response.json();
+      const { data } = await api.get('/posts');
+      return data;
     } catch (error) {
       console.error('Error fetching tours:', error);
       throw error;
@@ -32,8 +26,8 @@ export const tourService = {
   // Read Single
   async getTourById(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`);
-      return await response.json();
+      const { data } = await api.get(`/posts/${id}`);
+      return data;
     } catch (error) {
       console.error('Error fetching tour:', error);
       throw error;
@@ -43,14 +37,8 @@ export const tourService = {
   // Update
   async updateTour(id, tourData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tourData),
-      });
-      return await response.json();
+      const { data } = await api.put(`/posts/${id}`, tourData);
+      return data;
     } catch (error) {
       console.error('Error updating tour:', error);
       throw error;
@@ -60,10 +48,8 @@ export const tourService = {
   // Delete
   async deleteTour(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'DELETE',
-      });
-      return await response.json();
+      const { data } = await api.delete(`/posts/${id}`);
+      return data;
     } catch (error) {
       console.error('Error deleting tour:', error);
       throw error;

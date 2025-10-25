@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { adminAPI } from '@/lib/api';
+import api, { adminAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -95,11 +95,7 @@ const AdminDashboard = React.memo(() => {
         }
       }
 
-      const response = await fetch((import.meta as any).env?.VITE_API_URL ? `${(import.meta as any).env.VITE_API_URL}/api/chat/admin/unread-count` : 'https://karvaantours.com/api/chat/admin/unread-count', {
-        headers: headers
-      });
-      
-      const data = await response.json();
+      const { data } = await api.get('/chat/admin/unread-count', { headers });
       if (data.success) {
         setUnreadMessages(data.unreadCount || 0);
         console.log('📊 Unread messages count:', data.unreadCount);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Phone, Mail, User, Clock, CheckCircle, XCircle, AlertCircle, Search, Filter, X } from 'lucide-react';
-
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://karvaantours.com/api';
+import api from '@/lib/api';
 
 export default function AdminConsultationsButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,17 +22,12 @@ export default function AdminConsultationsButton() {
   const fetchConsultations = async () => {
     setLoading(true);
     try {
-      let endpoint = `${API_BASE_URL}/consultations`;
-      
-      if (activeTab === 'pending') endpoint = `${API_BASE_URL}/consultations/pending/list`;
-      if (activeTab === 'today') endpoint = `${API_BASE_URL}/consultations/today/list`;
-      if (activeTab === 'upcoming') endpoint = `${API_BASE_URL}/consultations/upcoming/list`;
-
-  
+      let endpoint = `/consultations`;
+      if (activeTab === 'pending') endpoint = `/consultations/pending/list`;
+      if (activeTab === 'today') endpoint = `/consultations/today/list`;
+      if (activeTab === 'upcoming') endpoint = `/consultations/upcoming/list`;
 
       const token = localStorage.getItem('token');
-    
-
       if (!token) {
         console.error('❌ No token found');
         alert('Please login as admin to view consultations');
@@ -41,31 +35,15 @@ export default function AdminConsultationsButton() {
         return;
       }
 
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-   
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
- 
+      const { data } = await api.get(endpoint);
 
       if (data.success) {
         setConsultations(data.data || []);
         setFilteredData(data.data || []);
-    
       } else {
         throw new Error(data.message || 'Failed to fetch consultations');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error fetching consultations:', error);
       alert(`Error: ${error.message}`);
     } finally {
@@ -75,13 +53,13 @@ export default function AdminConsultationsButton() {
 
   // Filter consultations
   useEffect(() => {
-    let filtered = consultations;
+    let filtered = consultations as any[];
 
     if (searchTerm) {
       filtered = filtered.filter(c => 
-        c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.phone.includes(searchTerm)
+        (c.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.phone || '').includes(searchTerm)
       );
     }
 
@@ -95,31 +73,20 @@ export default function AdminConsultationsButton() {
   const updateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      
       if (!token) {
         alert('Please login as admin');
         return;
       }
 
+      const { data } = await api.patch(`/consultations/${id}/status`, { status: newStatus });
 
-      const response = await fetch(`${API_BASE_URL}/consultations/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         alert('Status updated successfully! ✅');
         fetchConsultations();
       } else {
         throw new Error(data.message || 'Failed to update status');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error updating status:', error);
       alert(`Error: ${error.message}`);
     }
@@ -154,7 +121,7 @@ export default function AdminConsultationsButton() {
     });
   };
 
-  const pendingCount = consultations.filter(c => c.status === 'pending').length;
+  const pendingCount = consultations.filter((c: any) => c.status === 'pending').length;
 
   return (
     <>

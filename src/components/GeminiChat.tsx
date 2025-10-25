@@ -3,6 +3,7 @@ import { Send, Bot, User, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import axios from 'axios';
+import api from '@/lib/api';
 
 interface Message {
   role: 'user' | 'model';
@@ -22,7 +23,7 @@ const GeminiChat: React.FC<GeminiChatProps> = ({ onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://karvaantours.com';
+  // Use centralized axios instance base URL from lib/api (already has /api base)
 
   // Auto scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -40,7 +41,7 @@ const GeminiChat: React.FC<GeminiChatProps> = ({ onClose }) => {
 
   const loadHistory = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/gemini/history/${sessionId}`, {
+      const response = await api.get(`/gemini/history/${sessionId}`, {
         timeout: 5000 // 5 seconds timeout
       });
       if (response.data.success && response.data.history.length > 0) {
@@ -93,7 +94,7 @@ const GeminiChat: React.FC<GeminiChatProps> = ({ onClose }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/gemini/chat`, {
+      const response = await api.post(`/gemini/chat`, {
         message: userMessage.content,
         sessionId: sessionId
       }, {
@@ -149,7 +150,7 @@ const GeminiChat: React.FC<GeminiChatProps> = ({ onClose }) => {
 
   const handleClearHistory = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/api/gemini/clear-history`, {
+      await api.post(`/gemini/clear-history`, {
         sessionId: sessionId
       });
       

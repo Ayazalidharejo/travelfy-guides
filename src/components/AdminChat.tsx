@@ -31,7 +31,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
   const isTypingRef = useRef(false);
   const selectedUserRef = useRef<any>(null);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'https://tour-backend-production-7311.up.railway.app';
+  const SERVER_URL = (import.meta.env.VITE_API_URL as string) || window.location.origin;
 
   // Helpers to normalize IDs and shapes
   const normalizeId = (val: any): string => {

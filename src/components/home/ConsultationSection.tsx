@@ -17,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { bookingsAPI } from '@/lib/api';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import ConsultationDialog from '../ConsultationDialog';
 
 const ConsultationSection = () => {
   const [chatOpen, setChatOpen] = useState(false);
@@ -93,24 +92,16 @@ const ConsultationSection = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('https://karvaantours.com/api/consultations/schedule', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          date: formData.date,
-          time: formData.time,
-          travelPlans: formData.travelPlans
-        })
+      const data = await bookingsAPI.scheduleConsultation({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        date: formData.date,
+        time: formData.time,
+        travelPlans: formData.travelPlans
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         toast({
           title: "Consultation Scheduled! ✅",
           description: "We'll call you at your preferred time.",

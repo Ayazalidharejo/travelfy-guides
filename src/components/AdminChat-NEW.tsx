@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Volume2, VolumeX, Send, User, Clock } from 'lucide-react';
 import './AdminChat.css';
+import api from '@/lib/api';
 
 interface Message {
   _id: string;
@@ -48,7 +49,8 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'https://karvaantours.com';
+  // Derive server URL from window origin to avoid hardcoding; Nginx proxies /socket.io
+  const SERVER_URL = (import.meta.env.VITE_API_URL as string) || window.location.origin;
 
   // Initialize notification sound
   useEffect(() => {
@@ -69,12 +71,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
     if (!token) return;
     try {
       console.log('📥 Loading conversations...');
-      const response = await fetch(`${SERVER_URL}/api/chat/admin/conversations`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
+      const { data } = await api.get('/chat/admin/conversations');
    
       if (data.success) {
         setConversations(data.conversations);
@@ -87,13 +84,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   const loadUserMessages = useCallback(async (userId: string) => {
     if (!token) return;
     try {
-   
-      const response = await fetch(`${SERVER_URL}/api/chat/admin/conversation/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
+      const { data } = await api.get(`/chat/admin/conversation/${userId}`);
  
       if (data.success) {
         setMessages(data.messages);

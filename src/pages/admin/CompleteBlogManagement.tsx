@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search, Star, ChevronDown, ChevronRight, Save, X, MapPin, Shield, Camera } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 
 const CompleteBlogManagement = () => {
   const [posts, setPosts] = useState([]);
@@ -53,16 +53,7 @@ const CompleteBlogManagement = () => {
     packingList: []
   });
 
-  const api = axios.create({
-    baseURL: (import.meta as any).env?.VITE_API_BASE_URL || 'https://karvaantours.com/api',
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
+  // use centralized api instance from lib/api (already has baseURL and interceptors)
 
   const categories = ['blog', 'tour', 'mountain', 'cultural', 'nature', 'adventure', 'food'];
   const difficulties = ['Easy', 'Moderate', 'Hard'];

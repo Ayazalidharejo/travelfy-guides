@@ -52,8 +52,8 @@ const Header = () => {
         return finalUrl;
       }
       
-      // For relative paths, use live backend URL with cache-busting timestamp
-      const finalUrl = `https://karvaantours.com${user.avatar}?t=${Date.now()}`;
+      // For relative paths, use current origin with cache-busting timestamp
+      const finalUrl = `${window.location.origin}${user.avatar}?t=${Date.now()}`;
      
       return finalUrl;
     }

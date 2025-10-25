@@ -38,7 +38,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'tour-backend-production-7311.up.railway.app';
+  const SERVER_URL = (import.meta.env.VITE_API_URL as string) || window.location.origin;
 
   // Initialize notification sound
   useEffect(() => {
