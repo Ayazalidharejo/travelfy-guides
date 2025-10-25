@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +31,7 @@ import { postsAPI, bookingsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import SEO from '@/components/SEO';
 import {
   Calendar as CalIcon,
   Users,
@@ -456,6 +457,12 @@ const BookingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+      <SEO
+        title={tour?.title ? `${tour.title} | Karvaan Tours` : 'Book a Tour | Karvaan Tours'}
+        description={"Securely book your private Japan tour with Karvaan Tours. Choose vehicles, pick time slots, and pay online. Mount Fuji, Tokyo, Hakone and more."}
+        keywords={["Karvaan Tours", "Japan tour booking", "Mount Fuji tour", "Tokyo private tour", "Hakone tour", "Nikko tour", "private driver Japan"]}
+        canonical={`https://karvaantours.com/booking/${tourId || ''}`}
+      />
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <Button
@@ -1090,6 +1097,49 @@ const PaymentForm = ({ total, onSuccess, onCancel }) => {
   const [error, setError] = useState(null);
   const { toast } = useToast();
 
+  // Google Pay / Payment Request Button
+  const [paymentRequest, setPaymentRequest] = useState<any>(null);
+  const [prReady, setPrReady] = useState(false);
+  const [prCapabilities, setPrCapabilities] = useState<any>(null);
+
+  useEffect(() => {
+    if (!stripe) return;
+
+    const pr = stripe.paymentRequest({
+      country: 'US',
+      currency: 'usd',
+      total: {
+        label: 'Booking Total',
+        amount: Math.round(total * 100),
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+    });
+
+    pr.canMakePayment().then((result) => {
+      if (result) {
+        setPaymentRequest(pr);
+        setPrReady(true);
+        setPrCapabilities(result);
+      } else {
+        setPrReady(false);
+        setPrCapabilities(null);
+      }
+    });
+
+    pr.on('paymentmethod', async (ev) => {
+      try {
+        setProcessing(true);
+        await onSuccess(ev.paymentMethod.id);
+        ev.complete('success');
+      } catch (e) {
+        ev.complete('fail');
+      } finally {
+        setProcessing(false);
+      }
+    });
+  }, [stripe, total, onSuccess]);
+
   const handlePayment = async (e) => {
     e.preventDefault();
 
@@ -1171,6 +1221,21 @@ const PaymentForm = ({ total, onSuccess, onCancel }) => {
         <h3 className="text-2xl font-bold text-gray-900 mb-1">Complete Payment</h3>
         <p className="text-sm text-gray-600">Enter your card details to complete the booking</p>
       </div>
+
+      {/* Wallets: explicit Google Pay button when available */}
+      {prReady && paymentRequest && prCapabilities?.googlePay && (
+        <div className="space-y-3">
+          <Button
+            type="button"
+            onClick={() => paymentRequest?.show()}
+            disabled={processing}
+            className="w-full h-12 bg-black text-white hover:bg-gray-900"
+          >
+            Pay with Google Pay
+          </Button>
+          <div className="text-center text-xs text-gray-500">or pay with card</div>
+        </div>
+      )}
 
       {/* Card Details Section */}
       <div className="space-y-3">

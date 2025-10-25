@@ -52,8 +52,8 @@ const Header = () => {
         return finalUrl;
       }
       
-      // For relative paths, use local backend URL with cache-busting timestamp
-      const finalUrl = `http://localhost:5000${user.avatar}?t=${Date.now()}`;
+      // For relative paths, use live backend URL with cache-busting timestamp
+      const finalUrl = `https://karvaantours.com${user.avatar}?t=${Date.now()}`;
      
       return finalUrl;
     }
@@ -283,7 +283,7 @@ const Header = () => {
               <UserChat
                 token={localStorage.getItem('token') || ''}
                 currentUser={{
-                  id: user?._id || user?.id || '',
+                  id: (user as any)?._id || user?.id || '',
                   name: user?.name || '',
                   email: user?.email || '',
                   avatar: avatarUrl || undefined

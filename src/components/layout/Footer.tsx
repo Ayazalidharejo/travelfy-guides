@@ -19,13 +19,13 @@ const Footer = () => {
               Discover amazing destinations and create unforgettable memories with our curated travel experiences.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://www.facebook.com/share/1DPuTcap8s" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://www.instagram.com/karvaantours?igsh=N2xhdHBqNWk1Z3lm" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">

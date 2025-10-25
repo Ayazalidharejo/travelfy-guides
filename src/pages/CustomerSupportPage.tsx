@@ -45,7 +45,7 @@ const CustomerSupportPage: React.FC = () => {
               Speak directly with our support team for immediate assistance with any urgent matters.
             </p>
             <a href="tel:+81-XXX-XXXX" className="text-red-600 font-semibold hover:underline">
-              +81-XXX-XXXX-XXXX
+              +81 80-7480-1156
             </a>
           </div>
 
@@ -218,10 +218,10 @@ const CustomerSupportPage: React.FC = () => {
               For urgent matters during your tour, contact our emergency line:
             </p>
             <a 
-              href="tel:+81-XXX-EMERGENCY" 
+              href="tel:+81 80-7480-1156" 
               className="inline-block bg-red-600 text-white text-2xl font-bold px-8 py-4 rounded-full hover:bg-red-700 transition"
             >
-              +81-XXX-EMERGENCY
+              +81 80-7480-1156
             </a>
             <p className="text-gray-600 mt-4">Available 24/7 for tour participants</p>
           </div>

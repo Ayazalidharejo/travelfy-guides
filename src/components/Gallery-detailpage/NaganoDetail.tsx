@@ -11,16 +11,43 @@ const NaganoDetail = ({ onClose }) => {
     name: "Nagano",
     subtitle: "Alpine Beauty & Snow Monkeys",
     mainImage:   "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop",
-    description: "Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs.",
-    longDescription: "Nagano Prefecture is Japan's roof, encompassing much of the Japanese Alps. Famous for 1998 Winter Olympics and snow monkeys. This mountainous region offers pristine nature, ancient temples, and unique wildlife experiences.",
-    highlights: [
-      "Zenko-ji Temple - Historic 7th-century temple with hidden Buddha statue",
-      "Jigokudani Monkey Park - Wild snow monkeys bathing in natural hot springs",
-      "Hakuba Valley - World-class ski resort and 1998 Olympics venue",
-      "Matsumoto Castle - Stunning original black castle, one of Japan's treasures",
-      "Togakushi Shrine - Ancient shrine hidden in mystical cedar forests",
-      "Kamikochi Valley - Pristine alpine valley perfect for hiking"
-    ],
+    description: `Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs. This region blends natural beauty, cultural heritage, and unique wildlife experiences, making it a must-visit destination in Japan.`,
+
+longDescription: `Nagano Prefecture is often called the "roof of Japan" because it encompasses much of the Japanese Alps, a vast mountain range known for its towering peaks, scenic valleys, and pristine nature. The region has long been celebrated for outdoor adventures, from skiing and snowboarding in the winter to hiking, trekking, and mountain climbing in the warmer months. The 1998 Winter Olympics were hosted in Nagano, cementing its global reputation as a premier winter sports destination, with modern resorts, well-maintained trails, and spectacular alpine scenery attracting visitors from all over the world.
+
+One of Nagano's most famous cultural sites is Zenko-ji Temple, a Buddhist temple founded in the 7th century and considered one of Japan’s most important pilgrimage sites. The temple houses the first Buddhist statue ever brought to Japan, known as the Hibutsu, or “Hidden Buddha,” which is kept secret and only revealed to the public on rare occasions. Pilgrims and tourists alike visit Zenko-ji to experience its serene halls, historic architecture, and peaceful gardens. Walking through the temple complex, one can witness the deep spirituality of the area, participate in traditional rituals, and explore the quaint streets lined with shops selling local crafts, snacks, and souvenirs.
+
+Nagano is also famous for its unique wildlife, most notably the Japanese macaques, or snow monkeys, which are found in the Jigokudani Monkey Park near Yamanouchi. These monkeys are famous for their habit of bathing in natural hot springs during the winter months, creating a rare and captivating spectacle for visitors. Watching the monkeys relax in steaming onsen pools while surrounded by snow-covered forests is an experience unlike anywhere else in the world. The area also offers opportunities for nature walks, photography, and learning about local conservation efforts.
+
+Beyond the temple and monkeys, Nagano is dotted with other historical and cultural landmarks, including Matsumoto Castle, one of Japan's most beautiful original castles, known as the "Crow Castle" for its striking black exterior. The castle provides insight into Japan's feudal history and offers panoramic views of the surrounding city and mountains. Visitors can also explore traditional towns such as Obuse, known for chestnut sweets, art museums, and Edo-period architecture, giving a glimpse into the local lifestyle and craftsmanship.
+
+Nagano's natural beauty extends beyond its mountains and forests. The region is home to several scenic lakes, rivers, and hot spring towns (onsen), including Shiga Kogen, one of Japan's largest ski areas, and Nozawa Onsen, a charming village combining traditional ryokan inns with modern ski facilities. Hiking trails lead through alpine meadows, dense cedar forests, and past waterfalls, offering diverse opportunities for adventure and relaxation. Seasonal changes bring different charms: cherry blossoms in spring, lush greenery in summer, vibrant autumn foliage, and snowy landscapes in winter.
+
+Local cuisine in Nagano is another highlight. Visitors can savor soba noodles, a specialty made from buckwheat grown in the region, along with oyaki dumplings, mountain vegetables, and fresh river fish. Many onsen towns offer kaiseki meals, where seasonal ingredients are beautifully prepared and presented, enhancing the overall travel experience. Traditional festivals, such as the Nagano Lantern Festival or Obuse Chestnut Festival, add cultural richness, with parades, performances, and local delicacies available for visitors to enjoy.
+
+Nagano is easily accessible from Tokyo via bullet train or express trains, making it an ideal destination for both weekend trips and extended stays. Its combination of cultural heritage, natural beauty, winter sports, unique wildlife, and culinary delights ensures that every traveler finds something memorable. From meditating at Zenko-ji Temple, watching snow monkeys in steaming hot springs, skiing down alpine slopes, exploring historic castles, or sampling local dishes, Nagano offers a complete and unforgettable Japanese experience.
+
+Overall, Nagano perfectly balances Japan's spiritual, historical, and natural wonders. The prefecture offers a harmonious mix of mountains, forests, temples, castles, hot springs, and unique wildlife, making it a destination where visitors can connect with both nature and culture. Whether seeking adventure, relaxation, or cultural immersion, Nagano remains a timeless jewel in Japan's Northern Alps, captivating all who explore its landscapes and heritage.`  
+,
+   highlights: [
+  "Zenko-ji Temple - Historic 7th-century temple housing the Hidden Buddha, a key pilgrimage site",
+  "Jigokudani Monkey Park - Famous for wild Japanese macaques bathing in natural hot springs during winter",
+  "Hakuba Valley - World-class ski resort, venue of the 1998 Winter Olympics, offering slopes for all levels",
+  "Matsumoto Castle - Striking original black castle known as Crow Castle, symbol of feudal Japan",
+  "Togakushi Shrine - Ancient Shinto shrine complex nestled in mystical cedar forests with hiking trails",
+  "Kamikochi Valley - Pristine alpine valley with crystal-clear rivers, ideal for hiking and nature photography",
+  "Shiga Kogen - Extensive highland ski area and hiking destination with panoramic mountain views",
+  "Nozawa Onsen - Traditional hot spring village with charming streets and local delicacies",
+  "Obuse Town - Cultural town famous for chestnut sweets, Edo-period architecture, and Hokusai art museum",
+  "Lake Suwa - Scenic lake with historical shrines, leisure activities, and hot spring resorts",
+  "Ueda Castle - Historic samurai castle with preserved grounds and seasonal cherry blossoms",
+  "Narai-juku - Edo-period post town offering a glimpse into traditional Japanese life and architecture",
+  "Kiso Valley - Picturesque valley with traditional villages and hiking trails along the Nakasendo route",
+  "Matsushiro - Historic castle town with samurai houses, temples, and museums",
+  "Snow Monkey Onsen Experience - Unique opportunity to observe monkeys up close in natural hot springs",
+  "Local Cuisine Experiences - Savor soba noodles, oyaki dumplings, and mountain vegetable dishes in local inns"
+]
+,
     bestTime: "December-March (Skiing & Snow Monkeys) & June-October (Hiking)",
     duration: "2-4 days",
     rating: 4.7,
@@ -29,11 +56,19 @@ const NaganoDetail = ({ onClose }) => {
    
    
     tips: [
-      "Visit snow monkeys early morning for best experience - they're most active then",
-      "Try authentic handmade soba at local restaurants - Nagano is famous for it",
-      "Book ski accommodations early for winter season - gets very busy",
-      "Dress in layers - mountain weather changes quickly even in summer"
-    ],
+  "Visit snow monkeys early in the morning for the best experience - they are most active then",
+  "Try authentic handmade soba at local restaurants - Nagano is famous for it",
+  "Book ski accommodations early for the winter season as it gets very busy",
+  "Dress in layers - mountain weather can change quickly even in summer",
+  "Bring cash as many local restaurants, shops, and small attractions do not accept credit cards",
+  "Carry comfortable walking shoes for hiking and exploring traditional villages",
+  "Check the weather forecast before visiting alpine areas to avoid sudden storms",
+  "Use public transport passes like Alpico or Nagano Free Pass for convenient travel",
+  "Learn a few basic Japanese phrases; locals appreciate polite greetings and thanks",
+  "Respect hot spring etiquette - wash before entering onsen and avoid swimsuits",
+ 
+]
+,
     gallery: [
       "https://images.unsplash.com/photo-1735197679215-d3b2ff6c5734?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fE5hZ2FubyUyMFN0YXRpb258ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",
       "https://images.unsplash.com/photo-1596534633455-a2e1c12a8e76?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fFplbmtvLWppJTIwVGVtcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500",

@@ -348,6 +348,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
+import UserChat from '@/pages/UserChat';
+import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
   Phone,
@@ -360,6 +364,7 @@ import {
 } from 'lucide-react';
 import ContactHero from '@/components/Contact/ContactHero';
 import Testimonials from '@/components/Contact/Testimonials';
+import SEO from '@/components/SEO';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -371,6 +376,9 @@ const ContactPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const [chatOpen, setChatOpen] = useState(false);
+  const { user, isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -428,19 +436,19 @@ const ContactPage = () => {
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: ['123 Travel Street', 'Adventure City, AC 12345', 'United States'],
+      details: ['2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.'],
       color: 'text-primary'
     },
     {
       icon: Phone,
       title: 'Call Us',
-      details: ['+81 80-7480-1156', '+1 (555) 987-6543', 'Mon-Fri: 9AM-6PM'],
+      details: ['+81 80-7480-1156'],
       color: 'text-success'
     },
     {
       icon: Mail,
       title: 'Email Us',
-      details: ['info@traveltours.com', 'support@traveltours.com', 'booking@traveltours.com'],
+      details: ['support@traveltours.com'],
       color: 'text-secondary'
     },
     {
@@ -456,7 +464,7 @@ const ContactPage = () => {
       icon: MessageSquare,
       title: 'General Inquiry',
       description: 'Questions about our tours and services',
-      action: 'Send Message'
+      action: 'View FAQs'
     },
     {
       icon: HeadphonesIcon,
@@ -472,8 +480,25 @@ const ContactPage = () => {
     }
   ];
 
+  const handleSupportClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (isAdmin) {
+      return;
+    }
+    setChatOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-card">
+      <SEO
+        title="Contact Karvaan Tours | Japan Private Tours Support"
+        description="Contact Karvaan Tours for Japan tour inquiries, bookings, and support. Our team helps with Mount Fuji, Tokyo, Hakone, Nikko and more."
+        keywords={["contact Karvaan Tours", "Japan tour support", "private tour contact", "Mount Fuji contact", "Tokyo tour booking"]}
+        canonical="https://karvaantours.com/contact"
+      />
       <ContactHero />
       <Testimonials />
 
@@ -610,9 +635,13 @@ const ContactPage = () => {
                           <h3 className="font-semibold text-lg">{contact.title}</h3>
                           <p className="text-muted-foreground text-sm">{contact.description}</p>
                         </div>
-                        <Button variant="outline" size="sm">
-                          {contact.action}
-                        </Button>
+                        {contact.title === 'Customer Support' ? (
+                          <Button variant="outline" size="sm" onClick={handleSupportClick}>
+                            {contact.action}
+                          </Button>
+                        ) : (
+                          <Button variant="outline" size="sm">{contact.action}</Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -696,6 +725,31 @@ const ContactPage = () => {
           </div>
         </div>
       </div>
+      {/* Live Chat Modal */}
+      {isAuthenticated && !isAdmin && (
+        <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+          <DialogContent className="max-w-lg h-[650px] p-0 overflow-hidden">
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle className="flex items-center gap-2">
+                Live Chat Support
+              </DialogTitle>
+            </DialogHeader>
+            <div className="h-full">
+              <UserChat
+                token={localStorage.getItem('token') || ''}
+                currentUser={{
+                  id: (user as any)?._id || (user as any)?.id || '',
+                  name: (user as any)?.name || '',
+                  email: (user as any)?.email || '',
+                  avatar: (user as any)?.photoURL || (user as any)?.avatar || undefined
+                }}
+                isOpen={chatOpen}
+                onClose={() => setChatOpen(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

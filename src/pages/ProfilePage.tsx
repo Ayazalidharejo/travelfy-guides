@@ -31,7 +31,7 @@ const ProfilePage = () => {
 
     // For relative paths, use local backend URL
     // const baseURL = 'http://localhost:00001';
-    const baseURL = 'http://localhost:5000';
+    const baseURL = 'https://karvaantours.com';
     return `${baseURL}${avatarPath}`;
   }, []);
 

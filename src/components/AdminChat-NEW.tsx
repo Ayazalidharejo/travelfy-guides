@@ -48,7 +48,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const SERVER_URL = import.meta.env.VITE_API_URL || 'https://karvaantours.com';
 
   // Initialize notification sound
   useEffect(() => {

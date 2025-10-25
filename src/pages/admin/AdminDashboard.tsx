@@ -95,7 +95,7 @@ const AdminDashboard = React.memo(() => {
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/chat/admin/unread-count', {
+      const response = await fetch((import.meta as any).env?.VITE_API_URL ? `${(import.meta as any).env.VITE_API_URL}/api/chat/admin/unread-count` : 'https://karvaantours.com/api/chat/admin/unread-count', {
         headers: headers
       });
       
@@ -133,10 +133,10 @@ const AdminDashboard = React.memo(() => {
 
   // Memoize currentUser to prevent recreation
   const currentUserMemo = useMemo(() => ({
-    id: user?._id || user?.id || '',
+    id: (user as any)?._id || user?.id || '',
     name: user?.name || '',
     email: user?.email || ''
-  }), [user?._id, user?.id, user?.name, user?.email]);
+  }), [(user as any)?._id, user?.id, user?.name, user?.email]);
 
   if (!isAdmin) {
     return (
@@ -241,7 +241,7 @@ const AdminDashboard = React.memo(() => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Tours</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Products</p>
                   <p className="text-3xl font-bold text-primary">{stats?.totalPosts || 0}</p>
                 </div>
                 <MapPin className="h-8 w-8 text-primary" />

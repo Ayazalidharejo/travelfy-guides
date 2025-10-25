@@ -11,16 +11,33 @@ const HakoneDetail = ({ onClose }) => {
     name: "Hakone",
     subtitle: "Hot Spring Paradise with Fuji Views",
     mainImage: "https://images.unsplash.com/photo-1528164344705-47542687000d?w=1200&h=800&fit=crop",
-    description: "Hakone is a mountainous hot spring resort town famous for its stunning views of Mount Fuji, volcanic valleys, and world-class art museums.",
-    longDescription: "Hakone has been a popular hot spring destination for over 1,200 years, offering respite from urban Tokyo life with its therapeutic sulfur waters, mountain scenery, and cultural attractions. Part of Fuji-Hakone-Izu National Park.",
-    highlights: [
-      "Lake Ashi Cruise - Pirate ship cruise with stunning Mt. Fuji views across caldera lake",
-      "Hakone Ropeway - Cable car over Owakudani volcanic valley with panoramic vistas",
-      "Owakudani Valley - Active volcanic valley with sulfur vents and famous black eggs",
-      "Hakone Open-Air Museum - Japan's first outdoor sculpture museum with 120+ works",
-      "Hakone Shrine - Historic lakeside shrine with iconic red torii gate in water",
-      "Hakone Checkpoint - Reconstructed Edo-period checkpoint on historic Tokaido road"
-    ],
+  description: `Hakone is one of the most popular gateways to exploring the Fuji-Hakone-Izu National Park and the scenic Mount Fuji region. Located just a short trip from Tokyo, Hakone offers a perfect blend of natural beauty, cultural heritage, and relaxing experiences. Visitors often begin their journey by purchasing the Hakone Freepass, a convenient all-in-one ticket that provides unlimited access to trains, buses, cable cars, ropeways, and sightseeing cruises on Lake Ashi. The pass also offers discounted entry to many of Hakone’s attractions, making it an ideal option for first-time visitors and seasoned travelers alike.
+
+Hakone-Yumoto Station serves as the main entry point to the town. The station area itself is charming, lined with traditional shops, cafes, and restaurants where you can sample local delicacies. A short walk from the station leads to hot spring baths and onsen resorts, which Hakone is famous for. Visitors can soak in mineral-rich thermal waters while enjoying views of verdant hills and, on clear days, glimpses of Mount Fuji in the distance. Many ryokan (traditional inns) offer an immersive experience with tatami rooms, Japanese-style hospitality, and private onsen baths.
+
+The surrounding region is rich in natural and cultural attractions. A ride on the Hakone Tozan Railway winds through picturesque mountains, offering stunning views of valleys, rivers, and seasonal foliage. For panoramic vistas, the Hakone Ropeway takes visitors from Sounzan to Togendai, passing over the volcanic Owakudani Valley, known for its steaming vents, sulfuric hot springs, and the famous black eggs boiled in volcanic waters. Lake Ashi, a crater lake formed by volcanic activity, is another highlight. Visitors can enjoy scenic cruises, traditional pirate-ship tours, or lakeside strolls while admiring the reflections of Mount Fuji on calm waters.
+
+Hakone also boasts numerous cultural landmarks and museums. The Hakone Open-Air Museum showcases contemporary sculptures set against lush landscapes, blending art with nature in a way unique to Japan. The Pola Museum of Art houses collections of Western and Japanese masterpieces in a serene forested setting. Historical sites like Hakone Shrine, hidden among towering cedar trees near Lake Ashi, provide a glimpse into Japan’s spiritual heritage. Torii gates at the shrine by the water create iconic photo opportunities, especially during sunrise or misty mornings.
+
+Food and shopping in Hakone reflect local traditions and flavors. Streets in Hakone-Yumoto and surrounding areas are dotted with souvenir shops, craft stores, and snack stalls. Signature treats include black eggs from Owakudani, yuba (tofu skin) delicacies, and handmade sweets. Traditional crafts such as woodwork, pottery, and local textiles are available in small boutiques, making Hakone an excellent place to experience Japanese artistry and culture firsthand.
+
+Throughout the year, Hakone transforms with the seasons. Cherry blossoms in spring, lush green forests in summer, vibrant red and golden leaves in autumn, and snow-capped mountains in winter create a visual feast for travelers and photographers. Outdoor enthusiasts can enjoy hiking trails around the Hakone mountains, exploring hidden valleys, waterfalls, and volcanic formations. Wellness seekers can combine their visit with spa treatments, meditation, and hot spring relaxation, making Hakone a destination that balances adventure, culture, and rejuvenation.
+
+Whether you are here for a day trip from Tokyo or an extended stay, Hakone offers an immersive experience of Japan’s natural beauty, historical richness, and serene ambiance. The combination of scenic landscapes, cultural treasures, culinary delights, and rejuvenating hot springs makes it one of the most memorable destinations in the Fuji-Hakone-Izu region. Every corner of Hakone tells a story of tradition, nature, and harmony, ensuring that visitors leave with a deep appreciation for the unique charm of this mountain town.`
+,
+  highlights: [
+  "Lake Ashi Cruise - Pirate ship cruise with stunning Mt. Fuji views across caldera lake",
+  "Hakone Ropeway - Cable car over Owakudani volcanic valley with panoramic vistas",
+  "Owakudani Valley - Active volcanic valley with sulfur vents and famous black eggs",
+  "Hakone Open-Air Museum - Japan's first outdoor sculpture museum with 120+ works",
+  "Hakone Shrine - Historic lakeside shrine with iconic red torii gate in water",
+  "Hakone Checkpoint - Reconstructed Edo-period checkpoint on historic Tokaido road",
+  "Gora Park - French-style landscape park with seasonal flowers and tea houses",
+  "Pola Museum of Art - Modern museum with European and Japanese art in a forest setting",
+  "Hakone Venetian Glass Museum - Displays Venetian glass art with beautiful gardens",
+  "Onshi-Hakone Park - Scenic park offering panoramic views of Lake Ashi and Mt. Fuji"
+]
+,
     bestTime: "March-May & September-November (Clear Fuji Views, Mild Weather)",
     duration: "1-2 days",
     rating: 4.8,
@@ -28,12 +45,17 @@ const HakoneDetail = ({ onClose }) => {
     cuisine: ["Onsen Tamago", "Hakone Soba", "Black Eggs (Kuro-Tamago)", "Kaiseki Ryori", "Local Tofu", "Yosegi Zaiku Crafts"],
     transportation: "Hakone Freepass (¥6,100) covers all transport; Romance Car limited express from Shinjuku (85 min)",
     accommodation: "Traditional ryokans with onsen from ¥15,000, modern hotels with Mt. Fuji views, many with private baths",
-    tips: [
-      "Purchase Hakone Freepass for unlimited transport and museum discounts - saves money",
-      "Stay overnight in ryokan for authentic onsen experience with multi-course kaiseki dinner",
-      "Visit Owakudani early (before 10am) to avoid crowds and tour groups",
-      "Try black eggs (kuro-tamago) boiled in sulfur springs - said to add 7 years to life!"
-    ],
+   tips: [
+  "Purchase Hakone Freepass for unlimited transport and museum discounts - saves money",
+  "Stay overnight in ryokan for authentic onsen experience with multi-course kaiseki dinner",
+  "Visit Owakudani early (before 10am) to avoid crowds and tour groups",
+  "Try black eggs (kuro-tamago) boiled in sulfur springs - said to add 7 years to life!",
+  "Bring cash - many local shops and restaurants do not accept cards",
+  "Dress in layers - mountain weather can change quickly even in summer",
+  "Combine with a cruise on Lake Ashi for scenic views of Mount Fuji",
+  "Book accommodations and transportation early during peak seasons (spring and autumn)"
+]
+,
     gallery: [
       "https://images.unsplash.com/photo-1750137666716-1fb31a9a9b09?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDB8fEhha29uZS1ZdW1vdG8lMjBTdGF0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Hakone torii gate
       "https://images.unsplash.com/photo-1723829361220-6d93f36ebe72?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8SGFrb25lJTIwVG96YW4lMjBSYWlsd2F5fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Mt Fuji view

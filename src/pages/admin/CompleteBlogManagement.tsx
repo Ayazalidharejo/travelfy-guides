@@ -54,7 +54,7 @@ const CompleteBlogManagement = () => {
   });
 
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: (import.meta as any).env?.VITE_API_BASE_URL || 'https://karvaantours.com/api',
     headers: { 'Content-Type': 'application/json' }
   });
 

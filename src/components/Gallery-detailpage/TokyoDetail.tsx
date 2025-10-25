@@ -11,16 +11,40 @@ const TokyoDetail = ({ onClose }) => {
     name: "Tokyo",
     subtitle: "Where Tradition Meets Tomorrow",
     mainImage: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=800&fit=crop",
-    description: "Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples, offering a unique contrast of tradition and innovation.",
-    longDescription: "Tokyo is a city of contrasts where ancient temples stand beside futuristic skyscrapers. As the world's most populous metropolitan area with over 37 million people, it offers endless experiences - from serene gardens to neon-lit entertainment districts, Michelin-starred restaurants to tiny ramen shops.",
-    highlights: [
-      "Shibuya Crossing - World's busiest intersection with organized chaos, crossed by up to 3,000 people at once",
-      "Senso-ji Temple - Tokyo's oldest temple dating back to 628 AD in historic Asakusa district",
-      "Tokyo Skytree - 634m tall tower with breathtaking city panoramas, tallest structure in Japan",
-      "Harajuku & Takeshita Street - Youth culture and fashion epicenter with colorful street style",
-      "Tsukiji Outer Market - Fresh seafood and traditional Japanese breakfast experience",
-      "TeamLab Borderless - Immersive digital art museum with interactive installations"
-    ],
+    description: `Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples, offering a unique contrast of tradition and innovation. The city pulses with energy yet also provides pockets of serenity, making it a destination that captivates every type of traveler.`,
+
+longDescription: `Tokyo is a city of contrasts where ancient temples and shrines stand gracefully beside futuristic skyscrapers, neon-lit streets, and high-tech innovations. As the world's most populous metropolitan area with over 37 million people, Tokyo offers an endless array of experiences for visitors. From historic sites like Senso-ji Temple in Asakusa and Meiji Shrine in Shibuya to contemporary landmarks such as the Tokyo Skytree and Tokyo Tower, the city harmonizes the old and the new, reflecting centuries of culture alongside cutting-edge modernity.
+
+Neighborhoods in Tokyo each have their own unique character. Shibuya dazzles with its famous crossing, shopping, and nightlife; Shinjuku combines skyscrapers with the peaceful Shinjuku Gyoen National Garden; Ginza offers high-end shopping and gourmet dining; Akihabara is the mecca for electronics, anime, and gaming culture; Harajuku provides vibrant youth culture, fashion, and quirky cafes. Each district has its own flavor, allowing travelers to experience multiple sides of the city in a single day. 
+
+Food in Tokyo is as diverse as its neighborhoods. Michelin-starred restaurants sit alongside traditional izakayas and small ramen shops tucked in narrow alleyways. Sushi, tempura, kaiseki, and street food like takoyaki and yakitori provide a culinary journey that reflects Japan's rich gastronomic heritage. Tokyo’s markets, such as Tsukiji Outer Market and Toyosu Fish Market, offer fresh seafood and traditional ingredients, giving visitors a taste of authentic Japanese cuisine.
+
+Cultural experiences abound in Tokyo. Museums such as the Tokyo National Museum, Mori Art Museum, and teamLab Borderless digital art museum showcase both traditional and contemporary art. Seasonal festivals, from cherry blossom viewing (hanami) in spring to vibrant summer matsuri, highlight Japan’s long-standing traditions and community spirit. Parks and gardens, including Ueno Park and the Imperial Palace East Gardens, provide tranquil escapes amidst the urban hustle.
+
+For entertainment and nightlife, Tokyo offers something for everyone. The city’s theaters, concert halls, karaoke bars, and themed cafes cater to both locals and tourists. Nightlife districts like Roppongi and Kabukicho combine lively bars, clubs, and dining options, while quieter neighborhoods offer intimate cultural experiences and local hangouts. Modern attractions such as teamLab Planets, Odaiba’s futuristic entertainment complexes, and Tokyo Disneyland and DisneySea create unforgettable memories for families and travelers of all ages.
+
+Tokyo also serves as a hub for day trips to nearby destinations such as Mount Fuji, Hakone, Nikko, Kamakura, and Yokohama. These excursions provide opportunities to explore Japan’s natural beauty, historic sites, and regional culture, all within easy reach of the capital. Transportation in Tokyo is extremely efficient, with an extensive subway and train network connecting neighborhoods, attractions, and surrounding regions, making it convenient for both short visits and extended stays.
+
+Overall, Tokyo embodies the perfect balance between tradition and innovation, chaos and calm, history and modernity. Visitors can experience centuries-old cultural practices alongside futuristic technology, serene gardens alongside bustling streets, and gourmet dining alongside casual street food. Whether exploring sacred temples, shopping in high-end districts, enjoying vibrant nightlife, or simply observing the city’s energy from a quiet park bench, Tokyo offers a multidimensional and unforgettable experience that captures the spirit of Japan.`  
+,
+  highlights: [
+  "Shibuya Crossing - World's busiest intersection with organized chaos, crossed by up to 3,000 people at once",
+  "Senso-ji Temple - Tokyo's oldest temple dating back to 628 AD in historic Asakusa district",
+  "Tokyo Skytree - 634m tall tower with breathtaking city panoramas, tallest structure in Japan",
+  "Harajuku & Takeshita Street - Youth culture and fashion epicenter with colorful street style",
+  "Tsukiji Outer Market - Fresh seafood and traditional Japanese breakfast experience",
+  "TeamLab Borderless - Immersive digital art museum with interactive installations",
+  "Meiji Shrine - Serene Shinto shrine surrounded by a peaceful forest in central Tokyo",
+  "Odaiba - Modern entertainment hub with shopping, attractions, and waterfront views",
+  "Akihabara - Electronics and anime district, famous for maid cafes and gaming culture",
+  "Ueno Park & Zoo - Large public park with museums, cherry blossoms, and a historic zoo",
+  "Tokyo National Museum - Japan’s oldest and largest museum showcasing art and artifacts",
+  "Roppongi Hills - Luxury shopping, dining, and observation deck with city views",
+  "Imperial Palace - Residence of the Emperor with beautiful East Gardens open to visitors",
+  "Ginza - Upscale shopping district with designer boutiques, art galleries, and fine dining",
+  "Yanaka District - Traditional Tokyo neighborhood with nostalgic streets, temples, and shops"
+]
+,
     bestTime: "March-May (Cherry Blossoms) & September-November (Mild Weather)",
     duration: "4-7 days",
     rating: 4.9,
@@ -28,12 +52,23 @@ const TokyoDetail = ({ onClose }) => {
     cuisine: ["Sushi", "Ramen", "Tempura", "Yakitori", "Tonkatsu", "Street Food", "Wagyu Beef", "Matcha Desserts"],
     transportation: "Extensive subway and JR train network with 13 metro lines, extremely efficient and punctual",
     accommodation: "From capsule hotels (¥3000) to luxury ryokans (¥50000+), every budget and style available",
-    tips: [
-      "Get Suica or Pasmo IC card for seamless public transport and convenience store payments",
-      "Visit temples early morning (7-8am) to avoid crowds and experience peaceful atmosphere",
-      "Try standing sushi bars (tachi-gui) for authentic and affordable experience",
-      "Download Japan Transit Planner app for easy navigation on complex train system"
-    ],
+   tips: [
+  "Get Suica or Pasmo IC card for seamless public transport and convenience store payments",
+  "Visit temples early morning (7-8am) to avoid crowds and experience peaceful atmosphere",
+  "Try standing sushi bars (tachi-gui) for authentic and affordable experience",
+  "Download Japan Transit Planner app for easy navigation on complex train system",
+  "Bring cash as many small restaurants and shops may not accept credit cards",
+  "Wear comfortable walking shoes - Tokyo involves a lot of walking and train transfers",
+  "Check train schedules and avoid peak commuting hours (7-9am and 5-7pm) for comfort",
+  "Explore side streets and local neighborhoods for hidden gems and small eateries",
+  "Try seasonal street food in areas like Asakusa or Tsukiji Outer Market",
+  "Carry a portable phone charger - long days of sightseeing drain battery quickly",
+  "Use coin lockers at stations for storing bags while exploring attractions",
+  "Visit observation decks like Tokyo Skytree or Tokyo Tower for city panoramas",
+  "Take advantage of free Wi-Fi spots in major stations and tourist areas",
+  "Respect local customs such as queuing and not talking loudly on trains",
+   ]
+,
     gallery: [
       "https://images.unsplash.com/photo-1646649806488-6ecec62f03e9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fFRzdWtpamklMjBPdXRlciUyME1hcmtldHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=500", // Tokyo skyline night
       "https://images.unsplash.com/photo-1684224511966-09c5d5b6f3d4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U2Vuc28tamklMjBUZW1wbGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500", // Shibuya crossing

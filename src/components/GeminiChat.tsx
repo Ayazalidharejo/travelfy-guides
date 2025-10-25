@@ -22,7 +22,7 @@ const GeminiChat: React.FC<GeminiChatProps> = ({ onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://karvaantours.com';
 
   // Auto scroll to bottom when new messages arrive
   const scrollToBottom = () => {

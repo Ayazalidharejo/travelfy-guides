@@ -67,102 +67,219 @@ const ReliableTransportationPage: React.FC = () => {
         </div>
 
         {/* Our Fleet */}
-        <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Premium Fleet</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-6 shadow">
-              <Car className="w-10 h-10 text-red-600 mb-4" />
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Sedans & SUVs</h4>
-              <p className="text-gray-700 mb-4">
-                Perfect for individuals, couples, or small families (1-4 passengers). Ideal for city tours and 
-                day trips with comfortable seating and ample trunk space.
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Toyota Camry, Honda Accord</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Lexus RX, Toyota Highlander</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Premium leather seats</span>
-                </li>
-              </ul>
-            </div>
+        (
+    <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
+      <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        Our Premium Fleet
+      </h2>
 
-            <div className="bg-white rounded-xl p-6 shadow">
-              <Users className="w-10 h-10 text-red-600 mb-4" />
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Vans & Minibuses</h4>
-              <p className="text-gray-700 mb-4">
-                Great for larger families and groups (5-15 passengers). Spacious interiors with extra storage for 
-                luggage and equipment.
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Toyota Hiace, Nissan Caravan</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Mercedes-Benz Sprinter</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Reclining seats, USB charging</span>
-                </li>
-              </ul>
-            </div>
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Alphard */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Car className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Alphard — Popular Choice
+          </h4>
+          <p className="text-gray-700 mb-4">
+            The Alphard is a luxury MPV that combines elegant design with exceptional comfort. 
+            Ideal for family trips or executive travel, it offers a spacious interior and advanced 
+            entertainment options.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Premium Leather Seats</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Dual-Zone Climate Control</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Rear Entertainment System & USB Charging</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 6 Travelers</span>
+            </li>
+          </ul>
+        </div>
 
-            <div className="bg-white rounded-xl p-6 shadow">
-              <Truck className="w-10 h-10 text-red-600 mb-4" />
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Luxury Coaches</h4>
-              <p className="text-gray-700 mb-4">
-                For large groups and special events (16-45 passengers). Maximum comfort with premium amenities 
-                for long journeys.
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Modern tour buses</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Onboard restroom (select models)</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>WiFi, entertainment systems</span>
-                </li>
-              </ul>
-            </div>
+        {/* Vellfire */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Users className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Vellfire — Executive Luxury
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Executive-class MPV offering supreme luxury and advanced features for a premium travel experience.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Executive Reclining Seats with Massage Function</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Premium Audio System</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Ambient Cabin Lighting</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 5 Travelers</span>
+            </li>
+          </ul>
+        </div>
 
-            <div className="bg-white rounded-xl p-6 shadow">
-              <Sparkles className="w-10 h-10 text-red-600 mb-4" />
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Special Vehicles</h4>
-              <p className="text-gray-700 mb-4">
-                Unique transportation options for memorable experiences—including luxury cars and traditional 
-                vehicles for special occasions.
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Luxury sedans (BMW, Audi)</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Accessible vehicles available</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Custom requests welcome</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
+        {/* Mercedes Benz */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Car className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Mercedes Benz — Luxury Sedan
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Luxury sedan combining elegance, performance, and cutting-edge technology for VIP transportation.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Luxury Interior Finishing</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Premium Surround Sound</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Advanced Safety Systems</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 3 Travelers</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Land Cruiser Prado */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Truck className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Luxury Land Cruiser Prado — Premium SUV
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Premium SUV built for both city drives and adventurous terrain with unmatched comfort and reliability.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>4WD System with Hill Assist</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Leather Interior</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Advanced Safety Features</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 4 Travelers</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Toyota Crown */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Sparkles className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Toyota Crown — Elegant Sedan
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Elegant luxury sedan offering sophisticated comfort, hybrid technology, and a quiet driving experience.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Premium Comfort Seating</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Hybrid Engine Efficiency</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Smart Connectivity</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 3 Travelers</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Commuter Van */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Users className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Commuter Van — Group Comfort
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Spacious van perfect for group travel, offering comfort and reliability for larger parties.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Spacious Interior Layout</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Powerful Air Conditioning</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Multiple Row Seating</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 9 Travelers</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Commuter Van Large */}
+        <div className="bg-white rounded-xl p-6 shadow">
+          <Truck className="w-10 h-10 text-red-600 mb-4" />
+          <h4 className="text-xl font-bold text-gray-900 mb-3">
+            Commuter Van (Large) — Tour & Group Travel
+          </h4>
+          <p className="text-gray-700 mb-4">
+            Extra-large van ideal for big groups and tour parties, ensuring everyone travels together comfortably.
+          </p>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Maximum Passenger Capacity</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Comfortable Plush Seating</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Climate Control System</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+              <span>Up to 13 Travelers</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
         {/* Vehicle Amenities */}
         <section className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-12">
@@ -266,10 +383,10 @@ const ReliableTransportationPage: React.FC = () => {
             Book your tour today and experience the difference of reliable, comfortable transportation!
           </p>
           <Link
-            to="/tours"
+            to="/vehicle"
             className="inline-block bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition"
           >
-            View Available Tours
+            View Available Vehicles
           </Link>
         </section>
       </div>

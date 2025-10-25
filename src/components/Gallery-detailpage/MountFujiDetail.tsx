@@ -15,14 +15,36 @@ const MountFujiDetail = ({ onClose }) => {
     name: "Mount Fuji",
     subtitle: "Japan's Sacred Peak",
     mainImage: "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1200&h=800&fit=crop",
-    description: "Mount Fuji, standing at 3,776 meters, is Japan's highest and most iconic mountain. This perfectly symmetrical volcanic cone has inspired artists for centuries.",
+    description: `Mount Fuji, standing proudly at 3,776 meters (12,389 feet), is Japan’s highest and most iconic mountain. Located on Honshu Island, roughly 100 kilometers southwest of Tokyo, it rises gracefully above the surrounding plains and can often be seen from the city on clear days. With its perfectly symmetrical cone and snow-capped peak, Mount Fuji has become a powerful national symbol of Japan’s beauty, strength, and harmony with nature. It is not only a geographic wonder but also a spiritual and cultural landmark that has influenced Japanese art, religion, and identity for centuries.
+
+Geologically, Mount Fuji is an active stratovolcano that was formed through a series of eruptions over hundreds of thousands of years. Scientists believe the current shape of Fuji was completed about 10,000 years ago. It actually consists of three successive volcanoes stacked on top of each other — Komitake, Ko-Fuji, and Shin-Fuji — the last being the most recent layer that gives the mountain its elegant and symmetrical form. The most recent eruption took place in 1707 during the Edo period. Known as the Hōei eruption, it scattered volcanic ash as far as Edo (modern-day Tokyo). Although Mount Fuji has been dormant for over three centuries, it is still classified as an active volcano, and monitoring systems continuously observe its seismic activity.
+
+The area surrounding Mount Fuji is a treasure trove of natural beauty. It lies within the Fuji-Hakone-Izu National Park, one of Japan’s most visited and picturesque regions. At its northern base stretches the Fuji Five Lakes region — Kawaguchiko, Saiko, Shojiko, Yamanakako, and Motosuko — each offering distinct views of the mountain reflected in their calm waters. Nearby lies Aokigahara, the “Sea of Trees,” a dense forest that grows on ancient lava flows. Although mysterious in reputation, the forest is home to rare plant species and striking geological formations. The surrounding towns and hot spring resorts, such as Hakone and Fujinomiya, draw millions of tourists each year who come to enjoy the peaceful scenery and rejuvenating onsen baths while gazing at the mountain.
+
+Mount Fuji’s appearance changes dramatically with the seasons. During winter, its peak is draped in pure white snow, standing out sharply against the clear blue sky. In spring, cherry blossoms bloom across the foothills, creating a breathtaking contrast of pink petals and the mountain’s still-snowy summit. Summer brings lush greenery and the opening of the official climbing season, while autumn transforms the forests into a sea of fiery red and golden leaves. Each season reveals a new side of Fuji’s personality, which is why it remains one of the most photographed and admired places in Japan.
+
+For centuries, Mount Fuji has been a sacred site and a source of inspiration in Japanese culture. In both Shinto and Buddhist traditions, the mountain is believed to embody purity, endurance, and spiritual awakening. Pilgrimages to its summit began more than a thousand years ago, and climbing the mountain is still seen as a spiritual journey. The official climbing season runs from early July to early September, when thousands of climbers ascend its slopes through several routes such as Yoshida, Fujinomiya, and Subashiri trails. Along the way, they stop at mountain huts for rest and food before reaching the summit to witness the magnificent sunrise known as 'Goraikō' — a moment considered sacred and deeply moving.
+
+Mount Fuji’s beauty has inspired countless artists, poets, and travelers. It has been immortalized in Japanese art, most famously in Katsushika Hokusai’s and Utagawa Hiroshige’s ukiyo-e woodblock prints, especially in the series 'Thirty-Six Views of Mount Fuji,' which depict the mountain from different angles and seasons. Beyond art, Mount Fuji also appears in literature, films, and even modern pop culture, continuing to symbolize Japan’s harmony between nature and humanity.
+
+In 2013, Mount Fuji was recognized as a UNESCO World Heritage Site under the title 'Fujisan, Sacred Place and Source of Artistic Inspiration,' honoring not only its natural grandeur but also its cultural and spiritual influence throughout Japan’s history. The mountain’s base hosts shrines like Fujisan Hongu Sengen Taisha and Kitaguchi Hongu Sengen Shrine, dedicated to the Shinto goddess Konohanasakuya-hime, the deity of Mount Fuji and symbol of life and beauty.
+
+Today, Mount Fuji remains a beloved national symbol of Japan — appearing on everything from art and poetry to souvenirs and national identity itself. Whether viewed from afar, mirrored in the still waters of Lake Kawaguchi, or experienced firsthand from its summit at sunrise, Mount Fuji continues to inspire awe, reflection, and admiration in all who encounter it, standing timeless as a bridge between heaven and earth.`
+,
     longDescription: "Mount Fuji is more than just Japan's tallest peak - it's a sacred symbol deeply embedded in Japanese culture and spirituality. This active stratovolcano last erupted in 1707 and is now a UNESCO World Heritage Site.",
-    highlights: [
-      "Summit Climb - Challenging 6-8 hour trek to watch sunrise from 3,776m peak",
-      "Lake Kawaguchi - Most accessible of Five Lakes with perfect Fuji reflections",
-      "Chureito Pagoda - Iconic five-story pagoda with cherry blossoms and Fuji view",
-      "Fuji Five Lakes - Kawaguchi, Yamanaka, Sai, Shoji, and Motosu lakes"
-    ],
+   highlights: [
+  "Summit Climb - Challenging 6-8 hour trek to watch sunrise from 3,776m peak, offering breathtaking panoramic views",
+  "Lake Kawaguchi - Most accessible of Fuji Five Lakes with perfect reflections of Mount Fuji, popular for photography and boat rides",
+  "Chureito Pagoda - Iconic five-story pagoda set against Fuji backdrop, especially stunning during cherry blossom season",
+  "Fuji Five Lakes - Kawaguchi, Yamanaka, Sai, Shoji, and Motosu lakes, each offering scenic viewpoints, outdoor activities, and seasonal attractions",
+  "Oshino Hakkai - Traditional village with eight pristine spring-fed ponds and views of Mount Fuji",
+  "Aokigahara Forest - Dense lava forest at mountain's northwest base, known as the Sea of Trees, with hiking trails and unique lava formations",
+  "Fujisan World Heritage Center - Museum and visitor center showcasing Fuji's geology, culture, and climbing history",
+  "Mount Fuji Panoramic Ropeway - Cable car offering stunning vistas of the northern slopes and surrounding lakes",
+  "Sengen Shrine - Historic Shinto shrine at the base of Fuji, dedicated to the mountain deity, starting point for pilgrimages",
+  "Seasonal Views - Cherry blossoms in spring, vibrant green in summer, autumn foliage, and snow-capped peak in winter"
+]
+,
     bestTime: "July-September (Climbing) & October-February (Clear Views)",
     rating: 4.9,
     activities: ["Mountain Climbing", "Lake Cruises", "Photography", "Hiking Trails", "Shrine Visits", "Cable Car Rides"],
@@ -30,10 +52,17 @@ const MountFujiDetail = ({ onClose }) => {
     transportation: "Train to Kawaguchiko Station, then buses; express buses from Tokyo available",
     accommodation: "Lakeside hotels, mountain huts for climbers, traditional ryokans with Fuji views",
     tips: [
-      "Book mountain huts months in advance for overnight climbing",
-      "Start climb in afternoon, rest at station, summit for sunrise",
-      "Bring warm clothes even in summer - summit temperature near freezing"
-    ],
+  "Book mountain huts months in advance for overnight climbing to secure your spot",
+  "Start climb in the afternoon, rest at a station, and reach the summit in time for sunrise",
+  "Bring warm clothes even in summer - summit temperature can drop near freezing",
+  "Carry sufficient water and high-energy snacks to stay hydrated and fueled",
+,
+  "Check weather forecast before climbing - conditions can change rapidly",
+  "Bring a headlamp for early morning or night climbs",
+  "Leave no trace - carry all trash back and respect the natural environment",
+  "Bring cash with you - many mountain huts, small shops, and food stalls do not accept cards"
+]
+,
    gallery: [
   // 1. Chureito Pagoda
   "https://images.unsplash.com/photo-1677254817050-cb9b29fbb16e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Q2h1cmVpdG8lMjBQYWdvZGF8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500",

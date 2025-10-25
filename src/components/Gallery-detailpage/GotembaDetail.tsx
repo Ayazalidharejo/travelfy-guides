@@ -11,16 +11,33 @@ const GotembaDetail = ({ onClose }) => {
     name: "Gotemba",
     subtitle: "Shopping Paradise at Mount Fuji's Base",
     mainImage: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1200&h=800&fit=crop",
-    description: "Gotemba, located at the eastern base of Mount Fuji at 450m elevation, is famous for its massive premium outlets with spectacular mountain views and access to Mt. Fuji trails.",
-    longDescription: "Gotemba sits on the southeastern slope of Mount Fuji, providing some of the clearest and closest views of Japan's sacred mountain. Beyond shopping, it offers access to nature, breweries, and outdoor activities with Mt. Fuji as a constant backdrop.",
-    highlights: [
-      "Gotemba Premium Outlets - Japan's largest outlet mall with 290+ stores and stunning Mt. Fuji views",
-      "Peace Park - Beautiful memorial park with Mt. Fuji observation deck and walking paths",
-      "Gotemba Kogen Brewing - Award-winning craft brewery using pure Mt. Fuji spring water",
-      "Mt. Fuji Subashiri Trail - One of four climbing routes to Mt. Fuji summit",
-      "Chichibunomiya Memorial Park - Japanese garden with seasonal flowers and mountain views",
-      "Fuji Safari Park - Drive-through safari with 70+ animal species"
-    ],
+   description: `Gotemba, located at the eastern base of Mount Fuji at an elevation of 450 meters, is a lively city that blends shopping, cultural experiences, and outdoor adventures. It is most renowned for the Gotemba Premium Outlets, one of Japan's largest and most popular shopping destinations. With over 200 stores featuring both international and Japanese brands, the outlets attract millions of visitors annually. Shoppers are treated not only to world-class retail options but also to panoramic views of Mount Fuji on clear days, making every shopping trip a memorable experience. Beyond the outlets, Gotemba provides a gateway to nature and the Fuji-Hakone-Izu National Park, offering a perfect balance of urban convenience and outdoor exploration.`,
+
+longDescription: `Gotemba sits on the southeastern slopes of Mount Fuji, offering some of the closest and clearest views of Japan's sacred mountain. The city is strategically located for travelers who want to combine a modern shopping experience with access to the natural beauty of the region. Hiking trails originating from Gotemba lead toward the higher slopes of Mount Fuji, allowing trekkers and adventure seekers to enjoy scenic paths, volcanic landscapes, and panoramic vistas. These trails are suitable for varying levels of difficulty, from easy nature walks to challenging climbs, and they are particularly spectacular during spring cherry blossom season and autumn when the foliage turns vibrant red and gold.
+
+The natural environment around Gotemba is diverse and captivating. Rivers, forests, and volcanic formations create excellent spots for photography, picnics, and outdoor activities. Nearby lakes, such as Lake Yamanaka and Lake Kawaguchi, provide opportunities for boating, fishing, and lakeside relaxation, all with Mount Fuji in the background. Adventure enthusiasts can also engage in cycling, paragliding, and camping experiences, making Gotemba a hub for active travelers. 
+
+Cultural experiences are also abundant in Gotemba. The city hosts several seasonal festivals that showcase local traditions, music, and cuisine. Art lovers can explore galleries, craft workshops, and exhibitions featuring both traditional Japanese art and contemporary pieces. Local breweries and craft beer pubs allow visitors to sample unique beverages, while restaurants offer specialties such as Hōtō noodles, freshwater fish dishes, and regional sweets. Visitors can explore the historical aspects of Gotemba as well, including old shrines and local landmarks that tell the story of the city’s relationship with Mount Fuji throughout centuries. 
+
+For relaxation and wellness, Gotemba is home to numerous onsen resorts where travelers can soak in mineral-rich hot spring baths while gazing at the surrounding mountains. Many ryokan offer traditional Japanese hospitality with tatami rooms, kaiseki meals, and private baths, creating an immersive cultural experience. During winter, snow-capped Mount Fuji provides a breathtaking backdrop for these thermal baths, while spring and autumn offer milder temperatures and colorful natural scenery.
+
+Gotemba is highly accessible, located along major highways and train lines, making it a convenient stop for travelers coming from Tokyo, Hakone, or Shizuoka. It is ideal for both day trips and multi-day stays, offering a combination of modern amenities and natural tranquility. The city caters to a wide range of visitors—from shopping enthusiasts and families to outdoor adventurers and culture seekers. Seasonal highlights include cherry blossom viewing in spring, summer hiking and festivals, autumn foliage tours, and winter photography of snow-capped landscapes. 
+
+Overall, Gotemba provides a rich and multifaceted experience. Whether shopping at the world-class Premium Outlets, hiking the scenic trails of Mount Fuji, exploring local cuisine, participating in seasonal festivals, or simply enjoying the serene mountain environment, visitors are guaranteed a memorable journey. The city perfectly blends modern lifestyle with traditional culture, urban convenience with outdoor adventure, and relaxation with excitement. With Mount Fuji as a constant and awe-inspiring backdrop, Gotemba remains one of the most attractive and versatile destinations in the Fuji-Hakone-Izu region, offering something for every type of traveler and every season of the year.`
+,
+   highlights: [
+  "Gotemba Premium Outlets - Japan's largest outlet mall with 290+ stores and stunning Mt. Fuji views, perfect for shopping enthusiasts",
+  "Peace Park - Beautiful memorial park with Mt. Fuji observation deck, walking paths, and tranquil gardens for relaxation",
+  "Gotemba Kogen Brewing - Award-winning craft brewery using pure Mt. Fuji spring water, offering tours and tastings",
+  "Mt. Fuji Subashiri Trail - One of four climbing routes to Mt. Fuji summit, ideal for hiking and nature lovers",
+  "Chichibunomiya Memorial Park - Japanese garden with seasonal flowers, open lawns, and panoramic mountain views",
+  "Fuji Safari Park - Drive-through safari with 70+ animal species, interactive feeding zones, and family-friendly attractions",
+  "Gotemba Art Museum - Showcases local and international art collections in a serene environment",
+  "Mt. Fuji Panoramic Ropeway - Scenic cable car offering breathtaking views of the mountain and surrounding valleys",
+  "Gotemba Kogen Hot Springs - Relaxing onsen experience with outdoor baths overlooking Mt. Fuji",
+  "Local festivals and seasonal events - Enjoy cherry blossoms in spring and autumn foliage in fall around Gotemba area"
+]
+,
     bestTime: "October-February (Clearest Mt. Fuji Views) & Year-round Shopping",
     duration: "1-2 days",
     rating: 4.6,
@@ -28,13 +45,21 @@ const GotembaDetail = ({ onClose }) => {
     cuisine: ["Gotemba Koshihikari Rice", "Local Sake", "Craft Beer", "Mishima Croquettes", "Wasabi Dishes", "Fuji Trout"],
     transportation: "JR Gotemba Line from Tokyo (2 hours); highway buses from Shinjuku (1.5 hours); car rental recommended",
     accommodation: "Business hotels from ¥6000, resort hotels with onsen and Mt. Fuji views, budget accommodation near outlets",
-    tips: [
-      "Visit outlets on weekdays to avoid weekend crowds - much more relaxed shopping",
-      "Best Mt. Fuji views in winter mornings (Dec-Feb) when air is clearest",
-      "Combine with Hakone (30 min bus) for hot springs experience",
-      "Bring layers - elevation makes it cooler than Tokyo, even in summer"
-    ],
-
+   tips: [
+  "Visit outlets on weekdays to avoid weekend crowds - much more relaxed shopping",
+  "Best Mt. Fuji views in winter mornings (Dec-Feb) when air is clearest",
+  "Combine with Hakone (30 min bus) for hot springs experience",
+  "Bring layers - elevation makes it cooler than Tokyo, even in summer",
+  "Arrive early at Gotemba Premium Outlets for best parking and fewer crowds",
+  "Bring cash for small vendors, some shops may not accept credit cards",
+  "Check outlet store maps and plan shopping route for maximum efficiency",
+  "Use Gotemba Station or Shinjuku Expressway Bus for convenient access from Tokyo",
+  "Try local restaurants near the outlets for Japanese specialties like tempura and udon",
+  "Take photos with Mt. Fuji as backdrop from the outlet's open areas",
+  "Combine with a visit to nearby Fuji Safari Park or nature trails for family-friendly day trips",
+  "Check seasonal sales periods for biggest discounts (Golden Week, summer, winter)"
+]
+,
  
   gallery: [
     "https://images.unsplash.com/photo-1731736176703-df630e52781e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEdvdGVtYmElMjBTdGF0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500", // Gotemba Station
@@ -56,7 +81,7 @@ const GotembaDetail = ({ onClose }) => {
 ,
 
     itinerary: {
-      tripName: "Gotemba Mt. Fuji Shopping & Nature Tour",
+      tripName: " Best Places to visit in Gotemba Mt. Fuji Shopping & Nature Tour",
       // tripDuration: "2 Days • 11 Destinations",
       items: [
         { 
