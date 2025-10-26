@@ -32,11 +32,21 @@ const Testimonials: React.FC = () => {
         
         // Use centralized API method instead of manual axios call
         const response = await postsAPI.getAllRatings();
-        
-        if (response.success) {
-      
-          setTestimonials(response.data || []);
+        let items: any[] = Array.isArray(response?.data) ? response.data : [];
+
+        // Fallback: if no global ratings, load top post ratings
+        if ((!items || items.length === 0)) {
+          const topPosts = await postsAPI.getPosts({ sort: '-views', limit: 1, status: 'published' });
+          const first = (topPosts?.data || [])[0];
+          if (first?._id) {
+            const perPost = await postsAPI.getRatings(first._id);
+            if (perPost?.success && Array.isArray(perPost.data)) {
+              items = perPost.data;
+            }
+          }
         }
+
+        setTestimonials(items || []);
       } catch (error) {
         console.error('Error fetching testimonials:', error);
         // Keep existing testimonials on error if we have some

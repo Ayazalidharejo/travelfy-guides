@@ -277,11 +277,17 @@ export const postsAPI = {
 
   // Get all ratings for homepage
   getAllRatings: async () => {
-    return {
-      success: true,
-      data: [],
-      message: 'Ratings feature coming soon'
-    };
+    try {
+      const response = await api.get('/ratings');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ API Error:', error.response?.data || error.message);
+      return {
+        success: true,
+        data: [],
+        message: 'Ratings temporarily unavailable'
+      };
+    }
   },
 };
 
