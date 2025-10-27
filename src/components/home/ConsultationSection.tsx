@@ -351,6 +351,16 @@ const ConsultationSection = () => {
                     onChange={handleFormChange}
                     placeholder="+91 XXXXX XXXXX"
                     className="w-full px-3.5 py-2.5 text-sm"
+                    inputMode="numeric"
+                    pattern="\\d*"
+                    maxLength={15}
+                    onKeyDown={(e) => {
+                      const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                      if (allowed.includes(e.key)) return;
+                      if (!/\d/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </div>
               </div>
