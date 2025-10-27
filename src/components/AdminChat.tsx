@@ -37,7 +37,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser, onUnreadCount
     ((import.meta.env.VITE_API_BASE_URL as string)?.replace(/\/?api\/?$/, '') as string) ||
     (typeof window !== 'undefined' && window.location.origin.includes('localhost')
       ? 'http://localhost:5000'
-      : window.location.origin)
+      : 'https://karvaantours.com')
   );
 
   // Helpers to normalize IDs and shapes
