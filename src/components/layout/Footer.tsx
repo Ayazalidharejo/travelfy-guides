@@ -19,16 +19,17 @@ const Footer = () => {
               Discover amazing destinations and create unforgettable memories with our curated travel experiences.
             </p>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/share/1DPuTcap8s" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://www.facebook.com/share/1DPuTcap8s" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://x.com/KarvaanTours" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="https://www.instagram.com/karvaantours?igsh=N2xhdHBqNWk1Z3lm" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://www.instagram.com/karvaantours?igsh=N2xhdHBqNWk1Z3lm" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
+              <a href="https://www.youtube.com/channel/UC1SNJP176cWvb2ac38fnpPg
+" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -81,18 +82,57 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Contact Info</h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-[#4C9684]  hover:text-[#166955]" />
-                <span className="text-muted-foreground">info@karvaantours.com</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-[#4C9684]  hover:text-[#166955]" />
-                <span className="text-muted-foreground">+81 80-7480-1156</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-6 text-[#4C9684]  hover:text-[#166955]" />
-                <span className="text-muted-foreground">2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.</span>
-              </div>
+             <div className="flex items-center space-x-3">
+  <Mail className="h-5 w-5 text-[#4C9684] hover:text-[#166955]" />
+  <a 
+    href="mailto:info@karvaantours.com"
+    className="text-muted-foreground hover:text-[#166955] hover:underline cursor-pointer"
+  >
+    info@karvaantours.com
+  </a>
+</div>
+<div className="flex items-center space-x-3">
+  <Phone className="h-5 w-5 text-[#4C9684] hover:text-[#166955]" />
+  <a 
+    href="https://wa.me/818074801156"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-muted-foreground hover:text-[#166955] hover:underline cursor-pointer"
+  >
+    +81 80-7480-1156
+  </a>
+</div>
+            <div className="flex items-center space-x-3">
+  {/* Direct SVG use karein */}
+  <svg 
+    className="h-5 w-6 text-[#4C9684] hover:text-[#166955] flex-shrink-0"
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+    />
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+    />
+  </svg>
+  <a 
+    href="https://www.google.com/maps/search/?api=1&query=2nd+Floor,+Sotoike+Shukugo+Building,+Utsunomiya+City,+Tochigi"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-muted-foreground hover:text-[#166955] hover:underline cursor-pointer"
+  >
+    2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.
+  </a>
+</div>
             </div>
           </div>
         </div>

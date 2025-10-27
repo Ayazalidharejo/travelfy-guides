@@ -123,7 +123,7 @@ const ToursPage = () => {
 
   useEffect(() => {
     fetchTours();
-  }, [currentPage, sortBy, toursPerPage]);
+  }, [currentPage, sortBy, toursPerPage, searchTerm]);
 
   useEffect(() => {
     filterTours();
@@ -136,6 +136,8 @@ const ToursPage = () => {
         page: currentPage,
         limit: toursPerPage,
         sort: sortBy,
+        // server-side search support
+        search: (searchTerm || '').trim() || undefined,
         status: "published",
       });
 
@@ -476,7 +478,7 @@ const ToursPage = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              filterTours();
+              setCurrentPage(1);
             }}
             className="flex gap-2"
           >

@@ -36,23 +36,32 @@ const HeroFinal = () => {
 
   return (
     <div className="relative w-full overflow-hidden" style={{ minHeight: '700px' }}>
-      {/* Background with Couple Image - Florence Cathedral */}
+      {/* Background - mobile disabled (we will render a separate image element instead) */}
+      <div className="hidden md:hidden"></div>
+      {/* Background - desktop/laptop (cover) */}
       <div 
-        className="absolute inset-0"
+        className="absolute inset-0 hidden md:block"
         style={{
           backgroundImage: `url(${image})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center'
         }}
       >
-        {/* Dark Overlay for better text contrast */}
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
       {/* Content Container */}
       <div className="relative z-10 min-h-[700px] flex flex-col justify-between px-6 md:px-12 lg:px-20 py-12">
+        {/* Mobile-only hero image (complete, separate) */}
+        <div className="md:hidden w-full mb-4">
+          <img
+            src={image}
+            alt="Hero"
+            className="w-full h-64 object-contain"
+          />
+        </div>
         {/* Main Content - Full Width */}
-        <div className="flex-1 flex flex-col justify-center pt-8">
+        <div className="flex-1 flex flex-col justify-center pt-6 md:pt-8">
           {/* Main Heading */}
           <div className="mb-8 w-full max-w-4xl">
             {/* MEET - Top line, white, smaller */}
@@ -70,7 +79,7 @@ const HeroFinal = () => {
             </h1>
             
             {/* VOYAGE (blue) and STORIES (white) on same line */}
-            <div className="flex items-baseline gap-4 md:gap-8">
+            <div className="flex flex-wrap items-baseline gap-2 md:gap-8">
               <h1 
                 className="font-black uppercase" 
                 style={{ 
@@ -102,38 +111,38 @@ const HeroFinal = () => {
 
         </div>
 
-        {/* Buttons - Positioned at bottom: 20%, left: 50% */}
+        {/* Buttons - Mobile stacked, fixed near bottom (only mobile) */}
+        <div className="md:hidden absolute inset-x-0 bottom-6 z-20 px-6">
+          <div className="flex flex-col items-stretch gap-3 max-w-sm mx-auto">
+            <button
+              onClick={() => navigate('/tours')}
+              className="w-full px-5 py-2.5 rounded-full bg-[#5C7AC0] text-white hover:bg-[#284078] font-semibold uppercase tracking-wide text-xs whitespace-nowrap shadow-lg"
+            >
+              Start Your Journey
+            </button>
+            <button
+              onClick={() => navigate('/contact')}
+              className="w-full px-5 py-2.5 rounded-full border border-[#5C7AC0] text-white bg-transparent font-semibold uppercase tracking-wide text-xs whitespace-nowrap shadow-lg"
+            >
+              Contact Us
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop */}
         <div 
-          className="absolute flex gap-4"
-          style={{
-            bottom: '20%',
-            left: '50%',
-            transform: 'translateX(-50%)'
-          }}
+          className="hidden md:flex gap-4 absolute"
+          style={{ bottom: '20%', left: '50%', transform: 'translateX(-50%)' }}
         >
-          {/* Start Your Journey Button - Gold/Tan Color */}
           <button
             onClick={() => navigate('/tours')}
-            className="px-8 py-3 rounded-full bg-[#5C7AC0] text-white hover:bg-[#284078] font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:opacity-90"
-            style={{
-             
-              fontSize: '14px',
-              letterSpacing: '1px'
-            }}
+            className="px-8 py-3 rounded-full bg-[#5C7AC0] text-white hover:bg-[#284078] font-semibold uppercase tracking-wider transition-all duration-300"
           >
             START YOUR JOURNEY
           </button>
-
-          {/* Explore Tours Button - White Outlined */}
           <button
             onClick={() => navigate('/contact')}
-            className="px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:bg-white hover:text-white"
-            style={{
-              border: '2px solid #5C7AC0',
-              backgroundColor: 'transparent',
-              fontSize: '14px',
-              letterSpacing: '1px'
-            }}
+            className="px-8 py-3 rounded-full border border-[#5C7AC0] text-white bg-transparent font-semibold uppercase tracking-wider transition-all duration-300"
           >
             Contact us
           </button>
