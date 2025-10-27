@@ -81,7 +81,13 @@ const Header = () => {
   // Memoized navigation component
   const NavLinks = useCallback(() => (
     <>
-  
+      <Link 
+        to="/" 
+        className="text-foreground hover:text-primary transition-smooth font-medium"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Home
+      </Link>
       
       <Link 
         to="/tours" 
