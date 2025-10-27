@@ -21,8 +21,19 @@ jobs:
           echo "🚀 Starting React frontend deployment..."
           cd /root/travelfy-guides
           git pull origin main
+          echo "✅ Code pulled successfully"
+          
           npm install
+          echo "✅ Dependencies installed"
+          
           npm run build
-          # Build files web directory mein copy karein
+          echo "✅ Build completed"
+          
+          ls -la dist/
+          echo "✅ Build files listed"
+          
           cp -r dist/* /var/www/html/
           echo "🎉 React frontend deployed to live website!"
+          
+          ls -la /var/www/html/
+          echo "✅ Live website files verified"
