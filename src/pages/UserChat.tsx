@@ -42,11 +42,11 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const altAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<any>(null);
 
-  // Resolve socket server URL: prefer VITE_SOCKET_URL; else derive from VITE_API_BASE_URL by stripping /api; else default to local backend
+  // Resolve socket server URL: prefer VITE_SOCKET_URL; else derive from VITE_API_BASE_URL by stripping /api; else default to current origin
   const SERVER_URL = (
     (import.meta.env.VITE_SOCKET_URL as string) ||
     ((import.meta.env.VITE_API_BASE_URL as string)?.replace(/\/?api\/?$/, '') as string) ||
-    'https://karvaantours.com'
+    window.location.origin
   );
 
   // Notification sound - pleasant chimes (primary + alternate)
@@ -196,6 +196,11 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
 
     newSocket.on('connect', () => {
       setIsConnected(true);
+    });
+
+    newSocket.on('connect_error', (err: any) => {
+      console.error('Socket connect_error:', err?.message || err);
+      setIsConnected(false);
     });
 
     newSocket.on('disconnect', () => {
