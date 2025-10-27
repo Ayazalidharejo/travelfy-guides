@@ -46,9 +46,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const SERVER_URL = (
     (import.meta.env.VITE_SOCKET_URL as string) ||
     ((import.meta.env.VITE_API_BASE_URL as string)?.replace(/\/?api\/?$/, '') as string) ||
-    (typeof window !== 'undefined' && window.location.origin.includes('localhost')
-      ? 'http://localhost:5000'
-      : 'https://karvaantours.com')
+    'https://karvaantours.com'
   );
 
   // Notification sound - pleasant chimes (primary + alternate)
