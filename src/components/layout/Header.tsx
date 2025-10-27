@@ -52,8 +52,11 @@ const Header = () => {
         return finalUrl;
       }
       
-      // For relative paths, use current origin with cache-busting timestamp
-      const finalUrl = `${window.location.origin}${user.avatar}?t=${Date.now()}`;
+      // For relative paths, resolve backend base from env (strip /api) or localhost fallback, then add cache-busting
+      const envBase = (import.meta.env.VITE_API_BASE_URL as string) || '';
+      const derived = envBase ? envBase.replace(/\/?api\/?$/, '') : '';
+      const baseURL = derived || 'https://karvaantours.com';
+      const finalUrl = `${baseURL}${user.avatar}?t=${Date.now()}`;
      
       return finalUrl;
     }

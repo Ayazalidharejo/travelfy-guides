@@ -29,9 +29,10 @@ const ProfilePage = () => {
       return avatarPath;
     }
 
-    // For relative paths, use local backend URL
-    // const baseURL = 'http://localhost:00001';
-    const baseURL = window.location.origin;
+    // For relative paths, use backend base derived from env (strip /api) or localhost fallback
+    const envBase = (import.meta.env.VITE_API_BASE_URL as string) || '';
+    const derived = envBase ? envBase.replace(/\/?api\/?$/, '') : '';
+    const baseURL = derived || 'https://karvaantours.com';
     return `${baseURL}${avatarPath}`;
   }, []);
 
