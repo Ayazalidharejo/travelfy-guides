@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import suneel from "../../public/images/suneel.jpeg"
 import { 
   MapPin, 
   Users, 
@@ -58,10 +59,10 @@ const AboutPage = () => {
       image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
     },
     { 
-      name: 'Michael Chen', 
+      name: 'Suneel Pirkash', 
       role: 'Head of Operations', 
       experience: '12 years in tourism',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
+      image: suneel,
     },
     { 
       name: 'Emily Rodriguez', 
