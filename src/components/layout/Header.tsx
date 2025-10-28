@@ -7,7 +7,7 @@ import React, { useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import logo from "@/../public/logo.png"
+import logo from "@/../public/logo.webp"
 import {
   DropdownMenu,
   DropdownMenuContent,

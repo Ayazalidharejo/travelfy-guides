@@ -1,9 +1,9 @@
 
 // import React, { useEffect, useState } from 'react';
-// import bgImage from "@/../public/images/Group.png"
-// import statImage1 from "@/../public/images/Subtract.png"
-// import statImage2 from "@/../public/images/Subtract.png"
-// import statImage3 from "@/../public/images/Subtract.png"
+// import bgImage from "@/../public/images/Group.webp"
+// import statImage1 from "@/../public/images/Subtract.webp"
+// import statImage2 from "@/../public/images/Subtract.webp"
+// import statImage3 from "@/../public/images/Subtract.webp"
 
 // function useCounter(target: number, duration = 1200) {
 //   const [count, setCount] = useState(0);
@@ -117,7 +117,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import bgImage from "@/../public/images/count-img.jpg"
+import bgImage from "@/../public/images/count-img.webp"
 
 // Counter Hook
 function useCounter(target: number, duration = 1200) {

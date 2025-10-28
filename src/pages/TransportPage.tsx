@@ -5,21 +5,21 @@
 // import { Link } from 'react-router-dom';
 // import { Car, Users, Shield, Clock, CheckCircle, Star } from 'lucide-react';
 
-// import image1 from "../../public/images/toyota-alphard-side.png"
-// import image2 from "../../public/images/toyota-vellfire-side.png"
-// import image3 from "../../public/images/mercedes-benz-side.png"
-// import image4 from "../../public/images/toyota-land-cruiser-prado-side.png"
-// import image5 from "../../public/images/toyota-crown-luxury-side.png"
-// import image6 from "../../public/images/toyota-commuter-van-small-side.png"
-// import image7 from "../../public/images/Alphard.jpg"
+// import image1 from "../../public/images/toyota-alphard-side.webp"
+// import image2 from "../../public/images/toyota-vellfire-side.webp"
+// import image3 from "../../public/images/mercedes-benz-side.webp"
+// import image4 from "../../public/images/toyota-land-cruiser-prado-side.webp"
+// import image5 from "../../public/images/toyota-crown-luxury-side.webp"
+// import image6 from "../../public/images/toyota-commuter-van-small-side.webp"
+// import image7 from "../../public/images/Alphard.webp"
 
-// import imagehover1 from "../../public/images/hover/toyota-alphard-center.png"
-// import imagehover2 from "../../public/images/hover/toyota-vellfire-center.png"
-// import imagehover3 from "../../public/images/hover/mercedes-benz-center.png"
-// import imagehover4 from "../../public/images/hover/toyotalandcruiser-prado-center.png"
-// import imagehover5 from "../../public/images/hover/toyota-crownluxurycenter.png"
-// import imagehover6 from "../../public/images/hover/toyota-commuter-small-van-center.png"
-// import imagehover7 from "../../public/images/hover/toyota-commuter-van-center.png"
+// import imagehover1 from "../../public/images/hover/toyota-alphard-center.webp"
+// import imagehover2 from "../../public/images/hover/toyota-vellfire-center.webp"
+// import imagehover3 from "../../public/images/hover/mercedes-benz-center.webp"
+// import imagehover4 from "../../public/images/hover/toyotalandcruiser-prado-center.webp"
+// import imagehover5 from "../../public/images/hover/toyota-crownluxurycenter.webp"
+// import imagehover6 from "../../public/images/hover/toyota-commuter-small-van-center.webp"
+// import imagehover7 from "../../public/images/hover/toyota-commuter-van-center.webp"
 
 // const TransportPage = () => {
 //   const [hoveredVehicle, setHoveredVehicle] = useState<number | null>(null);
@@ -296,22 +296,22 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Car, Users, Shield, Clock, CheckCircle, Star } from 'lucide-react';
 
-import image1 from "../../public/images/toyota-alphard-side.png"
-import image2 from "../../public/images/toyota-vellfire-side.png"
-import image3 from "../../public/images/mercedes-benz-side.png"
-import image4 from "../../public/images/toyota-land-cruiser-prado-side.png"
-import image5 from "../../public/images/toyota-crown-luxury-side.png"
-import image6 from "../../public/images/toyota-commuter-van-small-side.png"
-import image7 from "../../public/images/Alphard.jpg"
+import image1 from "../../public/images/toyota-alphard-side.webp"
+import image2 from "../../public/images/toyota-vellfire-side.webp"
+import image3 from "../../public/images/mercedes-benz-side.webp"
+import image4 from "../../public/images/toyota-land-cruiser-prado-side.webp"
+import image5 from "../../public/images/toyota-crown-luxury-side.webp"
+import image6 from "../../public/images/toyota-commuter-van-small-side.webp"
+import image7 from "../../public/images/Alphard.webp"
 
-import imagehover1 from "../../public/images/hover/toyota-alphard-center.png"
-import imagehover2 from "../../public/images/hover/toyota-vellfire-center.png"
-import imagehover3 from "../../public/images/hover/mercedes-benz-center.png"
-import imagehover4 from "../../public/images/hover/toyotalandcruiser-prado-center.png"
-import imagehover5 from "../../public/images/hover/toyota-crownluxurycenter.png"
-import imagehover6 from "../../public/images/hover/toyota-commuter-small-van-center.png"
-import imagehover7 from "../../public/images/hover/toyota-commuter-van-center.png"
-import image from "@/../public/images/Vehicles.jpg"
+import imagehover1 from "../../public/images/hover/toyota-alphard-center.webp"
+import imagehover2 from "../../public/images/hover/toyota-vellfire-center.webp"
+import imagehover3 from "../../public/images/hover/mercedes-benz-center.webp"
+import imagehover4 from "../../public/images/hover/toyotalandcruiser-prado-center.webp"
+import imagehover5 from "../../public/images/hover/toyota-crownluxurycenter.webp"
+import imagehover6 from "../../public/images/hover/toyota-commuter-small-van-center.webp"
+import imagehover7 from "../../public/images/hover/toyota-commuter-van-center.webp"
+import image from "@/../public/images/Vehicles.webp"
 const TransportPage = () => {
   const [hoveredVehicle, setHoveredVehicle] = useState<number | null>(null);
 

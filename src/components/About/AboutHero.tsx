@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import image from "@/../public/images/about.jpg"
+import image from "@/../public/images/about.webp"
 
 const AboutHero: React.FC = () => {
   return (

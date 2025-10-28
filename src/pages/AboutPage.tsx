@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import suneel from "../../public/images/suneel.jpeg"
+import suneel from "../../public/images/suneel.webp"
 import { 
   MapPin, 
   Users, 
