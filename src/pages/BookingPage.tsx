@@ -834,23 +834,21 @@ const BookingPage = () => {
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={contactInfo.phone}
-                        onChange={(e) => handleContactInfoChange('phone', e.target.value)}
-                        inputMode="numeric"
-                        pattern="\\d{10,15}"
-                        maxLength={15}
-                        onKeyDown={(e) => {
-                          const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
-                          if (allowed.includes(e.key)) return;
-                          if (!/\d/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      required
-                    />
+                   <Input
+  id="phone"
+  type="tel"
+  value={contactInfo.phone}
+  onChange={(e) => {
+    // Remove any non-digit characters
+    const onlyNumbers = e.target.value.replace(/\D/g, '');
+    handleContactInfoChange('phone', onlyNumbers);
+  }}
+  inputMode="numeric"
+  pattern="\d{10,15}"
+  maxLength={15}
+  required
+/>
+
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
