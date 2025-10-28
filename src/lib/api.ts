@@ -4,7 +4,9 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   ((typeof window !== 'undefined' && window.location.origin.includes('localhost'))
     ? 'http://localhost:5000/api'
-    : 'https://karvaantours.com/api');
+    : (typeof window !== 'undefined' && window.location.origin.includes('karvaantours.com'))
+      ? `${window.location.origin}/api`
+      : 'https://karvaantours.com/api');
 // const API_BASE_URL = 'https://tour-backend-eight.vercel.app/api'; 
 // Create axios instance
 const api = axios.create({
