@@ -323,10 +323,7 @@ const BookingPage = () => {
       setSubmitting(true);
       
       const totalAmount = calculateTotal();
-      let tourDateString: string | null = null;
-      if (selectedDate) {
-        tourDateString = format(selectedDate as Date, 'yyyy-MM-dd');
-      }
+      const tourDateString = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null;
       
       const bookingData = {
         postId: tourId,
