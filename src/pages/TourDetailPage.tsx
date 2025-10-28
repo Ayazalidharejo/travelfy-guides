@@ -165,6 +165,26 @@ const TourDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* JSON-LD: Product/TouristTrip for ratings in SERP */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: tour.title,
+          url: `https://karvaantours.com/tours/${tour._id}`,
+          image: allImages?.[0] || tour.mainImageUrl || undefined,
+          description: tour.tagline || tour.description || undefined,
+          aggregateRating: tour.averageRating && tour.totalReviews ? {
+            '@type': 'AggregateRating',
+            ratingValue: Number(tour.averageRating).toFixed(1),
+            reviewCount: tour.totalReviews
+          } : undefined,
+          offers: {
+            '@type': 'Offer',
+            price: (discountedPrice || priceInfo.price || 0).toFixed(2),
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock'
+          }
+        }) }} />
       {/* HEADER */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">

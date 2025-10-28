@@ -112,7 +112,7 @@ const HeroFinal = () => {
         </div>
 
         {/* Buttons - Mobile stacked, fixed near bottom (only mobile) */}
-        <div className="md:hidden absolute inset-x-0 bottom-6 z-20 px-6">
+        <div className="hidden md:hidden absolute inset-x-0 bottom-6 z-20 px-6">
           <div className="flex flex-col items-stretch gap-3 max-w-sm mx-auto">
             <button
               onClick={() => navigate('/tours')}
@@ -122,7 +122,7 @@ const HeroFinal = () => {
             </button>
             <button
               onClick={() => navigate('/contact')}
-              className="w-full px-5 py-2.5 rounded-full border border-[#5C7AC0] text-white bg-transparent font-semibold uppercase tracking-wide text-xs whitespace-nowrap shadow-lg"
+              className="w-full px-5 py-2.5 rounded-full border border-[#5C7AC0] hover:text-[#284078] text-white bg-transparent font-semibold uppercase tracking-wide text-xs whitespace-nowrap shadow-lg"
             >
               Contact Us
             </button>
