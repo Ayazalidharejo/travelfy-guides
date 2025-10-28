@@ -193,7 +193,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center">
-         <p> © 2025 Karvaan Tours Powered by <b>Ebada Group</b>
+         <p> © 2025 Karvaan Tours Powered by <b>Ebada Group LLC</b>
            
           </p>
           
