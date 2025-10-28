@@ -188,41 +188,7 @@ const CustomerSupportPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Languages */}
-        {/* <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Multilingual Support
-          </h2>
-          <p className="text-center text-gray-700 text-lg mb-8">
-            Our support team speaks your language! We offer assistance in:
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇬🇧 English</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇯🇵 Japanese</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇨🇳 Chinese</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇰🇷 Korean</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇪🇸 Spanish</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇫🇷 French</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇩🇪 German</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 text-center shadow">
-              <p className="font-semibold text-gray-900">🇮🇹 Italian</p>
-            </div>
-          </div>
-        </section> */}
+        
         <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
   <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
     Multilingual Support
