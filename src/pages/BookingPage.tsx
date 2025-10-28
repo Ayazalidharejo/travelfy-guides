@@ -128,6 +128,9 @@ const BookingPage = () => {
       if (response.success) {
       
         setTour(response.data);
+        if (!response.data?.reserveNowPayLater) {
+          setPaymentMethod('pay-now');
+        }
         
         if (response.data.pricingSchedule?.[0]?.timeSlots?.length > 0) {
           setSelectedTimeSlot(response.data.pricingSchedule[0].timeSlots[0]);

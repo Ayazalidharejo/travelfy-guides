@@ -44,7 +44,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     hotels: [],
     includes: '',
     excludes: '',
-    languages: '',
+    languages: [],
     nearbyAttractions: '',
     freeCancellation: false,
     deadlineHours: '',
@@ -198,6 +198,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   ];
 
   const thingsToBringOptions = [
+  const languageOptions = [
+    'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
+    'Urdu', 'Korean', 'Spanish', 'French', 'German'
+  ];
     'Comfortable walking shoes',
     'Water bottle',
     'Sunscreen',
@@ -324,7 +328,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   };
 
   // Toggle utility for multi-select arrays (cities/hotels)
-  const toggleItem = (field: 'cities' | 'hotels', item: string) => {
+  const toggleItem = (field: 'cities' | 'hotels' | 'languages', item: string) => {
     setFormData((prev: any) => {
       const current: string[] = Array.isArray(prev[field]) ? prev[field] : [];
       const exists = current.includes(item);
@@ -1080,6 +1084,12 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     if (Array.isArray(formatted.hotels) && formatted.hotels.length > 0) {
       formatted.hotel = formatted.hotel || formatted.hotels[0];
     }
+    if (typeof formatted.languages === 'string') {
+      formatted.languages = formatted.languages
+        .split(',')
+        .map((s: string) => s.trim())
+        .filter(Boolean);
+    }
     
  
     
@@ -1192,7 +1202,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       hotels: [],
       includes: '',
       excludes: '',
-      languages: '',
+      languages: [],
       nearbyAttractions: '',
       freeCancellation: false,
       deadlineHours: '',
@@ -1287,6 +1297,11 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       sameDropOff: tour.sameDropOff !== undefined ? tour.sameDropOff : true,
       cities: tour.cities || (tour.city ? [tour.city] : []),
       hotels: tour.hotels || (tour.hotel ? [tour.hotel] : []),
+      languages: Array.isArray(tour.languages) 
+        ? tour.languages 
+        : (typeof tour.languages === 'string' && tour.languages.includes(',') 
+            ? tour.languages.split(',').map((s: string) => s.trim()).filter(Boolean)
+            : (tour.languages ? [tour.languages] : [])),
     };
     
    
@@ -2771,15 +2786,29 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
       {/* Languages */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
-        <input 
-          type="text" 
-          name="languages" 
-          value={formData.languages} 
-          onChange={handleInputChange} 
-          placeholder="e.g., English, Urdu, Arabic" 
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-        />
+        <label className="block text-sm font-medium text-gray-700 mb-1">Languages (select multiple)</label>
+        <div className="flex flex-wrap gap-2 p-2 border rounded-md">
+          {languageOptions.map((lang) => {
+            const active = formData.languages?.includes(lang);
+            return (
+              <button
+                type="button"
+                key={lang}
+                onClick={() => toggleItem('languages', lang)}
+                className={`px-3 py-1 rounded-full text-xs border transition ${active ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-700 border-gray-300 hover:border-emerald-400'}`}
+              >
+                {lang}
+              </button>
+            );
+          })}
+        </div>
+        {formData.languages?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {formData.languages.map((l: string) => (
+              <span key={l} className="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-700">{l}</span>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Tips */}
