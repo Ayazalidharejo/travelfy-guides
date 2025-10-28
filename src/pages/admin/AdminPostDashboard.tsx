@@ -20,7 +20,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const [fieldErrors, setFieldErrors] = useState<any>({});
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     title: '',
     category: '',
     tagline: '',
@@ -39,7 +39,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     bestTime: '',
     locationDetails: '',
     city: '',
+    cities: [],
     hotel: '',
+    hotels: [],
     includes: '',
     excludes: '',
     languages: '',
@@ -275,7 +277,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             return prices.length > 0 ? Math.min(...prices) : null;
           })(),
           // *** NEW: Include transportVehicles in tour data ***
-          transportVehicles: tour.transportVehicles || []
+          transportVehicles: tour.transportVehicles || [],
+          cities: tour.cities || (tour.city ? [tour.city] : []),
+          hotels: tour.hotels || (tour.hotel ? [tour.hotel] : [])
         }));
         
        
@@ -319,6 +323,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  // Toggle utility for multi-select arrays
+  const toggleItem = (field: 'cities' | 'hotels', item: string) => {
+    setFormData(prev => {
+      const list = new Set<string>(prev[field] || []);
+      if (list.has(item)) list.delete(item); else list.add(item);
+      return { ...prev, [field]: Array.from(list) } as any;
+    });
   };
 
   // Add Theme
@@ -1035,7 +1048,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     // *** FIX: Add missing fields that might be filtered out ***
     const requiredFields = [
       'title', 'category', 'description', 'tagline', 'tourType', 'transportType', 'transportModal', 'makeVariant',
-      'pickupLocation', 'bestTime', 'locationDetails', 'city', 'hotel', 'includes', 'excludes', 'languages', 'nearbyAttractions',
+      'pickupLocation', 'bestTime', 'locationDetails', 'city', 'hotel', 'cities', 'hotels', 'includes', 'excludes', 'languages', 'nearbyAttractions',
       'freeCancellation', 'deadlineHours', 'cancellationNote', 'reserveNowPayLater', 'reserveNote',
       'wheelchairAccessible', 'infantSeats', 'strollerAccessible', 'serviceAnimals', 'accessibilityNotes',
       'bookingType', 'singlePersonName', 'singlePersonAge', 'singlePersonNationality', 'singlePersonPreferences',
@@ -1056,6 +1069,14 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     
     // *** FIX: Remove price field completely (backend doesn't expect it) ***
     delete formatted.price;
+
+    // Backward-compat: map multi-select arrays to single fields for old readers
+    if (Array.isArray(formatted.cities) && formatted.cities.length > 0) {
+      formatted.city = formatted.city || formatted.cities[0];
+    }
+    if (Array.isArray(formatted.hotels) && formatted.hotels.length > 0) {
+      formatted.hotel = formatted.hotel || formatted.hotels[0];
+    }
     
  
     
@@ -1163,7 +1184,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       bestTime: '',
       locationDetails: '',
       city: '',
+      cities: [],
       hotel: '',
+      hotels: [],
       includes: '',
       excludes: '',
       languages: '',
@@ -1259,6 +1282,8 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       discountPercentage: tour.discountPercentage ? tour.discountPercentage.toString() : '',
       deadlineHours: tour.deadlineHours ? tour.deadlineHours.toString() : '',
       sameDropOff: tour.sameDropOff !== undefined ? tour.sameDropOff : true,
+      cities: tour.cities || (tour.city ? [tour.city] : []),
+      hotels: tour.hotels || (tour.hotel ? [tour.hotel] : []),
     };
     
    
@@ -1931,34 +1956,44 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* City */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                        <select
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select City</option>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Cities (select multiple)</label>
+                        <div className="grid grid-cols-2 gap-2 border rounded-md p-2 max-h-40 overflow-auto">
                           {japanCities.map((city) => (
-                            <option key={city} value={city}>{city}</option>
+                            <label key={city} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={formData.cities?.includes(city)}
+                                onChange={() => toggleItem('cities', city)}
+                                className="w-4 h-4 text-blue-600"
+                              />
+                              <span>{city}</span>
+                            </label>
                           ))}
-                        </select>
+                        </div>
+                        {formData.cities?.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">Selected: {formData.cities.join(', ')}</p>
+                        )}
                       </div>
 
                       {/* Hotel Dropdown */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Hotels</label>
-                        <select
-                          name="hotel"
-                          value={formData.hotel}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Hotel</option>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Hotels (select multiple)</label>
+                        <div className="grid grid-cols-1 gap-2 border rounded-md p-2 max-h-40 overflow-auto">
                           {japanHotels.map((hotel) => (
-                            <option key={hotel} value={hotel}>{hotel}</option>
+                            <label key={hotel} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={formData.hotels?.includes(hotel)}
+                                onChange={() => toggleItem('hotels', hotel)}
+                                className="w-4 h-4 text-blue-600"
+                              />
+                              <span>{hotel}</span>
+                            </label>
                           ))}
-                        </select>
+                        </div>
+                        {formData.hotels?.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">Selected: {formData.hotels.join(', ')}</p>
+                        )}
                       </div>
 
                       {/* Pickup Location */}
