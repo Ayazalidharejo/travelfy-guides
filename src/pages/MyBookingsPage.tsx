@@ -197,7 +197,7 @@ const MyBookingsPage = () => {
           <div className="flex flex-wrap items-center gap-3 text-sm text-white/90">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>{new Date(booking.tourDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              <span>{new Date(booking.tourDate).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
             {booking.selectedTimeSlot && (
               <div className="flex items-center gap-1">

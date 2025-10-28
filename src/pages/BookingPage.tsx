@@ -62,7 +62,7 @@ const BookingPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
-  const [selectedDate, setSelectedDate] = useState();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [selectedPricingSchedule, setSelectedPricingSchedule] = useState(null);
@@ -323,10 +323,14 @@ const BookingPage = () => {
       setSubmitting(true);
       
       const totalAmount = calculateTotal();
+      let tourDateString: string | null = null;
+      if (selectedDate) {
+        tourDateString = format(selectedDate as Date, 'yyyy-MM-dd');
+      }
       
       const bookingData = {
         postId: tourId,
-        tourDate: selectedDate,
+        tourDate: tourDateString,
         selectedDay,
         selectedTimeSlot,
         participants,

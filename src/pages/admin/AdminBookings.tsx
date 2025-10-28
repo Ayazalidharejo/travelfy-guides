@@ -353,7 +353,7 @@ const AdminBookings = React.memo(() => {
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              <span>{new Date(booking.tourDate).toLocaleDateString()}</span>
+                              <span>{new Date(booking.tourDate).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <FileText className="h-4 w-4" />
@@ -510,7 +510,7 @@ const AdminBookings = React.memo(() => {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{new Date(selectedBooking.tourDate).toLocaleDateString()}</span>
+                            <span>{new Date(selectedBooking.tourDate).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
