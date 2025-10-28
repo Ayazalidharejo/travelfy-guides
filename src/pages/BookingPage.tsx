@@ -81,6 +81,7 @@ const BookingPage = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState('pay-now'); // 'pay-now' or 'pay-later'
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [selectedTransportType, setSelectedTransportType] = useState('');
@@ -127,10 +128,6 @@ const BookingPage = () => {
       if (response.success) {
       
         setTour(response.data);
-        // Default payment method based on tour flag
-        if (!response.data?.reserveNowPayLater) {
-          setPaymentMethod('pay-now');
-        }
         
         if (response.data.pricingSchedule?.[0]?.timeSlots?.length > 0) {
           setSelectedTimeSlot(response.data.pricingSchedule[0].timeSlots[0]);
@@ -312,13 +309,16 @@ const BookingPage = () => {
       return;
     }
 
-    // If pay now is selected, show payment dialog
+    // Ask for confirmation before proceeding
+    setShowConfirmDialog(true);
+  };
+
+  const confirmBooking = async () => {
+    setShowConfirmDialog(false);
     if (paymentMethod === 'pay-now') {
       setShowPaymentDialog(true);
       return;
     }
-
-    // If pay later, proceed directly with booking
     await processBooking(null);
   };
 
@@ -876,31 +876,29 @@ const BookingPage = () => {
                         </div>
                       </div>
 
-                      {tour?.reserveNowPayLater && (
-                        <div
-                          onClick={() => setPaymentMethod('pay-later')}
-                          className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                            paymentMethod === 'pay-later'
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-blue-300 bg-white'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                                <Clock className="h-5 w-5" />
-                                Reserve Now, Pay Later
-                              </h4>
-                              <p className="text-sm text-gray-600 mt-1">
-                                No payment required now
-                              </p>
-                            </div>
-                            {paymentMethod === 'pay-later' && (
-                              <CheckCircle className="h-6 w-6 text-blue-600" />
-                            )}
+                      <div
+                        onClick={() => setPaymentMethod('pay-later')}
+                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                          paymentMethod === 'pay-later'
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                              <Clock className="h-5 w-5" />
+                              Reserve Now, Pay Later
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">
+                              No payment required now
+                            </p>
                           </div>
+                          {paymentMethod === 'pay-later' && (
+                            <CheckCircle className="h-6 w-6 text-blue-600" />
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
 
@@ -999,6 +997,25 @@ const BookingPage = () => {
               onSuccess={processBooking}
               onCancel={() => setShowPaymentDialog(false)}
             />
+          </DialogContent>
+        </Dialog>
+
+        {/* Confirm Booking Dialog */}
+        <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+                Confirm Booking
+              </DialogTitle>
+              <DialogDescription>
+                Are you sure you want to confirm your booking for {selectedDate ? format(selectedDate, 'EEEE, MMMM dd, yyyy') : 'the selected date'}?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-3 justify-end pt-2">
+              <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>Cancel</Button>
+              <Button onClick={confirmBooking} className="bg-green-600 hover:bg-green-700">Yes, Confirm</Button>
+            </div>
           </DialogContent>
         </Dialog>
 

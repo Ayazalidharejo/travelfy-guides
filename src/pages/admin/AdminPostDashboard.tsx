@@ -215,7 +215,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30',
     '10:00', '10:30', '11:00', '11:30', '12:00'
   ];
-  const durationOptions = ['2 Hours', '4 Hours', '6 Hours', '1 Day', '2 Days', '3 Days'];
+  const durationOptions = ['2 Hours', '4 Hours', '5 Hours', '6 Hours', '8 Hours', '10 Hours', '1 Day', '2 Days', '3 Days'];
   const currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
   const groupTypes = ['Family', 'Friends', 'Corporate', 'School', 'Other'];
 
@@ -277,9 +277,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             return prices.length > 0 ? Math.min(...prices) : null;
           })(),
           // *** NEW: Include transportVehicles in tour data ***
-          transportVehicles: tour.transportVehicles || [],
-          cities: tour.cities || (tour.city ? [tour.city] : []),
-          hotels: tour.hotels || (tour.hotel ? [tour.hotel] : [])
+          transportVehicles: tour.transportVehicles || []
         }));
         
        
@@ -325,12 +323,17 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     }));
   };
 
-  // Toggle utility for multi-select arrays
+  // Toggle utility for multi-select arrays (cities/hotels)
   const toggleItem = (field: 'cities' | 'hotels', item: string) => {
-    setFormData(prev => {
-      const list = new Set<string>(prev[field] || []);
-      if (list.has(item)) list.delete(item); else list.add(item);
-      return { ...prev, [field]: Array.from(list) } as any;
+    setFormData((prev: any) => {
+      const current: string[] = Array.isArray(prev[field]) ? prev[field] : [];
+      const exists = current.includes(item);
+      const next = exists ? current.filter((v) => v !== item) : [...current, item];
+      // Also keep legacy single fields in sync for compatibility
+      const legacyMap: any = {};
+      if (field === 'cities') legacyMap.city = next[0] || '';
+      if (field === 'hotels') legacyMap.hotel = next[0] || '';
+      return { ...prev, [field]: next, ...legacyMap };
     });
   };
 
@@ -1070,7 +1073,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     // *** FIX: Remove price field completely (backend doesn't expect it) ***
     delete formatted.price;
 
-    // Backward-compat: map multi-select arrays to single fields for old readers
+    // Backward-compatibility: keep single fields in sync
     if (Array.isArray(formatted.cities) && formatted.cities.length > 0) {
       formatted.city = formatted.city || formatted.cities[0];
     }
@@ -1834,18 +1837,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         </label>
                       </div>
 
-                      {/* Manual URL Input (Backup) */}
-                      <div className="mt-3">
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Or paste image URL directly:</label>
-                        <input 
-                          type="text" 
-                          name="imageUrl"
-                          value={formData.imageUrl}
-                          onChange={handleInputChange}
-                          placeholder="https://example.com/image.jpg"
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" 
-                        />
-                      </div>
+                      {/* Enforce file uploads only - URL field removed */}
 
                       {/* Image Preview */}
                       {formData.imageUrl && (
@@ -1878,17 +1870,27 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Additional Images (URLs, comma-separated)</label>
-                      <textarea
-                        placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                        value={formData.images.join(', ')}
-                        onChange={(e) => {
-                          const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
-                          setFormData(prev => ({ ...prev, images: urls }));
-                        }}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Additional Images (Upload multiple)</label>
+                      <div className="relative">
+                        <input 
+                          type="file" 
+                          id="additionalImagesUpload"
+                          accept="image/*" 
+                          multiple 
+                          onChange={(e) => handleFileChange(e, 'additionalImages')} 
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                        <label 
+                          htmlFor="additionalImagesUpload"
+                          className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                        >
+                          <Upload size={20} className={uploading ? 'animate-bounce' : ''} />
+                          <span className="font-medium">
+                            {uploading ? 'Uploading...' : 'Click to Upload Additional Images'}
+                          </span>
+                        </label>
+                      </div>
                       {formData.images && formData.images.length > 0 && (
                         <div className="mt-3 grid grid-cols-4 gap-2">
                           {formData.images.map((img: string, idx: number) => (
@@ -1915,7 +1917,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           ))}
                         </div>
                       )}
-                      <p className="text-xs text-gray-500 mt-1">Enter multiple image URLs separated by commas</p>
+                      <p className="text-xs text-gray-500 mt-1">Upload JPG/PNG/WebP (multiple files allowed)</p>
                     </div>
                     
                     <div>
@@ -1954,45 +1956,57 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                 {expandedSections.location && (
                   <div className="mt-4 p-6 bg-gray-50 rounded-lg">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* City */}
+                      {/* Cities - multi-select with chips */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Cities (select multiple)</label>
-                        <div className="grid grid-cols-2 gap-2 border rounded-md p-2 max-h-40 overflow-auto">
-                          {japanCities.map((city) => (
-                            <label key={city} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={formData.cities?.includes(city)}
-                                onChange={() => toggleItem('cities', city)}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <span>{city}</span>
-                            </label>
-                          ))}
+                        <div className="flex flex-wrap gap-2 p-2 border rounded-md">
+                          {japanCities.map((city) => {
+                            const active = formData.cities?.includes(city);
+                            return (
+                              <button
+                                type="button"
+                                key={city}
+                                onClick={() => toggleItem('cities', city)}
+                                className={`px-3 py-1 rounded-full text-xs border transition ${active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'}`}
+                              >
+                                {city}
+                              </button>
+                            );
+                          })}
                         </div>
                         {formData.cities?.length > 0 && (
-                          <p className="text-xs text-gray-500 mt-1">Selected: {formData.cities.join(', ')}</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {formData.cities.map((c: string) => (
+                              <span key={c} className="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700">{c}</span>
+                            ))}
+                          </div>
                         )}
                       </div>
 
-                      {/* Hotel Dropdown */}
+                      {/* Hotels - multi-select with chips */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Hotels (select multiple)</label>
-                        <div className="grid grid-cols-1 gap-2 border rounded-md p-2 max-h-40 overflow-auto">
-                          {japanHotels.map((hotel) => (
-                            <label key={hotel} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={formData.hotels?.includes(hotel)}
-                                onChange={() => toggleItem('hotels', hotel)}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <span>{hotel}</span>
-                            </label>
-                          ))}
+                        <div className="flex flex-wrap gap-2 p-2 border rounded-md">
+                          {japanHotels.map((hotel) => {
+                            const active = formData.hotels?.includes(hotel);
+                            return (
+                              <button
+                                type="button"
+                                key={hotel}
+                                onClick={() => toggleItem('hotels', hotel)}
+                                className={`px-3 py-1 rounded-full text-xs border transition ${active ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:border-purple-400'}`}
+                              >
+                                {hotel}
+                              </button>
+                            );
+                          })}
                         </div>
                         {formData.hotels?.length > 0 && (
-                          <p className="text-xs text-gray-500 mt-1">Selected: {formData.hotels.join(', ')}</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {formData.hotels.map((h: string) => (
+                              <span key={h} className="px-2 py-0.5 rounded-full text-xs bg-purple-100 text-purple-700">{h}</span>
+                            ))}
+                          </div>
                         )}
                       </div>
 

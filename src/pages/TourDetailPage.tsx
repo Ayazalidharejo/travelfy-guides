@@ -298,6 +298,20 @@ const TourDetailPage = () => {
                   <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
                 </div>
               )}
+              {(tour.cities?.length > 0 || tour.city) && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <MapPin className="h-5 w-5 text-gray-500" />
+                  <span className="font-bold">Cities:</span>
+                  <span>{tour.cities?.length ? tour.cities.join(', ') : tour.city}</span>
+                </div>
+              )}
+              {(tour.hotels?.length > 0 || tour.hotel) && (
+                <div className="flex items-center gap-3 text-gray-700">
+                  <MapPin className="h-5 w-5 text-gray-500" />
+                  <span className="font-bold">Hotels:</span>
+                  <span>{tour.hotels?.length ? tour.hotels.join(', ') : tour.hotel}</span>
+                </div>
+              )}
               {tour.pickupLocation && (
                 <div className="flex items-center gap-3 text-gray-700">
                   <MapPin className="h-5 w-5 text-gray-500" />

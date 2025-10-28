@@ -38,14 +38,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors (avoid unexpected auto-logout)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && localStorage.getItem('token')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    // Do not force redirect; allow UI to handle gracefully
+    // Optionally, emit a custom event for session expiry
+    if (error.response?.status === 401) {
+      window.dispatchEvent(new CustomEvent('api:unauthorized'));
     }
     return Promise.reject(error);
   }
