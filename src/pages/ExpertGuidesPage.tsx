@@ -74,7 +74,7 @@ const ExpertGuidesPage: React.FC = () => {
             </h3>
             <p className="text-gray-700 leading-relaxed">
               Communication is key to a great experience. Our team speaks
-              multiple languages including English, Japanese, Chinese, and more,
+              multiple languages including English, Japanese, Hindhi, Russian,Arbaic and more,
               ensuring clear communication throughout your journey.
             </p>
           </div>

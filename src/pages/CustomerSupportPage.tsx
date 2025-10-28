@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { Headset, Clock, MessageCircle, Phone, Mail, Globe } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import UserChat from "@/pages/UserChat";
 
 const CustomerSupportPage: React.FC = () => {
+  const [chatOpen, setChatOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, isAuthenticated, isAdmin } = useAuth();
+  const handleChatClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (isAdmin) return;
+    setChatOpen(true);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Hero Section */}
@@ -55,7 +69,10 @@ const CustomerSupportPage: React.FC = () => {
             <p className="text-gray-700 mb-4">
               Get instant responses through our live chat feature on our website or mobile app.
             </p>
-            <button className="text-red-600 font-semibold hover:underline">
+            <button 
+              className="text-red-600 font-semibold hover:underline"
+              onClick={handleChatClick}
+            >
               Start Chat Now
             </button>
           </div>
@@ -172,7 +189,7 @@ const CustomerSupportPage: React.FC = () => {
         </section>
 
         {/* Languages */}
-        <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
+        {/* <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
             Multilingual Support
           </h2>
@@ -205,7 +222,33 @@ const CustomerSupportPage: React.FC = () => {
               <p className="font-semibold text-gray-900">🇮🇹 Italian</p>
             </div>
           </div>
-        </section>
+        </section> */}
+        <section className="bg-gradient-to-r from-red-50 to-yellow-50 rounded-2xl p-8 md:p-12 mb-12">
+  <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+    Multilingual Support
+  </h2>
+  <p className="text-center text-gray-700 text-lg mb-8">
+    Our support team speaks your language! We offer assistance in:
+  </p>
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+    <div className="bg-white rounded-lg p-4 text-center shadow">
+      <p className="font-semibold text-gray-900">🇬🇧 English</p>
+    </div>
+    <div className="bg-white rounded-lg p-4 text-center shadow">
+      <p className="font-semibold text-gray-900">🇮🇳 Hindi</p>
+    </div>
+    <div className="bg-white rounded-lg p-4 text-center shadow">
+      <p className="font-semibold text-gray-900">🇯🇵 Japanese</p>
+    </div>
+    <div className="bg-white rounded-lg p-4 text-center shadow">
+      <p className="font-semibold text-gray-900">🇷🇺 Russian</p>
+    </div>
+    <div className="bg-white rounded-lg p-4 text-center shadow">
+      <p className="font-semibold text-gray-900">🇸🇦 Arabic</p>
+    </div>
+  </div>
+</section>
+
 
         {/* Emergency Support */}
         <section className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-12 border-2 border-red-600">
@@ -249,6 +292,33 @@ const CustomerSupportPage: React.FC = () => {
           </div>
         </section>
       </div>
+
+      {/* Live Chat Modal */}
+      {isAuthenticated && !isAdmin && (
+        <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+          <DialogContent className="max-w-lg h-[650px] p-0 overflow-hidden">
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                Live Chat Support
+              </DialogTitle>
+            </DialogHeader>
+            <div className="h-full">
+              <UserChat
+                token={localStorage.getItem('token') || ''}
+                currentUser={{
+                  id: (user as any)?._id || (user as any)?.id || '',
+                  name: (user as any)?.name || '',
+                  email: (user as any)?.email || '',
+                  avatar: (user as any)?.photoURL || (user as any)?.avatar || undefined
+                }}
+                isOpen={chatOpen}
+                onClose={() => setChatOpen(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

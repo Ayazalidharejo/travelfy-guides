@@ -664,7 +664,7 @@ const BookingPage = () => {
         {showAdditionalSections && selectedVehicle && (
           <div id="additional-sections" className="mt-8 space-y-6">
             {/* Additional Options Section */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5" />
@@ -755,7 +755,7 @@ const BookingPage = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Contact Information Section */}
             <Card>
