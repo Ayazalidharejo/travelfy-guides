@@ -1,40 +1,95 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
-
+import { Linkedin } from "lucide-react";  
+import { FaTiktok } from "react-icons/fa";  
 const Footer = () => {
   return (
     <footer className="bg-gradient-card border-t">
       <div className="container px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <MapPin className="h-8 w-8 text-[#307172]" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#307172] to-[#204f4f]  bg-clip-text text-transparent">
-                Karvaan Tours
-              </span>
-            </Link>
-            <p className="text-muted-foreground">
-              Discover amazing destinations and create unforgettable memories with our curated travel experiences.
-            </p>
-            <div className="flex space-x-4">
-              <a href="https://www.facebook.com/share/1DPuTcap8s" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="https://x.com/KarvaanTours" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="https://www.instagram.com/karvaantours?igsh=N2xhdHBqNWk1Z3lm" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="https://www.youtube.com/channel/UC1SNJP176cWvb2ac38fnpPg
-" target="_blank" rel="noopener noreferrer" className="text-[#4C9684]  text:bg-[#166955] transition-smooth">
-                <Youtube className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
+      
+<div className="space-y-4">
+      <Link to="/" className="flex items-center space-x-2">
+        <MapPin className="h-8 w-8 text-[#307172]" />
+        <span className="text-2xl font-bold bg-gradient-to-r from-[#307172] to-[#204f4f] bg-clip-text text-transparent">
+          Karvaan Tours
+        </span>
+      </Link>
 
+      <p className="text-muted-foreground">
+        Discover amazing destinations and create unforgettable memories with our curated travel experiences.
+      </p>
+
+      <div className="flex space-x-4">
+        {/* Facebook */}
+        <a
+          href="https://www.facebook.com/profile.php?id=61582604152338"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <Facebook className="h-5 w-5" />
+        </a>
+
+        {/* Twitter */}
+        <a
+          href="https://x.com/karvaan_tours"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <Twitter className="h-5 w-5" />
+        </a>
+
+        {/* Instagram */}
+        <a
+          href="https://www.instagram.com/karvaantours/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <Instagram className="h-5 w-5" />
+        </a>
+
+        {/* YouTube */}
+        <a
+          href="https://www.youtube.com/channel/UC1SNJP176cWvb2ac38fnpPg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <Youtube className="h-5 w-5" />
+        </a>
+
+        {/* LinkedIn */}
+        <a
+          href="https://www.linkedin.com/company/karvaan-tours-japan"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <Linkedin className="h-5 w-5" />
+        </a>
+
+        {/* TikTok (Fixed SVG) */}
+        <a
+          href="https://www.tiktok.com/@karvaan_tours?is_from_webapp=1&sender_device=pc"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#4C9684] hover:text-[#166955] transition-smooth"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 256 256"
+            fill="currentColor"
+            className="h-5 w-5"
+          >
+            <path d="M224 80a48 48 0 0 1-48-48h-32v136a40 40 0 1 1-40-40v-32a72 72 0 1 0 72 72V93.25A79.45 79.45 0 0 0 224 96Z" />
+          </svg>
+        </a>
+      </div>
+    </div>
           {/* Quick Links */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Quick Links</h3>

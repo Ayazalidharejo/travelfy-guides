@@ -273,12 +273,12 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !socket) {
-      console.log('❌ Cannot send message:', { hasSocket: !!socket, message: newMessage });
+      
       return;
     }
 
     const messageToSend = newMessage.trim();
-    console.log('📤 Sending message to admin:', messageToSend);
+    
     
     // Clear input immediately to prevent duplicate sends
     setNewMessage('');

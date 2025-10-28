@@ -33,7 +33,7 @@ class FaviconLoader {
   showLoading() {
     if (this.faviconElement) {
       this.faviconElement.href = this.loaderFavicon + '?t=' + Date.now();
-      console.log('🔄 Favicon: Loading...');
+     
     }
   }
 
@@ -43,7 +43,7 @@ class FaviconLoader {
   setStatic() {
     if (this.faviconElement) {
       this.faviconElement.href = this.originalFavicon + '?t=' + Date.now();
-      console.log('✅ Favicon: Static');
+     
     }
   }
 
@@ -53,7 +53,7 @@ class FaviconLoader {
   showError() {
     // Can implement custom error favicon if needed
     this.setStatic();
-    console.log('❌ Favicon: Error');
+   
   }
 
   /**

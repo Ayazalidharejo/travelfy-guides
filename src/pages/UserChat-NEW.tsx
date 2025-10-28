@@ -58,7 +58,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   const loadMessageHistory = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('📡 Loading messages from:', `${SERVER_URL}/api/chat/user/messages`);
+     if (!token) return;
       
       const response = await fetch(`${SERVER_URL}/api/chat/user/messages`, {
         headers: {
@@ -83,7 +83,9 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
   useEffect(() => {
     if (!isOpen || !token) return;
 
-    console.log('🚀 Connecting socket to:', SERVER_URL);
+    if (socket) {
+      socket.disconnect();
+    }
 
     const newSocket = io(SERVER_URL, {
       auth: { token },
@@ -91,24 +93,24 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Socket connected');
+     
       setIsConnected(true);
       loadMessageHistory();
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
+    
       setIsConnected(false);
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('🚨 Connection error:', error);
+      
       setIsConnected(false);
     });
 
     // ✅ RECEIVE ADMIN MESSAGE
     newSocket.on('newMessageFromAdmin', (message: Message) => {
-      console.log('📨 NEW MESSAGE FROM ADMIN:', message);
+ 
       
       setMessages(prev => {
         if (prev.some(m => m._id === message._id)) {
@@ -122,7 +124,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
 
     // ✅ MESSAGE SENT CONFIRMATION
     newSocket.on('messageSent', (message: Message) => {
-      console.log('✅ Message sent confirmed:', message);
+
       setMessages(prev => {
         if (prev.some(m => m._id === message._id)) {
           return prev;
@@ -133,14 +135,14 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
 
     // ✅ ADMIN TYPING
     newSocket.on('adminTyping', (data: { typing: boolean }) => {
-      console.log('⌨️ Admin typing:', data.typing);
+ 
       setIsTyping(data.typing);
     });
 
     setSocket(newSocket);
 
     return () => {
-      console.log('🧹 Cleaning up socket');
+ 
       newSocket.close();
     };
   }, [isOpen, token, SERVER_URL, playNotificationSound, loadMessageHistory]);
@@ -157,7 +159,7 @@ const UserChat: React.FC<UserChatProps> = ({ token, currentUser, isOpen, onClose
     e.preventDefault();
     if (!newMessage.trim() || !socket || !isConnected) return;
 
-    console.log('📤 Sending message:', newMessage);
+ 
     socket.emit('sendMessageToAdmin', {
       message: newMessage.trim()
     });

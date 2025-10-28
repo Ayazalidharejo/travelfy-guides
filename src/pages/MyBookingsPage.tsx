@@ -54,12 +54,12 @@ const MyBookingsPage = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      console.log('📥 Fetching bookings...');
+    
       const response = await bookingsAPI.getMyBookings();
-      console.log('📦 Bookings response:', response);
+  
       if (response.success) {
         setBookings(response.data || []);
-        console.log('✅ Bookings loaded:', response.data?.length || 0);
+ 
       } else {
         console.error('❌ Response not successful:', response);
         toast({
@@ -69,8 +69,7 @@ const MyBookingsPage = () => {
         });
       }
     } catch (error: any) {
-      console.error('❌ Error fetching bookings:', error);
-      console.error('Error details:', error.response?.data);
+     
       toast({
         title: "Error",
         description: error.response?.data?.message || error.message || "Failed to load your bookings.",

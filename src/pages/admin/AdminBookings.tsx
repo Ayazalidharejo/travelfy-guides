@@ -51,16 +51,16 @@ const AdminBookings = React.memo(() => {
   const fetchBookings = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('📥 Admin fetching bookings...');
+    
       const response = await bookingsAPI.getAllBookings();
-      console.log('📦 Admin bookings response:', response);
+    
       if (response.success) {
         setBookings(response.data || []);
-        console.log('✅ Admin bookings loaded:', response.data?.length || 0);
+     
         // Debug: Check image data
         if (response.data && response.data.length > 0) {
-          console.log('🖼️ First booking post data:', response.data[0]?.post);
-          console.log('🖼️ First booking mainImage:', response.data[0]?.post?.mainImage);
+      
+      
         }
       }
     } catch (error) {
@@ -333,9 +333,7 @@ const AdminBookings = React.memo(() => {
                         alt={booking.post?.title || 'Tour image'}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          console.log('🖼️ Image load error for:', booking.post?.title);
-                          console.log('🖼️ Attempted URL:', e.currentTarget.src);
-                          console.log('🖼️ Post data:', booking.post);
+                       
                           e.currentTarget.src = 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
                         }}
                       />

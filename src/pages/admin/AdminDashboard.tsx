@@ -98,10 +98,10 @@ const AdminDashboard = React.memo(() => {
       const { data } = await api.get('/chat/admin/unread-count', { headers });
       if (data.success) {
         setUnreadMessages(data.unreadCount || 0);
-        console.log('📊 Unread messages count:', data.unreadCount);
+
       }
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+    return error
     }
   }, []);
 

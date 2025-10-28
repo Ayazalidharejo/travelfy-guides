@@ -70,14 +70,14 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
   const loadConversations = useCallback(async () => {
     if (!token) return;
     try {
-      console.log('📥 Loading conversations...');
+     
       const { data } = await api.get('/chat/admin/conversations');
    
       if (data.success) {
         setConversations(data.conversations);
       }
     } catch (error) {
-      console.error('❌ Error loading conversations:', error);
+      return error;
     }
   }, [token, SERVER_URL]);
 
@@ -195,7 +195,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ token, currentUser }) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedUser || !socket) return;
 
-    console.log('📤 Admin sending message to:', selectedUser._id);
+   
     socket.emit('sendMessageToUser', {
       userId: selectedUser._id,
       message: newMessage.trim()

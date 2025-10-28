@@ -90,7 +90,7 @@ const HomePage = () => {
           limit: 8,
           status: 'published'
         });
-        console.log("✅ Popular Tours Data:", popularResponse.data);
+   
         
         // Convert backend mainImage to frontend imageUrl
         const popularData = (popularResponse.data || []).map((tour: any) => ({

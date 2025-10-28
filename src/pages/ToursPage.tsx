@@ -286,17 +286,7 @@ const ToursPage = () => {
       }
     });
 
-    console.log('🔄 Filters applied:', {
-      sortBy,
-      selectedLanguage,
-      selectedBookingType,
-      totalFiltered: filtered.length,
-      sampleTour: filtered[0] ? {
-        title: filtered[0].title,
-        languages: filtered[0].languages,
-        bookingType: filtered[0].bookingType
-      } : null
-    });
+ 
 
     setFilteredTours(filtered);
   };

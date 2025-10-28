@@ -143,8 +143,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
   // Debug savedTransportVehicles changes
   useEffect(() => {
-    console.log('🚗 savedTransportVehicles changed:', savedTransportVehicles);
-    console.log('🚗 savedTransportVehicles length:', savedTransportVehicles.length);
+ 
   }, [savedTransportVehicles]);
 
   const [expandedSections, setExpandedSections] = useState({
@@ -226,9 +225,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const fetchTours = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Fetching tours from database...');
+    
       const response = await postsAPI.getPosts({ limit: 100 });
-      console.log('📊 Tours response:', response);
+  
       
       // *** FIX: Handle both success and error responses ***
       if (response && (response.success || response.data)) {
@@ -279,42 +278,29 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
           transportVehicles: tour.transportVehicles || []
         }));
         
-        console.log('✅ Tours loaded:', toursData.length);
+       
         
         if (toursData.length > 0) {
-          console.log('📊 First Tour Complete Data:', toursData[0]);
-          console.log('💰 First Tour - priceNumber:', toursData[0]?.priceNumber);
-          console.log('💰 First Tour - price:', toursData[0]?.price);
-          console.log('💰 First Tour - pricingSchedule:', toursData[0]?.pricingSchedule);
-          console.log('🔥 First Tour - discountPercentage:', toursData[0]?.discountPercentage);
-          console.log('🚗 First Tour - transportVehicles:', toursData[0]?.transportVehicles);
-          console.log('🚗 First Tour - minVehiclePrice:', toursData[0]?.minVehiclePrice);
+       
           
           if (toursData[0]?.pricingSchedule?.length > 0) {
-            console.log('💰 PricingSchedule[0]:', {
-              actualPrice: toursData[0].pricingSchedule[0].actualPrice,
-              netPrice: toursData[0].pricingSchedule[0].netPrice,
-              currency: toursData[0].pricingSchedule[0].currency
-            });
-          }
+                  }
         }
         
         setTours(toursData);
-        console.log('✅ Tours set successfully:', toursData.length);
+       
       } else {
-        console.log('⚠️ No tours found or invalid response');
+      
         setTours([]);
       }
     } catch (error) {
-      console.error('❌ Error fetching tours:', error);
-      console.error('❌ Error details:', error);
+     
       
-      // *** FIX: Don't show error toast, just set empty tours ***
-      console.log('🔧 Setting empty tours array due to error');
+    
       setTours([]);
     } finally {
       setLoading(false);
-      console.log('🔄 Loading finished');
+    
     }
   };
 
@@ -517,13 +503,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
   // Add Pricing Schedule
   const addPricingSchedule = () => {
-    console.log('🔍 Adding Pricing Schedule:', {
-      days: currentPricing.days,
-      timeSlots: currentPricing.timeSlots,
-      duration: currentPricing.duration,
-      existingSchedules: formData.pricingSchedule.length,
-      savedVehicles: savedTransportVehicles.length
-    });
+ 
     
     // *** UPDATED: Create shared schedule for all vehicles, not dependent on current vehicle price ***
     // Check if we have any saved vehicles or if this is a general schedule
@@ -545,7 +525,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         makeVariant: ''
       };
       
-      console.log('✅ New Shared Schedule Created:', newSchedule);
+     
 
       setFormData(prev => ({
         ...prev,
@@ -569,8 +549,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         currency: 'USD'
       });
       
-      console.log('✅ Shared Pricing Schedule Added Successfully');
-      console.log('📊 Updated pricingSchedule:', [...formData.pricingSchedule, newSchedule]);
+    
       
       toast({
         title: "Success",
@@ -579,13 +558,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       });
     } else {
       // *** UPDATED: Show error if no vehicles and no schedule details ***
-      console.log('⚠️ No vehicles saved and no schedule details - cannot add schedule');
-      console.log('📊 Current state:', {
-        days: currentPricing.days.length,
-        timeSlots: currentPricing.timeSlots.length,
-        savedVehicles: savedTransportVehicles.length,
-        duration: currentPricing.duration
-      });
+     
       
       toast({
         title: "Error",
@@ -604,13 +577,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
   // Add Transport Vehicle
   const addTransportVehicle = () => {
-    console.log('🚗 Adding Transport Vehicle:', {
-      transportType: formData.transportType,
-      transportModal: formData.transportModal,
-      makeVariant: formData.makeVariant,
-      groupSize: formData.groupSize,
-      vehiclePrice: formData.vehiclePrice
-    });
+  
 
     // Validate at least transport type is selected
     if (!formData.transportType) {
@@ -649,8 +616,6 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       variant: "default",
     });
 
-    console.log('✅ Transport Vehicle Added:', newVehicle);
-    console.log('🚗 Current savedTransportVehicles:', [...savedTransportVehicles, newVehicle]);  // *** ADDED: Show current vehicles ***
   };
 
   // Remove Transport Vehicle
@@ -669,20 +634,20 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     
     if (files.length === 0) return;
 
-    console.log('Uploading files:', files.length, 'for field:', field);
+    
 
     try {
       setUploading(true);
       
       if (field === 'mainImage') {
         // Upload single main image
-        console.log('Uploading main image...');
+     
         const response = await uploadAPI.uploadImage(files[0]);
-        console.log('Upload response:', response);
+     
         
         if (response.success) {
           const imageUrl = response.imageUrl || response.url || response.data?.url;
-          console.log('Image URL received:', imageUrl);
+    
           
           setFormData(prev => ({ 
             ...prev, 
@@ -697,9 +662,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         }
       } else if (field === 'additionalImages' || field === 'galleryImages') {
         // Upload multiple images
-        console.log('Uploading multiple images...');
+     
         const response = await uploadAPI.uploadMultipleImages(files);
-        console.log('Multiple upload response:', response);
+       
         
         if (response.success) {
           // Extract URLs from response - backend returns Array in data field
@@ -714,7 +679,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             imageUrls = response.urls;
           }
           
-          console.log('Image URLs extracted:', imageUrls);
+      
           
           setFormData(prev => ({ 
             ...prev, 
@@ -745,11 +710,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   // Itinerary Handlers
 
   const addItinerary = () => {
-    console.log('🎯 Add Itinerary button clicked!');
-    console.log('📊 Current Itinerary Data:', currentItinerary);
+  
     
     if (currentItinerary.activity) {
-      console.log('✅ Activity name present, proceeding...');
+  
       
       // Add itinerary item without image
       const newItem = { 
@@ -757,12 +721,11 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         image: null  // No image field
       };
       
-      console.log('➕ Adding itinerary item:', newItem);
+   
       
       setFormData(prev => {
         const updatedItems = [...prev.itineraryItems, newItem];
-        console.log('✅ Updated itineraryItems count:', updatedItems.length);
-        console.log('✅ All itinerary items:', updatedItems);
+      
         return {
           ...prev,
           itineraryItems: updatedItems
@@ -780,13 +743,13 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         image: null
       });
       
-      console.log('🎉 Itinerary item added successfully!');
+     
       toast({
         title: "Success",
         description: "Itinerary item added successfully!",
       });
     } else {
-      console.log('❌ Cannot add itinerary: Activity name is required');
+   
       toast({
         title: "Activity Required",
         description: "Please enter an activity name",
@@ -874,7 +837,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   // Validation Function
   // *** FIX: Completely disable form validation - always return empty errors ***
   const validateForm = () => {
-    console.log('🚫 Validation disabled - returning empty errors array');
+   
     
     // Always return empty errors - no validation
     const errors: string[] = [];
@@ -883,24 +846,14 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     // Clear any existing field errors
     setFieldErrors({});
     
-    console.log('✅ Validation bypassed - form will always pass');
+ 
     return errors;
   };
 
   // Format data for API
   const formatTourDataForAPI = (data: any) => {
-    console.log('🔧 FORMATTING TOUR DATA FOR API...');
-    console.log('📊 Input Data Keys:', Object.keys(data));
-    console.log('📊 Input Data Sample:', {
-      title: data.title,
-      category: data.category,
-      description: data.description,
-      pricingSchedule: data.pricingSchedule,
-      imageUrl: data.imageUrl,
-      images: data.images,
-      transportVehicles: data.transportVehicles  // *** ADDED: transportVehicles logging ***
-    });
-    
+  
+ 
     const formatted = { ...data };
     
     // *** FIX: Ensure required fields for backend validation ***
@@ -915,12 +868,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     // *** FIX: Only set priceNumber, don't set price string ***
     formatted.priceNumber = formatted.priceNumber || 100;
     
-    console.log('✅ Required fields ensured:', {
-      title: formatted.title,
-      category: formatted.category,
-      description: formatted.description?.length || 0,
-      priceNumber: formatted.priceNumber
-    });
+   
     
     // *** FIX: Convert imageUrl to mainImage for backend ***
     if (formatted.imageUrl) {
@@ -933,23 +881,22 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     }
     
     // *** FIX: Always ensure pricing schedule and price are set ***
-    console.log('🔍 Checking pricing schedule:', formatted.pricingSchedule);
+    
     
     if (formatted.pricingSchedule && formatted.pricingSchedule.length > 0) {
       const firstSchedule = formatted.pricingSchedule[0];
       const netPrice = firstSchedule.netPrice || firstSchedule.actualPrice;
       
-      console.log('📊 First schedule:', firstSchedule);
-      console.log('💰 Net Price from schedule:', netPrice);
+   
       
       // *** FIX: Only set priceNumber (no price string field) ***
       const priceValue = parseFloat(String(netPrice)) || 100;
       formatted.priceNumber = priceValue;
       
-      console.log('✅ Auto-setting priceNumber from schedule:', formatted.priceNumber);
+   
     } else {
       // *** FIX: Always create default pricing schedule ***
-      console.log('⚠️ No pricing schedule found, creating default...');
+    
       const defaultPrice = 100;
       const defaultCurrency = 'USD';
       
@@ -966,27 +913,24 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       // *** FIX: Set priceNumber only (no price string) ***
       formatted.priceNumber = defaultPrice;
       
-      console.log('✅ Created default pricing schedule:', formatted.pricingSchedule);
-      console.log('✅ Default priceNumber set:', formatted.priceNumber);
+   
     }
     
     // *** FIX: Final priceNumber validation - ensure it's always set ***
     if (!formatted.priceNumber || formatted.priceNumber === 0) {
       formatted.priceNumber = 100;
-      console.log('✅ Final fallback priceNumber set:', formatted.priceNumber);
+  
     }
     
     // *** FIX: Clean up itineraryItems - remove File objects ***
     if (formatted.itineraryItems && formatted.itineraryItems.length > 0) {
-      console.log('🧹 Cleaning itineraryItems - removing File objects...');
+    
       formatted.itineraryItems = formatted.itineraryItems.map((item: any) => {
         const cleanItem = { ...item };
         
         // If image is a File object, remove it (should have been uploaded)
         if (cleanItem.image && cleanItem.image instanceof File) {
-          console.log('⚠️ WARNING: Itinerary item has File object instead of URL!');
-          console.log('⚠️ File name:', cleanItem.image.name);
-          console.log('⚠️ This means image was NOT uploaded. Removing...');
+         
           delete cleanItem.image;
         }
         
@@ -997,7 +941,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         
         return cleanItem;
       });
-      console.log('✅ Cleaned itineraryItems:', formatted.itineraryItems);
+     
     }
     
     // *** FIX: Set discount info if available ***
@@ -1009,7 +953,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     }
     
     // *** FIX: Convert numeric fields from strings to numbers properly ***
-    console.log('🔢 Converting numeric fields...');
+    
     
     if (formatted.price) {
       const priceNum = parseFloat(formatted.price.toString().replace(/[^0-9.]/g, ''));
@@ -1054,17 +998,12 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     
     // *** FIX: Format pricing schedule with proper number conversion ***
     if (formatted.pricingSchedule && Array.isArray(formatted.pricingSchedule)) {
-      console.log('💰 Formatting pricing schedule...');
+  
       formatted.pricingSchedule = formatted.pricingSchedule.map((schedule: any, index: number) => {
         const actualPriceNum = parseFloat(String(schedule.actualPrice));
         const netPriceNum = parseFloat(String(schedule.netPrice));
         
-        console.log(`💰 Schedule ${index + 1}:`, {
-          originalActualPrice: schedule.actualPrice,
-          convertedActualPrice: actualPriceNum,
-          originalNetPrice: schedule.netPrice,
-          convertedNetPrice: netPriceNum
-        });
+       
         
         return {
           ...schedule,
@@ -1076,8 +1015,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     }
     
     // *** FIX: Ensure ALL fields from formData are included ***
-    console.log('🔍 Form Data Keys:', Object.keys(data));
-    console.log('🔍 Formatted Keys Before Cleanup:', Object.keys(formatted));
+   
     
     // Remove empty strings and null values (but keep important fields)
     Object.keys(formatted).forEach(key => {
@@ -1119,17 +1057,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     // *** FIX: Remove price field completely (backend doesn't expect it) ***
     delete formatted.price;
     
-    console.log('✅ Final Formatted Keys:', Object.keys(formatted));
-    console.log('✅ Final Formatted Data Sample:', {
-      title: formatted.title,
-      category: formatted.category,
-      description: formatted.description,
-      pricingSchedule: formatted.pricingSchedule,
-      mainImage: formatted.mainImage,
-      additionalImages: formatted.additionalImages?.length || 0,
-      transportVehicles: formatted.transportVehicles,  // *** ADDED: transportVehicles logging ***
-      totalFields: Object.keys(formatted).length
-    });
+ 
     
     return formatted;
   };
@@ -1138,17 +1066,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     
-    // *** FIX: Complete bypass - no validation, no checks, direct submit ***
-    console.log('🚀 COMPLETE BYPASS - Direct submission without any validation...');
-    console.log('🚀 SUBMISSION STARTED - About to save vehicles to database...');
-    console.log('🚀 Current savedTransportVehicles before submit:', savedTransportVehicles);
+   
     
-    // Log all form data
-    console.log('📊 Complete Form Data:', formData);
-    console.log('📊 All Fields Count:', Object.keys(formData).length);
-    console.log('📊 Form Fields:', Object.keys(formData));
     
-    console.log('✅ Direct submission approved - no validation performed!');
     
     try {
       const tourData = formatTourDataForAPI({
@@ -1159,71 +1079,20 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         transportVehicles: savedTransportVehicles // Include saved transport vehicles
       });
 
-      console.log('=== TOUR DATA BEFORE SUBMIT ===');
-      console.log('📝 Form Data - Title:', formData.title);
-      console.log('📝 Form Data - Description:', formData.description);
-      console.log('📊 Form Data - Pricing Schedule:', formData.pricingSchedule);
-      console.log('🔥 Form Data - Discount %:', formData.discountPercentage);
-      console.log('⏱️ Form Data - Duration:', formData.duration);
-      console.log('🕐 Form Data - Duration Hours:', formData.durationHours);
-      console.log('🖼️ Form Data - Image URL:', formData.imageUrl);
-      console.log('🖼️ Form Data - Images Array:', formData.images);
-      console.log('👥 Form Data - Min/Max Group:', formData.minGroup, '/', formData.maxGroup);
-      console.log('📍 Form Data - City:', formData.city);
-      console.log('🎯 Form Data - Booking Type:', formData.bookingType);
-      console.log('🚗 Saved Transport Vehicles:', savedTransportVehicles);  // *** ADDED: transportVehicles logging ***
-      console.log('👤 Form Data - Single Person:', {
-        name: formData.singlePersonName,
-        age: formData.singlePersonAge,
-        nationality: formData.singlePersonNationality,
-        preferences: formData.singlePersonPreferences
-      });
-      console.log('👥 Form Data - Group Booking:', {
-        groupName: formData.groupName,
-        groupLeaderName: formData.groupLeaderName,
-        groupSize: formData.groupSize,
-        groupType: formData.groupType,
-        groupSpecialRequests: formData.groupSpecialRequests
-      });
-      console.log('💰 Form Data - Pricing Info:', {
-        discountPercentage: formData.discountPercentage,
-        validUntil: formData.validUntil,
-        pricingSchedule: formData.pricingSchedule,
-        priceNumber: formData.priceNumber
-      });
-      console.log('🚗 Form Data - Transport Details:', {
-        transportType: formData.transportType,
-        transportModal: formData.transportModal,
-        makeVariant: formData.makeVariant
-      });
-      console.log('🚗 Saved Transport Vehicles:', savedTransportVehicles);
-      console.log('📋 Form Data - Itinerary Items:', formData.itineraryItems);
-      console.log('📋 Itinerary Items Count:', formData.itineraryItems?.length || 0);
+    
+     
       if (formData.itineraryItems?.length > 0) {
-        console.log('🎯 First Itinerary Item:', formData.itineraryItems[0]);
-        console.log('🖼️ First Itinerary Image:', formData.itineraryItems[0].image);
+    
       }
-      console.log('---');
-      console.log('🔄 Formatted - mainImage:', tourData.mainImage);
-      console.log('🔄 Formatted - additionalImages:', tourData.additionalImages);
-      console.log('🔄 Formatted - itineraryItems:', tourData.itineraryItems);
-      console.log('💰 Formatted - priceNumber:', tourData.priceNumber, '(BACKEND EXPECTS THIS)');
-      console.log('📊 Formatted - pricingSchedule:', tourData.pricingSchedule?.length, 'schedules');
-      console.log('🔄 Formatted - duration:', tourData.duration);
-      console.log('📋 Total Fields Being Saved:', Object.keys(tourData).length);
-      console.log('📋 All Fields:', Object.keys(tourData).join(', '));
-      console.log('================================');
+     
 
-      console.log('🚀 Sending tour data to API:', tourData);
-      console.log('🚀 Tour data transportVehicles:', tourData.transportVehicles);
-      console.log('🚀 Tour data keys:', Object.keys(tourData));
-      
+    
       if (modalMode === 'create') {
         const response = await postsAPI.createPost(tourData);
-        console.log('✅ API Response:', response);
+     
         
-        // *** FIX: Always proceed with success - ignore API response ***
-        console.log('✅ Proceeding with success regardless of API response:', response);
+     
+       
         
         // Always show success and proceed
         toast({
@@ -1231,23 +1100,21 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
           description: "Tour created successfully and saved to database!",
         });
         
-        // *** FIX: Force refresh tours list ***
-        console.log('🔄 Refreshing tours list after creation...');
+    
+      
         await fetchTours();
         
         if (onTourChange) onTourChange();
         resetForm();
         setShowForm(false);
         
-        console.log('✅ Tour creation completed successfully');
+       
       } else if (modalMode === 'edit') {
-        console.log('🔄 Updating tour with ID:', selectedTour._id);
-        console.log('🔄 Update data transportVehicles:', tourData.transportVehicles);
+      
         const response = await postsAPI.updatePost(selectedTour._id, tourData);
-        console.log('✅ Update API Response:', response);
+       
         
-        // *** FIX: Always proceed with success for edit too ***
-        console.log('✅ Proceeding with update success regardless of API response:', response);
+        
         
         // Always show success and proceed
         toast({
@@ -1260,10 +1127,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         setShowForm(false);
       }
     } catch (error: any) {
-      // *** FIX: Treat errors as success - always proceed ***
-      console.log('🚫 Error occurred but treating as success:', error);
-      console.log('🚫 Error response:', error.response?.data);
-      
+    
       // Show success even if error occurred
       toast({
         title: "Success",
@@ -1369,15 +1233,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   };
 
   const openEditModal = (tour: any) => {
-    console.log('🔧 Opening edit for tour:', tour);
-    console.log('🔧 Tour title:', tour.title);
-    console.log('🔧 Tour description:', tour.description);
-    console.log('🔧 Tour transportType:', tour.transportType);
-    console.log('🔧 Tour transportModal:', tour.transportModal);
-    console.log('🔧 Tour makeVariant:', tour.makeVariant);
-    console.log('🚗 Tour transportVehicles:', tour.transportVehicles);  // *** ADDED: transportVehicles debugging ***
-    console.log('🚗 Tour transportVehicles type:', typeof tour.transportVehicles);  // *** ADDED: type debugging ***
-    console.log('🚗 Tour transportVehicles isArray:', Array.isArray(tour.transportVehicles));  // *** ADDED: array check ***
+  
     setFieldErrors({});
     
     const editFormData = {
@@ -1405,24 +1261,21 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       sameDropOff: tour.sameDropOff !== undefined ? tour.sameDropOff : true,
     };
     
-    console.log('🔧 Setting form data:', editFormData);
-    console.log('🔧 Form data title:', editFormData.title);
-    console.log('🔧 Form data transportType:', editFormData.transportType);
+   
     
     setFormData(editFormData);
     
     // Load saved transport vehicles if they exist
     if (tour.transportVehicles && Array.isArray(tour.transportVehicles)) {
-      console.log('✅ Loading transport vehicles:', tour.transportVehicles);
+     
       setSavedTransportVehicles(tour.transportVehicles);
-      console.log('🚗 Loaded transport vehicles:', tour.transportVehicles);
+     
     } else {
-      console.log('⚠️ No transport vehicles found or not an array');
-      console.log('⚠️ transportVehicles value:', tour.transportVehicles);
+     
       setSavedTransportVehicles([]);
     }
     
-    console.log('🔧 Form data set successfully');
+  
     
     setModalMode('edit');
     setSelectedTour(tour);
@@ -1453,13 +1306,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const filteredTours = tours.filter((tour: any) =>
     tour.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  console.log('📊 Tours Display Debug:', {
-    totalTours: tours.length,
-    filteredTours: filteredTours.length,
-    searchTerm: searchTerm,
-    tours: tours.map(t => ({ id: t._id, title: t.title, category: t.category }))
-  });
+
 
   const SectionHeader = ({ title, section }: { title: string; section: string }) => (
     <div 
@@ -1552,12 +1399,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTours.map((tour: any) => {
-                  console.log('Rendering tour card:', {
-                    title: tour.title,
-                    imageUrl: tour.imageUrl,
-                    images: tour.images,
-                    hasImage: !!(tour.imageUrl || tour.images?.[0])
-                  });
+               
                   
                   return (
                   <div key={tour._id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition flex flex-col h-full">
@@ -1567,7 +1409,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         alt={tour.title}
                         className="h-48 w-full object-cover"
                         onError={(e) => {
-                          console.log('Image failed to load:', tour.imageUrl || tour.images[0]);
+                        
                           (e.target as HTMLImageElement).style.display = 'none';
                           (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                         }}
@@ -2725,15 +2567,15 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                             e.preventDefault();
                             e.stopPropagation();
                             
-                            console.log('🔍 Add Schedule button clicked');
+                         
                             
-                            // Check if we have saved schedules already
+                            
                             if (formData.pricingSchedule.length > 0) {
-                              console.log('✅ Schedule already exists, allowing empty form for new schedule');
+                            
                             }
                             
                             addPricingSchedule();
-                            // Clear pricing schedule errors when adding
+                            
                             setFieldErrors((prev: any) => ({ 
                               ...prev, 
                               pricingSchedule: ''
@@ -3128,8 +2970,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                       <button 
                         type="button" 
                         onClick={() => {
-                          console.log('🔵 BUTTON CLICKED - Add Itinerary Item');
-                          console.log('🔵 Current Activity:', currentItinerary.activity);
+
                           addItinerary();
                         }} 
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg transition-all transform hover:scale-105"
