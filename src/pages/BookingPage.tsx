@@ -158,27 +158,10 @@ const BookingPage = () => {
   };
 
   const handleContactInfoChange = (field, value) => {
-    let newValue = value;
-    if (field === 'phone') {
-      // Keep only digits and limit to 15
-      newValue = String(value || '').replace(/\D/g, '').slice(0, 15);
-    }
     setContactInfo(prev => ({
       ...prev,
-      [field]: newValue
+      [field]: value
     }));
-  };
-
-  const isValidEmail = (email: string) => {
-    if (!email) return false;
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    return re.test(email.trim());
-  };
-
-  const isValidPhone = (phone: string) => {
-    if (!phone) return false;
-    const digitsOnly = phone.replace(/\D/g, '');
-    return /^\d{10,15}$/.test(digitsOnly);
   };
 
   const calculateTotal = () => {
@@ -294,34 +277,6 @@ const BookingPage = () => {
         title: "Date Required",
         description: "Please select a tour date.",
         variant: "destructive",
-      });
-      return;
-    }
-
-    // Contact validations
-    if (!contactInfo.fullName || contactInfo.fullName.trim().length < 2) {
-      toast({
-        title: 'Full Name Required',
-        description: 'Please enter your full name.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!isValidEmail(contactInfo.email)) {
-      toast({
-        title: 'Invalid Email',
-        description: 'Please enter a valid email address.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!isValidPhone(contactInfo.phone)) {
-      toast({
-        title: 'Invalid Phone Number',
-        description: 'Please enter a valid phone number (10–15 digits).',
-        variant: 'destructive'
       });
       return;
     }
@@ -826,29 +781,19 @@ const BookingPage = () => {
                         type="email"
                         value={contactInfo.email}
                         onChange={(e) => handleContactInfoChange('email', e.target.value)}
-                        pattern="[^\s@]+@[^\s@]+\.[^\s@]{2,}"
-                        inputMode="email"
                         required
                       />
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
-                   <Input
-  id="phone"
-  type="tel"
-  value={contactInfo.phone}
-  onChange={(e) => {
-    // Remove any non-digit characters
-    const onlyNumbers = e.target.value.replace(/\D/g, '');
-    handleContactInfoChange('phone', onlyNumbers);
-  }}
-  inputMode="numeric"
-  pattern="\d{10,15}"
-  maxLength={15}
-  required
-/>
-
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={contactInfo.phone}
+                      onChange={(e) => handleContactInfoChange('phone', e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
