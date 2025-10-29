@@ -129,6 +129,9 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     openingHours: ''
   });
 
+  // State for managing multiple transport vehicles (declare before effects that use it)
+  const [savedTransportVehicles, setSavedTransportVehicles] = useState([]);
+
   // Persist draft locally so accidental navigation doesn't clear the form
   useEffect(() => {
     try {
@@ -172,9 +175,6 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     netPrice: '',
     currency: 'USD'
   });
-
-  // State for managing multiple transport vehicles
-  const [savedTransportVehicles, setSavedTransportVehicles] = useState([]);
 
   // Debug savedTransportVehicles changes
   useEffect(() => {

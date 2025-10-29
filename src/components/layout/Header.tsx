@@ -118,13 +118,16 @@ const Header = () => {
         Contact
       </Link>
       {isAdmin && (
-        <Link 
-          to="/admin" 
-          className="text-foreground hover:text-primary transition-smooth font-medium"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          Admin
-        </Link>
+        <Button asChild variant="outline" className="font-medium">
+          <Link 
+            to="/admin" 
+            preventScrollReset
+            reloadDocument={false}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Admin
+          </Link>
+        </Button>
       )}
      
     </>

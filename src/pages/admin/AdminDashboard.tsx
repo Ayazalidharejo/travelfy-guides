@@ -28,7 +28,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import AdminPostDashboard from './AdminPostDashboard';
+import React, { Suspense } from 'react';
+const AdminPostDashboard = React.lazy(() => import('./AdminPostDashboard'));
 import NotificationBell from '@/components/admin/NotificationBell';
 import AdminChat from '@/components/AdminChat';
 import AdminConsultationsDashboard from '@/components/admin/AdminConsultationsDashboard';
@@ -418,7 +419,9 @@ const AdminDashboard = React.memo(() => {
             </div>
           </CardContent>
         </Card>
-        <AdminPostDashboard onTourChange={fetchStats} />
+        <Suspense fallback={<div className="mt-8 text-muted-foreground">Loading admin tools...</div>}>
+          <AdminPostDashboard onTourChange={fetchStats} />
+        </Suspense>
 
         {/* Refund Requests Modal */}
         <Dialog open={refundsOpen} onOpenChange={setRefundsOpen}>
