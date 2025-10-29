@@ -23,6 +23,12 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   // Image upload constraints (frontend guard)
   const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
+
+  const formatBytes = (bytes: number) => {
+    if (!bytes && bytes !== 0) return '';
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(2)}MB`;
+  };
   
   const [formData, setFormData] = useState<any>({
     title: '',
@@ -688,10 +694,19 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
     if (invalidByType.length > 0 || invalidBySize.length > 0) {
       const typeList = 'JPG, JPEG, PNG, WEBP';
-      const sizeMb = (MAX_IMAGE_SIZE_BYTES / (1024 * 1024)).toFixed(0);
+      const maxSizeLabel = formatBytes(MAX_IMAGE_SIZE_BYTES);
+      const details: string[] = [];
+      if (invalidBySize.length > 0) {
+        const lines = invalidBySize.slice(0, 3).map((f) => `${f.name} (${formatBytes(f.size)}) > ${maxSizeLabel}`);
+        details.push(`Too large: ${lines.join(', ')}${invalidBySize.length > 3 ? `, +${invalidBySize.length - 3} more` : ''}`);
+      }
+      if (invalidByType.length > 0) {
+        const lines = invalidByType.slice(0, 3).map((f) => `${f.name} (${f.type || 'unknown'})`);
+        details.push(`Wrong type: ${lines.join(', ')}${invalidByType.length > 3 ? `, +${invalidByType.length - 3} more` : ''}`);
+      }
       toast({
-        title: 'Invalid File',
-        description: `Only ${typeList} up to ${sizeMb}MB each are allowed. Remove unsupported/large files and try again.`,
+        title: 'File not allowed',
+        description: `Allowed: ${typeList}, up to ${maxSizeLabel} each. ${details.join(' | ')}`,
         variant: 'destructive',
       });
       // Continue with only valid files if any
@@ -2007,6 +2022,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                           </span>
                         </label>
                       </div>
+                        <p className="text-xs text-gray-500 mt-2">Allowed types: JPG, JPEG, PNG, WEBP. Max size: 2MB per file.</p>
                       {formData.galleryImages.length > 0 && (
                         <p className="text-xs text-green-600 mt-1">{formData.galleryImages.length} files selected</p>
                       )}
