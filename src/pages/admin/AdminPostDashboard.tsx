@@ -20,6 +20,10 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
   const [fieldErrors, setFieldErrors] = useState<any>({});
   const { toast } = useToast();
   
+  // Image upload constraints (frontend guard)
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
+  
   const [formData, setFormData] = useState<any>({
     title: '',
     category: '',
@@ -119,6 +123,29 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     openingHours: ''
   });
 
+  // Persist draft locally so accidental navigation doesn't clear the form
+  useEffect(() => {
+    try {
+      localStorage.setItem('adminTourDraft', JSON.stringify(formData));
+      localStorage.setItem('adminTourVehiclesDraft', JSON.stringify(savedTransportVehicles));
+    } catch {}
+  }, [formData, savedTransportVehicles]);
+
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('adminTourDraft');
+      const savedVehicles = localStorage.getItem('adminTourVehiclesDraft');
+      if (savedDraft && modalMode === 'create') {
+        setFormData((prev: any) => ({ ...prev, ...JSON.parse(savedDraft) }));
+      }
+      if (savedVehicles && modalMode === 'create') {
+        setSavedTransportVehicles(JSON.parse(savedVehicles));
+      }
+    } catch {}
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [currentFaq, setCurrentFaq] = useState({
     question: '',
     answer: '',
@@ -197,41 +224,22 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     'Luxury', 'Budget', 'Family', 'Romantic', 'Educational',  'private'
   ];
 
-  // const thingsToBringOptions = [
-  // const languageOptions = [
-  //   'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
-  //   'Urdu', 'Korean', 'Spanish', 'French', 'German'
-  // ];
-  //   'Comfortable walking shoes',
-  //   'Water bottle',
-  //   'Sunscreen',
-  //   'Hat/Cap',
-  //   'Camera',
-  //   'Rain jacket/Umbrella',
-  //   'Snacks',
-  //   'Medications',
-  //   'Swimwear',
-  //   'Extra clothes'
-  // ];
-
+  const thingsToBringOptions = [
   const languageOptions = [
-  'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
-  'Urdu', 'Korean', 'Spanish', 'French', 'German'
-];
-
-const thingsToBringOptions = [
-  'Comfortable walking shoes',
-  'Water bottle',
-  'Sunscreen',
-  'Hat/Cap',
-  'Camera',
-  'Rain jacket/Umbrella',
-  'Snacks',
-  'Medications',
-  'Swimwear',
-  'Extra clothes'
-];
-
+    'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
+    'Urdu', 'Korean', 'Spanish', 'French', 'German'
+  ];
+    'Comfortable walking shoes',
+    'Water bottle',
+    'Sunscreen',
+    'Hat/Cap',
+    'Camera',
+    'Rain jacket/Umbrella',
+    'Snacks',
+    'Medications',
+    'Swimwear',
+    'Extra clothes'
+  ];
 
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlotsOptions = [
@@ -673,15 +681,32 @@ const thingsToBringOptions = [
     
     if (files.length === 0) return;
 
-    
+    // Frontend type/size validation with user-friendly toasts
+    const invalidByType = files.filter((f) => !ALLOWED_IMAGE_TYPES.includes(f.type));
+    const invalidBySize = files.filter((f) => f.size > MAX_IMAGE_SIZE_BYTES);
+
+    if (invalidByType.length > 0 || invalidBySize.length > 0) {
+      const typeList = 'JPG, JPEG, PNG, WEBP';
+      const sizeMb = (MAX_IMAGE_SIZE_BYTES / (1024 * 1024)).toFixed(0);
+      toast({
+        title: 'Invalid File',
+        description: `Only ${typeList} up to ${sizeMb}MB each are allowed. Remove unsupported/large files and try again.`,
+        variant: 'destructive',
+      });
+      // Continue with only valid files if any
+    }
+
+    const validFiles = files.filter((f) => ALLOWED_IMAGE_TYPES.includes(f.type) && f.size <= MAX_IMAGE_SIZE_BYTES);
+    if (validFiles.length === 0) {
+      return;
+    }
 
     try {
       setUploading(true);
       
       if (field === 'mainImage') {
         // Upload single main image
-     
-        const response = await uploadAPI.uploadImage(files[0]);
+        const response = await uploadAPI.uploadImage(validFiles[0]);
      
         
         if (response.success) {
@@ -691,18 +716,17 @@ const thingsToBringOptions = [
           setFormData(prev => ({ 
             ...prev, 
             imageUrl: imageUrl,
-            mainImage: files[0]
+            mainImage: validFiles[0]
           }));
           
           toast({
             title: "Success",
-            description: "Image uploaded successfully!",
+            description: `Image uploaded successfully! Allowed types: JPG, JPEG, PNG, WEBP. Max size: 2MB.`,
           });
         }
       } else if (field === 'additionalImages' || field === 'galleryImages') {
         // Upload multiple images
-     
-        const response = await uploadAPI.uploadMultipleImages(files);
+        const response = await uploadAPI.uploadMultipleImages(validFiles);
        
         
         if (response.success) {
@@ -723,12 +747,12 @@ const thingsToBringOptions = [
           setFormData(prev => ({ 
             ...prev, 
             images: [...(prev.images || []), ...imageUrls],
-            [field]: files
+            [field]: validFiles
           }));
           
           toast({
             title: "Success",
-            description: `${imageUrls.length} images uploaded successfully!`,
+            description: `${imageUrls.length} image(s) uploaded! Max 2MB each.`,
           });
         }
       }
@@ -738,7 +762,7 @@ const thingsToBringOptions = [
       
       toast({
         title: "Upload Error",
-        description: error.response?.data?.message || "Failed to upload image(s). You can enter image URL manually.",
+        description: error.response?.data?.message || "Failed to upload image(s). Ensure type is JPG/PNG/WEBP and size ≤ 2MB.",
         variant: "destructive",
       });
     } finally {
@@ -1277,6 +1301,10 @@ const thingsToBringOptions = [
     setCurrentTagline('');
     setCurrentTheme('');
     setSavedTransportVehicles([]); // Reset saved transport vehicles
+    try {
+      localStorage.removeItem('adminTourDraft');
+      localStorage.removeItem('adminTourVehiclesDraft');
+    } catch {}
   };
 
   const openCreateModal = () => {
@@ -1871,6 +1899,8 @@ const thingsToBringOptions = [
                         </label>
                       </div>
 
+                      <p className="text-xs text-gray-500 mt-2">Allowed types: JPG, JPEG, PNG, WEBP. Max size: 2MB.</p>
+
                       {/* Enforce file uploads only - URL field removed */}
 
                       {/* Image Preview */}
@@ -1951,7 +1981,7 @@ const thingsToBringOptions = [
                           ))}
                         </div>
                       )}
-                      <p className="text-xs text-gray-500 mt-1">Upload JPG/PNG/WebP (multiple files allowed)</p>
+                      <p className="text-xs text-gray-500 mt-1">Upload JPG/JPEG/PNG/WEBP (multiple files allowed, max 2MB each)</p>
                     </div>
                     
                     <div>
