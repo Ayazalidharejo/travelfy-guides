@@ -224,22 +224,23 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     'Luxury', 'Budget', 'Family', 'Romantic', 'Educational',  'private'
   ];
 
-  const thingsToBringOptions = [
-  const languageOptions = [
-    'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
-    'Urdu', 'Korean', 'Spanish', 'French', 'German'
-  ];
-    'Comfortable walking shoes',
-    'Water bottle',
-    'Sunscreen',
-    'Hat/Cap',
-    'Camera',
-    'Rain jacket/Umbrella',
-    'Snacks',
-    'Medications',
-    'Swimwear',
-    'Extra clothes'
-  ];
+	const languageOptions = [
+		'English', 'Hindi', 'Arabic', 'Russian', 'Japanese', 'Chinese',
+		'Urdu', 'Korean', 'Spanish', 'French', 'German'
+	];
+
+	const thingsToBringOptions = [
+		'Comfortable walking shoes',
+		'Water bottle',
+		'Sunscreen',
+		'Hat/Cap',
+		'Camera',
+		'Rain jacket/Umbrella',
+		'Snacks',
+		'Medications',
+		'Swimwear',
+		'Extra clothes'
+	];
 
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const timeSlotsOptions = [
