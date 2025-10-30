@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 // ✅ Critical - Load immediately (above the fold)
 import HeroFinal from '@/components/home/HeroFinal';
 import TourCard from '@/components/tour/TourCard';
+import GetYourGuideTours from '@/components/Getyourguide';
 
 // 🚀 Lazy load - Load on scroll (below the fold)
 const IntroductionSection = lazy(() => import('@/components/IntroductionSection'));
@@ -170,6 +171,7 @@ const HomePage = () => {
       <Suspense fallback={<SectionLoader />}>
         <IntroductionSection/>
       </Suspense>
+      <GetYourGuideTours/>
       
       <Suspense fallback={<SectionLoader />}>
         <WhyChooseUs />
