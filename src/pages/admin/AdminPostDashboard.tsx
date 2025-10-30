@@ -91,6 +91,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
     themesList: [],
     selectedSellingPoints: [],
     thingsToBring: [],
+    additionalInfo: '',
     discountPercentage: '',
     validUntil: '',
     minGroup: '',
@@ -1120,7 +1121,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       'bookingType', 'singlePersonName', 'singlePersonAge', 'singlePersonNationality', 'singlePersonPreferences',
       'groupName', 'groupLeaderName', 'groupSize', 'groupType', 'groupSpecialRequests',
       'itineraryItems', 'includedDestinations', 'faqs', 'activities', 'pricingSchedule',
-      'highlightsList', 'taglinesList', 'themesList', 'selectedSellingPoints', 'thingsToBring',
+      'highlightsList', 'taglinesList', 'themesList', 'selectedSellingPoints', 'thingsToBring', 'additionalInfo',
       'sameDropOff', 'dropArea', 'dropLocation', 'dropPoint', 'dropDetails',
       'minGroup', 'maxGroup', 'capacity', 'duration', 'durationHours', 'startTime', 'endTime', 'operatingHours',
       'priceNumber', 'pricePerPerson', 'currency', 'discountPercentage', 'validUntil', 'transportVehicles'  // *** ADDED: 'transportVehicles' ***
@@ -1298,6 +1299,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
       themesList: [],
       selectedSellingPoints: [],
       thingsToBring: [],
+      additionalInfo: '',
       discountPercentage: '',
       validUntil: '',
       minGroup: '',
@@ -1365,6 +1367,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
         : (typeof tour.languages === 'string' && tour.languages.includes(',') 
             ? tour.languages.split(',').map((s: string) => s.trim()).filter(Boolean)
             : (tour.languages ? [tour.languages] : [])),
+      additionalInfo: tour.additionalInfo || '',
     };
     
    
@@ -2912,6 +2915,19 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
           onChange={handleInputChange} 
           rows={3}
           placeholder="What's not included" 
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+        />
+      </div>
+
+      {/* Additional Info */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Additional Info</label>
+        <textarea 
+          name="additionalInfo" 
+          value={formData.additionalInfo} 
+          onChange={handleInputChange} 
+          rows={2}
+          placeholder="Any extra information for this tour"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
         />
       </div>

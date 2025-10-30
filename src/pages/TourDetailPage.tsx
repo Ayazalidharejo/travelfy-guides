@@ -364,13 +364,7 @@ const TourDetailPage = () => {
                   </span>
                 </div>
               )}
-              {/* {tour.city && (
-                <div className="flex items-center gap-3 text-gray-700">
-                  <MapPin className="h-5 w-5 text-gray-500" />
-                  <span className="font-bold">Drop-Off:</span>
-                  <span>Return to {tour.city}</span>
-                </div>
-              )} */}
+              
               <div className="flex items-center gap-3 text-gray-700">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <span className="font-bold">Availability:</span>
@@ -680,6 +674,14 @@ const TourDetailPage = () => {
                 )}
               </div>
             </div>
+            {/* Interactive FAQs */}
+            {tour.additionalInfo && (
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Additional Info</h3>
+                <p className="text-gray-600 whitespace-pre-line">{tour.additionalInfo}</p>
+              </div>
+            )}
+            
             {/* Interactive FAQs */}
             {tour.faqs && tour.faqs.length > 0 && (
               <div className="bg-white rounded-2xl p-6 shadow-lg border">
