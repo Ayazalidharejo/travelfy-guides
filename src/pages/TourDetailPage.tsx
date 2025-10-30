@@ -489,19 +489,7 @@ const TourDetailPage = () => {
               <div className="border-2 border-gray-200 rounded-2xl p-6">
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* What's Exclude */}
-                  {excludesArray.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's exclude</h3>
-                      <ul className="space-y-3 list-un">
-                        {excludesArray.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            {/* <Check className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" /> */}
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                
 
 
                   {/* What's Included */}
@@ -512,6 +500,21 @@ const TourDetailPage = () => {
                         {includesArray.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-3">
                             {/* <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /> */}
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+
+                    {excludesArray.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What's exclude</h3>
+                      <ul className="space-y-3 list-un">
+                        {excludesArray.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            {/* <Check className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" /> */}
                             <span className="text-gray-700">{item}</span>
                           </li>
                         ))}
