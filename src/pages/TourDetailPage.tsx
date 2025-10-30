@@ -68,23 +68,44 @@ const TourDetailPage = () => {
     const fetchTour = async () => {
       try {
         setLoading(true);
-        const response = await postsAPI.getPost(id);
-        if (response.success) {
-          setTour(response.data);
-        } else {
-          navigate('/tours');
-          toast({
-            title: "Tour not found",
-            variant: "destructive",
-          });
+        // Try by Mongo _id first (24 hex chars)
+        let data: any = null;
+        if (typeof id === 'string' && id.length === 24) {
+          try {
+            const resp = await postsAPI.getPost(id);
+            if (resp?.success && resp.data) data = resp.data;
+          } catch {}
         }
+        // Fallback: try by slug via listing filter
+        if (!data) {
+          try {
+            const listResp = await postsAPI.getPosts({ limit: 1, slug: id });
+            const first = Array.isArray(listResp?.data) ? listResp.data[0] : null;
+            if (first) data = first;
+          } catch {}
+        }
+
+        if (data) {
+          setTour(data);
+          return;
+        }
+
+        // As a final fallback, search in first page by matching _id or slug
+        try {
+          const listResp = await postsAPI.getPosts({ limit: 100 });
+          const found = (listResp?.data || []).find((p: any) => p?._id === id || p?.slug === id);
+          if (found) {
+            setTour(found);
+            return;
+          }
+        } catch {}
+
+        navigate('/tours');
+        toast({ title: 'Tour not found', variant: 'destructive' });
       } catch (error) {
         console.error('Error:', error);
+        toast({ title: 'Server error', description: 'Unable to load tour. Please try again.', variant: 'destructive' });
         navigate('/tours');
-        toast({
-          title: "Error",
-          variant: "destructive",
-        });
       } finally {
         setLoading(false);
       }
