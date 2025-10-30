@@ -924,8 +924,8 @@ const TourDetailPage = () => {
 
       {/* Gallery Modal */}
       <Dialog open={showGalleryModal} onOpenChange={setShowGalleryModal}>
-        <DialogContent className="max-w-4xl p-0">
-          <div className="bg-black text-white relative">
+        <DialogContent className="max-w-4xl p-0 md:max-h-[85vh] overflow-hidden">
+          <div className="bg-black text-white relative max-h-[85vh] flex flex-col">
             <button
               type="button"
               onClick={() => setShowGalleryModal(false)}
@@ -933,7 +933,7 @@ const TourDetailPage = () => {
             >
               Close
             </button>
-            <div className="relative aspect-video w-full">
+            <div className="relative w-full h-[55vh] sm:h-[60vh] md:h-[65vh]">
               <img
                 src={allImages[activeImageIndex]}
                 alt={`Gallery ${activeImageIndex + 1}`}
@@ -955,7 +955,7 @@ const TourDetailPage = () => {
               </button>
             </div>
             {allImages.length > 1 && (
-              <div className="grid grid-cols-6 gap-2 p-3 bg-black">
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 p-3 bg-black overflow-y-auto max-h-[20vh]">
                 {allImages.map((img, idx) => (
                   <button
                     type="button"
