@@ -676,7 +676,7 @@ const TourDetailPage = () => {
             {/* Interactive FAQs */}
             {tour.additionalInfo && (
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg font-bold text-gray-800 mb-3">Additional Info</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Know Before You go</h3>
                 <p className="text-gray-600 whitespace-pre-line">{tour.additionalInfo}</p>
               </div>
             )}

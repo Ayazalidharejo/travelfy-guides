@@ -2921,7 +2921,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
 
       {/* Additional Info */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Additional Info</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Know Before You go</label>
         <textarea 
           name="additionalInfo" 
           value={formData.additionalInfo} 
