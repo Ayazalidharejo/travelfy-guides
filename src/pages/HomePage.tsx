@@ -6,6 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import HeroFinal from '@/components/home/HeroFinal';
 import TourCard from '@/components/tour/TourCard';
 import GetYourGuideTours from '@/components/Getyourguide';
+import KlookTours from '@/components/klook';
+import TripadvisorTours from '@/components/TripadvisorTours';
 
 // 🚀 Lazy load - Load on scroll (below the fold)
 const IntroductionSection = lazy(() => import('@/components/IntroductionSection'));
@@ -179,6 +181,12 @@ const HomePage = () => {
       <Suspense fallback={<SectionLoader />}>
       <GetYourGuideTours/>
       </Suspense>
+
+
+      <Suspense fallback={<SectionLoader />}>
+      <KlookTours/>
+      </Suspense>
+     
       {/* Explore Our Tours - Cards Design like ToursPage */}
       {featuredTours.length > 0 && (
         <section className="container mx-auto px-4 py-10">

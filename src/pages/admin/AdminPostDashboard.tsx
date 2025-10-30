@@ -3108,7 +3108,7 @@ const TourManagementApp: React.FC<TourManagementAppProps> = ({ onTourChange }) =
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Additional Cost</label>
                           <input 
-                            type="number" 
+                            type="text" 
                             value={currentItinerary.additionalCost} 
                             onChange={(e) => setCurrentItinerary({...currentItinerary, additionalCost: e.target.value})} 
                             className="w-full px-3 py-2 border border-gray-300 rounded-md" 
