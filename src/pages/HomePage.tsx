@@ -171,10 +171,13 @@ const HomePage = () => {
       <Suspense fallback={<SectionLoader />}>
         <IntroductionSection/>
       </Suspense>
-      <GetYourGuideTours/>
+     
       
       <Suspense fallback={<SectionLoader />}>
         <WhyChooseUs />
+      </Suspense>
+      <Suspense fallback={<SectionLoader />}>
+      <GetYourGuideTours/>
       </Suspense>
       {/* Explore Our Tours - Cards Design like ToursPage */}
       {featuredTours.length > 0 && (

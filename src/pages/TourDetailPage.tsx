@@ -55,6 +55,8 @@ const TourDetailPage = () => {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [tour, setTour] = useState(null);
+  console.log(tour,"tourtourtour");
+  
 
   
 
