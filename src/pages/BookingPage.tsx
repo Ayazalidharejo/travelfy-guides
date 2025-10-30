@@ -1000,7 +1000,7 @@ const BookingPage = () => {
 
         {/* Payment Dialog */}
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-xl w-[90vw] md:w-[720px] p-4 md:p-6 max-h-[85vh] overflow-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CreditCard className="h-6 w-6 text-green-600" />
