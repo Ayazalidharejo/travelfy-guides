@@ -2,6 +2,7 @@
 
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +62,7 @@ const TourDetailPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -79,9 +81,9 @@ const TourDetailPage = () => {
         // Fallback: try by slug via listing filter
         if (!data) {
           try {
-            const listResp = await postsAPI.getPosts({ limit: 1, slug: id });
-            const first = Array.isArray(listResp?.data) ? listResp.data[0] : null;
-            if (first) data = first;
+            const listResp = await postsAPI.getPosts({ limit: 50, slug: id });
+            const match = (Array.isArray(listResp?.data) ? listResp.data : []).find((p: any) => p?.slug === id);
+            if (match) data = match;
           } catch {}
         }
 
@@ -236,9 +238,19 @@ const TourDetailPage = () => {
               )}
             </div>
 
-            {/* Thumbnail Images - HORIZONTAL */}
+            {/* Thumbnail Images - HORIZONTAL with Gallery button */}
             {thumbnailImages.length > 0 && (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="relative">
+                <div className="absolute -top-8 right-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowGalleryModal(true)}
+                    className="text-sm px-3 py-1 rounded-full bg-black/70 text-white hover:bg-black"
+                  >
+                    Gallery
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
                 {thumbnailImages.map((img, idx) => (
                   <div
                     key={idx}
@@ -254,6 +266,7 @@ const TourDetailPage = () => {
                     />
                   </div>
                 ))}
+                </div>
               </div>
             )}
           </div>
@@ -908,6 +921,56 @@ const TourDetailPage = () => {
         tourTitle={tour?.title}
         tourDescription={tour?.tagline || tour?.description}
       />
+
+      {/* Gallery Modal */}
+      <Dialog open={showGalleryModal} onOpenChange={setShowGalleryModal}>
+        <DialogContent className="max-w-4xl p-0">
+          <div className="bg-black text-white relative">
+            <button
+              type="button"
+              onClick={() => setShowGalleryModal(false)}
+              className="absolute top-3 right-3 bg-white/20 hover:bg-white/30 rounded px-3 py-1"
+            >
+              Close
+            </button>
+            <div className="relative aspect-video w-full">
+              <img
+                src={allImages[activeImageIndex]}
+                alt={`Gallery ${activeImageIndex + 1}`}
+                className="w-full h-full object-contain bg-black"
+              />
+              <button
+                type="button"
+                onClick={() => setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveImageIndex((prev) => (prev + 1) % allImages.length)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded"
+              >
+                ›
+              </button>
+            </div>
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-6 gap-2 p-3 bg-black">
+                {allImages.map((img, idx) => (
+                  <button
+                    type="button"
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative aspect-video rounded overflow-hidden border ${idx === activeImageIndex ? 'border-green-500' : 'border-transparent'}`}
+                  >
+                    <img src={img} alt={`thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

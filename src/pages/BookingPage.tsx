@@ -124,24 +124,39 @@ const BookingPage = () => {
   const fetchTour = async () => {
     try {
       setLoading(true);
-      const response = await postsAPI.getPost(tourId);
-      if (response.success) {
-      
-        setTour(response.data);
-        if (!response.data?.reserveNowPayLater) {
-          setPaymentMethod('pay-now');
-        }
-        
-        if (response.data.pricingSchedule?.[0]?.timeSlots?.length > 0) {
-          setSelectedTimeSlot(response.data.pricingSchedule[0].timeSlots[0]);
-        }
-      } else {
-        navigate('/tours');
-        toast({
-          title: "Tour not found",
-          variant: "destructive",
-        });
+      let data: any = null;
+      if (typeof tourId === 'string' && tourId.length === 24) {
+        try {
+          const resp = await postsAPI.getPost(tourId);
+          if (resp?.success && resp.data) data = resp.data;
+        } catch {}
       }
+      if (!data) {
+        try {
+          const listResp = await postsAPI.getPosts({ limit: 50, slug: tourId });
+          const match = (Array.isArray(listResp?.data) ? listResp.data : []).find((p: any) => p?.slug === tourId);
+          if (match) data = match;
+        } catch {}
+      }
+      if (!data) {
+        try {
+          const listResp = await postsAPI.getPosts({ limit: 100 });
+          const found = (listResp?.data || []).find((p: any) => p?._id === tourId || p?.slug === tourId);
+          if (found) data = found;
+        } catch {}
+      }
+
+      if (data) {
+        setTour(data);
+        if (!data?.reserveNowPayLater) setPaymentMethod('pay-now');
+        if (data.pricingSchedule?.[0]?.timeSlots?.length > 0) {
+          setSelectedTimeSlot(data.pricingSchedule[0].timeSlots[0]);
+        }
+        return;
+      }
+
+      navigate('/tours');
+      toast({ title: 'Tour not found', variant: 'destructive' });
     } catch (error) {
       console.error('Error fetching tour:', error);
       navigate('/tours');
