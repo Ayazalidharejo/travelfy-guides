@@ -72,20 +72,25 @@ const TourDetailPage = () => {
     const fetchTour = async () => {
       try {
         setLoading(true);
-        // Try by Mongo _id first (24 hex chars)
+        // Prefer safe list queries first to avoid 500s on get-by-id
         let data: any = null;
-        if (typeof id === 'string' && id.length === 24) {
+        try {
+          const listResp = await postsAPI.getPosts({ limit: 50, slug: id });
+          const match = (Array.isArray(listResp?.data) ? listResp.data : []).find((p: any) => p?.slug === id);
+          if (match) data = match;
+        } catch {}
+        if (!data) {
+          try {
+            const listResp = await postsAPI.getPosts({ limit: 100 });
+            const found = (listResp?.data || []).find((p: any) => p?._id === id || p?.slug === id);
+            if (found) data = found;
+          } catch {}
+        }
+        // As a last resort, try by Mongo _id (can 500 on invalid/hidden ids)
+        if (!data && typeof id === 'string' && id.length === 24) {
           try {
             const resp = await postsAPI.getPost(id);
             if (resp?.success && resp.data) data = resp.data;
-          } catch {}
-        }
-        // Fallback: try by slug via listing filter
-        if (!data) {
-          try {
-            const listResp = await postsAPI.getPosts({ limit: 50, slug: id });
-            const match = (Array.isArray(listResp?.data) ? listResp.data : []).find((p: any) => p?.slug === id);
-            if (match) data = match;
           } catch {}
         }
 
@@ -94,15 +99,7 @@ const TourDetailPage = () => {
           return;
         }
 
-        // As a final fallback, search in first page by matching _id or slug
-        try {
-          const listResp = await postsAPI.getPosts({ limit: 100 });
-          const found = (listResp?.data || []).find((p: any) => p?._id === id || p?.slug === id);
-          if (found) {
-            setTour(found);
-            return;
-          }
-        } catch {}
+        // If still not found, redirect
 
         navigate('/tours');
         toast({ title: 'Tour not found', variant: 'destructive' });
