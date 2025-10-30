@@ -176,6 +176,67 @@ const ShareModal: React.FC<ShareModalProps> = ({onClose,isOpen,  tourTitle, tour
           </button>
         </div>
 
+        {/* Official Social Profiles */}
+        <div className="border-t pt-6 mb-6">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Our official profiles</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => window.open('https://www.tiktok.com/@karvaan_tours?is_from_webapp=1&sender_device=pc', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-black hover:bg-gray-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">TT</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-black">TikTok</span>
+            </button>
+            <button
+              onClick={() => window.open('https://www.youtube.com/channel/UC1SNJP176cWvb2ac38fnpPg', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-red-600 hover:bg-red-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">YT</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-red-600">YouTube</span>
+            </button>
+            <button
+              onClick={() => window.open('https://www.facebook.com/profile.php?id=61582604152338', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">FB</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-600">Facebook</span>
+            </button>
+            <button
+              onClick={() => window.open('https://www.instagram.com/karvaantours/', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-pink-600 hover:bg-pink-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">IG</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-pink-600">Instagram</span>
+            </button>
+            <button
+              onClick={() => window.open('https://www.linkedin.com/company/karvaan-tours-japan', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-blue-700 hover:bg-blue-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">IN</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700">LinkedIn</span>
+            </button>
+            <button
+              onClick={() => window.open('https://x.com/karvaan_tours', '_blank')}
+              className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all group"
+            >
+              <div className="w-8 h-8 bg-blue-400 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs">X</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-400">Twitter (X)</span>
+            </button>
+          </div>
+        </div>
+
         {/* Link Section */}
         <div className="border-t pt-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
