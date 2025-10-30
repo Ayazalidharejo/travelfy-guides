@@ -41,7 +41,7 @@ const TourCard: React.FC<TourCardProps> = ({ id, title, imageUrl, description, u
         <div className="flex-grow"></div>
         <CardFooter>
           <Button className="w-full bg-[#ff5722] hover:bg-[#e64a19] text-white font-medium rounded-md">
-            Book Now
+            View on Klook
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
