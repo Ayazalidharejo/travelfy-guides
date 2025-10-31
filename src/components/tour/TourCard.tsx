@@ -82,7 +82,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
 
   return (
     <Card
-      className="group overflow-hidden hover:shadow-large transition-smooth border-0 bg-gradient-card cursor-pointer"
+      className="group overflow-hidden hover:shadow-large transition-smooth border-0 bg-gradient-card cursor-pointer relative pb-12"
       onClick={handleCardClick}
       tabIndex={0}
       role="button"
@@ -124,7 +124,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         </div>
       </div>
 
-      <CardContent className="p-4 pb-12 space-y-3 relative">
+      <CardContent className="p-4 space-y-3">
         <div className="space-y-2">
           <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-smooth">
             {tour.title}
@@ -212,7 +212,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
           </div>
         )}
-        <div className="flex absolute left-4 right-4 bottom-3 items-center justify-between pt-2 border-t">
+        <div className="flex absolute left-0 right-0 bottom-0 items-center justify-between pt-2 border-t px-4 pb-2">
           <div className="flex-1">
             {/* Enhanced Price Display with Minimum Vehicle Price */}
             {(() => {
