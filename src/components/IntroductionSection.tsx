@@ -19,8 +19,11 @@ export default function IntroductionSection() {
           Our expert team carefully designs each tour to ensure you discover the authentic essence of every location. 
           With years of experience in the travel industry, we pride ourselves on providing personalized service and attention to detail. 
           From breathtaking landscapes to cultural immersion, we handle every aspect of your journey. 
-          At Karvaan Tours, we believe travel is not just about destinations, but about creating memories that last a lifetime. 
+          At Karvaan Tours, we believe travel is not just about destinations, but about creating memories that last a lifetime. Explore curated tours in Japan—guided tours in Japan, private tours in Japan, small group tours in Japan, and family tours in Japan. Discover the best Japan tour packages, Japan tour package price options, and tours in Japan from USA, Australia, and Philippines for 2024, 2025, and 2026.
           Join us and let us turn your travel dreams into reality.
+        </p>
+        <p className="text-base md:text-lg text-gray-700 mt-4">
+          We currently operate tours in: Mount Fuji, Hakone, Gotemba, Tokyo, Nikko, and Nagano.
         </p>
       </div>
       

@@ -11,7 +11,7 @@ const NikkoDetail = ({ onClose }) => {
     name: "Nikko",
     subtitle: "Sacred Mountains & UNESCO Treasures",
     mainImage: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&h=800&fit=crop",
-    description: `Nikko, a mountain town north of Tokyo, is home to UNESCO World Heritage shrines and temples set among stunning natural scenery. It combines rich history, spiritual significance, and breathtaking landscapes, making it one of Japan's most cherished destinations.`,
+  description: `Nikko, a mountain town north of Tokyo, is home to UNESCO World Heritage shrines and temples set among stunning natural scenery. It combines rich history, spiritual significance, and breathtaking landscapes, making it one of Japan's most cherished destinations. Ideal for guided tours in Japan, private tours in Japan, and small group tours in Japan 2024–2026.`,
 
 longDescription: `Nikko has been a center of Shinto and Buddhist mountain worship for over 1,200 years, attracting pilgrims, artists, and travelers for generations. The town is most famous for its ornate Toshogu Shrine, dedicated to Tokugawa Ieyasu, the founder of the Tokugawa shogunate. Toshogu Shrine is a masterpiece of craftsmanship, featuring intricate wood carvings, vibrant colors, golden accents, and symbolic statues such as the famous "Three Wise Monkeys" representing the principle of see no evil, hear no evil, speak no evil. The shrine complex includes Yomeimon Gate, often called the “Gate of Sunlight,” with its elaborate carvings and stunning architectural details that reflect Edo-period artistry at its peak.
 

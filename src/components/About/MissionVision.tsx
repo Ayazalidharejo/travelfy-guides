@@ -19,9 +19,7 @@ const MissionVision: React.FC = () => {
               <span className="text-white">🎯</span> Mission
             </h3>
             <p className="text-gray-700 text-lg leading-relaxed">
-              To offer immersive, culturally rich, and personalized travel experiences across Japan — 
-              connecting hearts, stories, and landscapes through every journey with{" "}
-              <span className="font-semibold hover:text-[#284078] text-[#5C7AC0]">Karvaan Tours</span>.
+              To offer immersive, culturally rich, and personalized travel experiences across Japan — including guided tours in Japan, private tours in Japan, and small group tours in Japan — connecting hearts, stories, and landscapes through every journey with <span className="font-semibold hover:text-[#284078] text-[#5C7AC0]">Karvaan Tours</span>.
             </p>
           </div>
 
@@ -31,9 +29,7 @@ const MissionVision: React.FC = () => {
           <span className="text-white">🌅</span> Vision
             </h3>
             <p className="text-gray-700 text-lg leading-relaxed">
-              To become the most trusted and beloved travel partner for discovering Japan — known for authenticity, 
-              local expertise, and unforgettable memories. We envision <span className="font-semibold icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">Karvaan Tours</span> 
-                as a symbol of meaningful travel.
+              To become the most trusted and beloved travel partner for discovering Japan — known for authenticity, local expertise, and unforgettable memories. From family tours in Japan and senior-friendly trips to luxury tours in Japan and tours in Japan by train, we envision <span className="font-semibold icons me green text-transparent bg-clip-text bg-[linear-gradient(to_left,_black_20%,_black_0%,_#5C7AC0_60%)]">Karvaan Tours</span> as a symbol of meaningful travel.
             </p>
           </div>
         </div>

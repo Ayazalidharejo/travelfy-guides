@@ -178,14 +178,7 @@ const HomePage = () => {
       <Suspense fallback={<SectionLoader />}>
         <WhyChooseUs />
       </Suspense>
-      <Suspense fallback={<SectionLoader />}>
-      <GetYourGuideTours/>
-      </Suspense>
-
-
-      <Suspense fallback={<SectionLoader />}>
-      <KlookTours/>
-      </Suspense>
+     
      
       {/* Explore Our Tours - Cards Design like ToursPage */}
       {featuredTours.length > 0 && (
@@ -214,7 +207,14 @@ const HomePage = () => {
           </div>
         </section>
       )}
-   
+    <Suspense fallback={<SectionLoader />}>
+      <GetYourGuideTours/>
+      </Suspense>
+
+
+      <Suspense fallback={<SectionLoader />}>
+      <KlookTours/>
+      </Suspense>
       {/* Stats Section - EXACT Design */}
       
 

@@ -43,7 +43,7 @@ const CoreValues: React.FC = () => {
           Our <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-black">Core Values</span>
         </h2>
         <p className="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">
-          These are the principles that guide everything we do at Karvaan Tours.
+          These are the principles that guide everything we do at Karvaan Tours—from crafting the best Japan tour packages to designing guided and self guided tours in Japan for travelers from the USA, Australia, and the Philippines.
         </p>
       </div>
 

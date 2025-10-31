@@ -24,7 +24,7 @@ const AboutHero: React.FC = () => {
           </span>
         </h1>
         <p className="text-lg md:text-xl max-w-3xl text-gray-200">
-          Learn about our journey, our values, and the passion behind curating unforgettable travel experiences in Japan.
+          Learn about our journey, our values, and the passion behind curating unforgettable travel experiences in Japan—covering tours in Japan Tokyo, guided tours in Japan, private tours in Japan, and small group tours in Japan for 2024, 2025 and 2026.
         </p>
       </div>
     </section>

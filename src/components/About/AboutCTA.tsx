@@ -8,7 +8,7 @@ const AboutCTA: React.FC = () => {
         Ready to start your unforgettable journey with <span className="underline decoration-white/70">Karvaan Tours</span>?
       </h2>
       <p className="text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-        Contact us today and let’s craft your perfect Japan travel experience!
+        Contact us today and let’s craft your perfect Japan travel experience—best Japan tour packages, luxury tours in Japan, walking tours in Japan, and tours in Japan including train journeys.
       </p>
       <div className="flex justify-center gap-6">
         <a

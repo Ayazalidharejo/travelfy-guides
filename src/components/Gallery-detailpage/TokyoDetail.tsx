@@ -11,7 +11,7 @@ const TokyoDetail = ({ onClose }) => {
     name: "Tokyo",
     subtitle: "Where Tradition Meets Tomorrow",
     mainImage: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=800&fit=crop",
-    description: `Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples, offering a unique contrast of tradition and innovation. The city pulses with energy yet also provides pockets of serenity, making it a destination that captivates every type of traveler.`,
+    description: `Tokyo, Japan's bustling capital, seamlessly blends ultra-modern architecture with historic temples, offering a unique contrast of tradition and innovation. The city pulses with energy yet also provides pockets of serenity, making it a destination that captivates every type of traveler. Perfect for tours in Japan Tokyo, guided tours in Japan, and small group tours in Japan—popular with travelers from the USA, Australia, and the Philippines.`,
 
 longDescription: `Tokyo is a city of contrasts where ancient temples and shrines stand gracefully beside futuristic skyscrapers, neon-lit streets, and high-tech innovations. As the world's most populous metropolitan area with over 37 million people, Tokyo offers an endless array of experiences for visitors. From historic sites like Senso-ji Temple in Asakusa and Meiji Shrine in Shibuya to contemporary landmarks such as the Tokyo Skytree and Tokyo Tower, the city harmonizes the old and the new, reflecting centuries of culture alongside cutting-edge modernity.
 

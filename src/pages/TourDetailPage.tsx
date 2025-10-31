@@ -726,32 +726,6 @@ const TourDetailPage = () => {
               </div>
             )}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             {/* Rating and Reviews Section */}
             {tour?._id && (
               <div className="mt-8">
@@ -794,37 +768,8 @@ const TourDetailPage = () => {
 
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               
-
-
-                
-
-                
-
-               
                 
               </div>
-
-            
-
-              
-
-
-            
-
-             
-
-
-
-            
-
-           
-
-
-            
-
-
-
 
             </div>
 
@@ -873,13 +818,7 @@ const TourDetailPage = () => {
                 >
                   Check Availability
                 </Button>
-                {/* <Button
-                  variant="outline"
-                  className="w-full py-6 text-lg rounded-xl font-semibold border-2"
-                  onClick={handleBookNow}
-                >
-                  Add to Cart
-                </Button> */}
+              
               </div>
 
               <Separator className="my-6" />

@@ -33,7 +33,7 @@ const Achievements: React.FC = () => {
            <span className="text-transparent bg-clip-text icons me green text-transparent bg-clip-text bg-[#5C7AC0]">Our Achievements</span>
         </h2>
         <p className="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">
-          We’re proud of what we’ve accomplished together with our amazing travelers.
+          We’re proud of what we’ve accomplished together with our amazing travelers—delivering top-rated tours in Japan 2024–2026, small group tours in Japan, and guided tours in Japan Tokyo with transparent Japan tour package price options.
         </p>
       </div>
 

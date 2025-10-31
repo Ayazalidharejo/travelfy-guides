@@ -11,7 +11,7 @@ const NaganoDetail = ({ onClose }) => {
     name: "Nagano",
     subtitle: "Alpine Beauty & Snow Monkeys",
     mainImage:   "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=800&fit=crop",
-    description: `Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs. This region blends natural beauty, cultural heritage, and unique wildlife experiences, making it a must-visit destination in Japan.`,
+    description: `Nagano, nestled in Japan's Northern Alps, offers world-class skiing, the famous Zenko-ji Temple, and wild snow monkeys bathing in hot springs. This region blends natural beauty, cultural heritage, and unique wildlife experiences, making it a must-visit destination in Japan. Popular for family tours in Japan, senior-friendly guided tours in Japan, and walking tours in Japan.`,
 
 longDescription: `Nagano Prefecture is often called the "roof of Japan" because it encompasses much of the Japanese Alps, a vast mountain range known for its towering peaks, scenic valleys, and pristine nature. The region has long been celebrated for outdoor adventures, from skiing and snowboarding in the winter to hiking, trekking, and mountain climbing in the warmer months. The 1998 Winter Olympics were hosted in Nagano, cementing its global reputation as a premier winter sports destination, with modern resorts, well-maintained trails, and spectacular alpine scenery attracting visitors from all over the world.
 
