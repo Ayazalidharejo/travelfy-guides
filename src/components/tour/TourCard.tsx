@@ -206,11 +206,27 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           </div>
         )}
         {tour.languages && (
-          <div className="flex items-center gap-3 text-gray-700">
-            <MessageSquare className="h-5 w-5 text-gray-500" /> <br />
-            {/* <span className="font-bold">Languages:</span> */}
-            <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
-          </div>
+         <div className="flex items-center gap-3 text-gray-700 group relative">
+  <MessageSquare className="h-5 w-5 text-gray-500" /> 
+  {/* <span className="font-bold">Languages:</span> */}
+  <span className="cursor-pointer">
+    {(() => {
+      const langText = Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages;
+      return langText.length > 20 ? `${langText.slice(0, 20)}...` : langText;
+    })()}
+  </span>
+  
+  {/* Tooltip */}
+  {(() => {
+    const langText = Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages;
+    return langText.length > 20 && (
+      <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg z-10 whitespace-nowrap">
+        {langText}
+        <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+      </div>
+    );
+  })()}
+</div>
         )}
         <div className="flex absolute left-0 right-0 bottom-0 items-center justify-between pt-2 border-t px-4 pb-2">
           <div className="flex-1">
