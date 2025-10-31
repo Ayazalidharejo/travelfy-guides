@@ -220,9 +220,9 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
    {(() => {
      const langText = Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages;
      return langText.length > 20 && (
-       <div className="absolute left-0 top-full mt-2 pointer-events-none opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg z-50 whitespace-nowrap transition-opacity transition-transform duration-200 ease-out transform group-hover:translate-y-1">
+       <div className="absolute left-0 bottom-full mb-2 pointer-events-none opacity-0 group-hover:opacity-100 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg z-50 max-w-[260px] sm:max-w-xs whitespace-normal break-words transition-all duration-200 ease-out transform -translate-y-1 group-hover:translate-y-0">
          {langText}
-         <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+         <div className="absolute -bottom-1 left-4 w-2 h-2 bg-gray-800 transform rotate-45"></div>
        </div>
      );
    })()}
