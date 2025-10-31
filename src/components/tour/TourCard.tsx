@@ -207,7 +207,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         )}
         {tour.languages && (
           <div className="flex items-center gap-3 text-gray-700">
-            <MessageSquare className="h-5 w-5 text-gray-500" />
+            <MessageSquare className="h-5 w-5 text-gray-500" /> <br />
             {/* <span className="font-bold">Languages:</span> */}
             <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
           </div>
