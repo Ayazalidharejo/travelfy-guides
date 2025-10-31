@@ -124,7 +124,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         </div>
       </div>
 
-      <CardContent className="p-4 space-y-3 relative">
+      <CardContent className="p-4 pb-12 space-y-3 relative">
         <div className="space-y-2">
           <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-smooth">
             {tour.title}
@@ -212,7 +212,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <span>{Array.isArray(tour.languages) ? tour.languages.join(', ') : tour.languages}</span>
           </div>
         )}
-        <div className="flex absolute bottom-3 items-center justify-between pt-2 border-t">
+        <div className="flex absolute left-4 right-4 bottom-3 items-center justify-between pt-2 border-t">
           <div className="flex-1">
             {/* Enhanced Price Display with Minimum Vehicle Price */}
             {(() => {

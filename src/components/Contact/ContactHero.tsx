@@ -11,7 +11,7 @@ const ContactHero: React.FC = () => {
       }}
     >
       {/* Overlay with blur */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/40 "></div>
 
       {/* Content */}
       <div className="relative text-center text-white px-6 max-w-3xl">
